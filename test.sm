@@ -1,0 +1,7 @@
+
+
+fn main()
+{
+    integer number = 4 + 12;
+    return number;
+}
