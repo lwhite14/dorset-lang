@@ -4,4 +4,9 @@ project(summit)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(summit src/main.cpp)
+add_executable(summit 
+    src/main.cpp
+    src/error.cpp
+    src/scanner.cpp
+    src/token.cpp
+)
