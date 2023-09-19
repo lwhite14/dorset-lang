@@ -47,14 +47,15 @@ class Token
 private:
     TokenType type;
     std::string lexeme;
+    std::string* literal;
     int line; 
 
 public:
-    Token(TokenType type, std::string lexeme, int line);
-    std::string toString();
+    Token(TokenType type, std::string lexeme, std::string* literal, int line);
 
     TokenType getType();
     std::string getTypeStr();
     std::string getLexeme();
+    std::string getLiteral();
     int getLine();
 };

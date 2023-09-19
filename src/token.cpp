@@ -2,18 +2,13 @@
 
 #include "../deps/magic_enum.hpp"
 
-Token::Token(TokenType type, std::string lexeme, int line) 
+Token::Token(TokenType type, std::string lexeme, std::string* literal, int line) 
 {
     this->type = type;
     this->lexeme = lexeme;
+    this->literal = literal;
     this->line = line;
 }
-
-std::string Token::toString() 
-{
-    return "|" + std::string(magic_enum::enum_name(type)) + "| --- |" + lexeme + "| --- |" + std::to_string(line) + "|";
-}
-
 
 TokenType Token::getType()
 {
@@ -28,6 +23,15 @@ std::string Token::getTypeStr()
 std::string Token::getLexeme()
 {
     return lexeme;
+}
+
+std::string Token::getLiteral()
+{
+    if (literal == nullptr)
+    {
+        return "";
+    }
+    return *literal;
 }
 
 int Token::getLine()

@@ -17,7 +17,7 @@ std::vector<Token> Scanner::scanTokens()
       scanToken();
     }
 
-    tokens.push_back(Token(_EOF, "", line));
+    tokens.push_back(Token(_EOF, "", nullptr, line));
     return tokens;
 }
 
@@ -83,8 +83,13 @@ char Scanner::advance()
 
 void Scanner::addToken(TokenType type) 
 {
+    addToken(type, nullptr);
+}
+
+void Scanner::addToken(TokenType type, std::string* literal)
+{
     std::string text = source.substr(start, current - start);
-    tokens.push_back(Token(type, text, line));
+    tokens.push_back(Token(type, text, literal, line));
 }
 
 bool Scanner::match(char expected) 
@@ -129,8 +134,8 @@ void Scanner::string()
 
     advance();
 
-    std::string value = source.substr(start + 1, (current - 1) - (start + 1));
-    addToken(STRING);
+    std::string* value = new std::string(source.substr(start + 1, (current - 1) - (start + 1)));
+    addToken(STRING, value);
 }
 
 void Scanner::number() 
@@ -149,7 +154,8 @@ void Scanner::number()
         }
     }
 
-    addToken(NUMBER);
+    std::string* value = new std::string(source.substr(start, current - start));
+    addToken(NUMBER, value);
 }
 
 char Scanner::peekNext() 

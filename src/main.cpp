@@ -32,22 +32,29 @@ void outputTokenInfo(std::vector<Token> tokens)
 {
     std::string headingOne = "Token Type";
     std::string headingTwo = "Lexeme";
-    std::string headingThree = "Line";
+    std::string headingThree = "Literal";
 
-    std::cout << headingOne;
-    std::cout << std::setw(30 - headingOne.length());
-    std::cout << headingTwo;
-    std::cout << std::setw(15);
-    std::cout << headingThree;
+    std::cout << std::setw(20);
+    std::cout << "Token Type";
+    std::cout << std::setw(20);
+    std::cout << "Lexeme";
+    std::cout << std::setw(20);
+    std::cout << "Literal";
+    std::cout << std::setw(20);
+    std::cout << "Line";
     std::cout << std::endl;
+    std::cout << "----------------------------------------------";
     std::cout << "----------------------------------------------" << std::endl;
 
     for (auto token : tokens) 
     {
+        std::cout << std::setw(20);
         std::cout << token.getTypeStr();
-        std::cout << std::setw(30 - token.getTypeStr().length());
+        std::cout << std::setw(20);
         std::cout << token.getLexeme();
-        std::cout << std::setw(15);
+        std::cout << std::setw(20);
+        std::cout << token.getLiteral();
+        std::cout << std::setw(20);
         std::cout << token.getLine();
         std::cout << std::endl;
     }
