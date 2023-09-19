@@ -42,7 +42,6 @@ void Scanner::scanToken()
     {
         if (match('/')) 
         {
-          // A comment goes until the end of the line.
             while (peek() != '\n' && !isAtEnd()) advance();
         } 
         else 
@@ -50,9 +49,7 @@ void Scanner::scanToken()
             addToken(SLASH);
         }
     }
-    else if (c == ' ') {}
-    else if (c == '\r') {}
-    else if (c == '\t') {}
+    else if (c == ' ' || c == '\r' || c == '\t') {}
     else if (c == '\n') { line++; }
     else if (c == '"') { string(); }
     else if (c == 'o') { if (match('r')) { addToken(OR); } }
@@ -130,24 +127,26 @@ void Scanner::string()
         return;
     }
 
-    // The closing ".
     advance();
 
-    // Trim the surrounding quotes.
     std::string value = source.substr(start + 1, (current - 1) - (start + 1));
     addToken(STRING);
 }
 
 void Scanner::number() 
 {
-    while (isdigit(peek())) advance();
-
-    // Look for a fractional part.
-    if (peek() == '.' && isdigit(peekNext())) {
-        // Consume the "."
+    while (isdigit(peek()))
+    {
         advance();
+    }
 
-        while (isdigit(peek())) advance();
+    if (peek() == '.' && isdigit(peekNext())) 
+    {
+        advance();
+        while (isdigit(peek()))
+        {
+            advance();
+        }
     }
 
     addToken(NUMBER);
@@ -164,7 +163,10 @@ char Scanner::peekNext()
 
 void Scanner::identifier() 
 {
-    while (isalnum(peek())) advance();
+    while (isalnum(peek())) 
+    {
+        advance();
+    }
 
     std::string text = source.substr(start, current - start);
     TokenType type;
@@ -179,18 +181,3 @@ void Scanner::identifier()
     }
     addToken(type);
 }
-
-// bool Scanner::isDigit(char c) 
-// {
-//     return c >= '0' && c <= '9';
-// } 
-
-// bool Scanner::isAlpha(char c)
-// {
-//     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||  c == '_';
-// }
-
-// bool Scanner::isAlphaNumeric(char c) 
-// {
-//     return isAlpha(c) || isDigit(c);
-// }

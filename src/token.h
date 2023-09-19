@@ -52,4 +52,9 @@ private:
 public:
     Token(TokenType type, std::string lexeme, int line);
     std::string toString();
+
+    TokenType getType();
+    std::string getTypeStr();
+    std::string getLexeme();
+    int getLine();
 };

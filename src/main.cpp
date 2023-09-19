@@ -2,9 +2,11 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <iomanip>
 
 #include "error.h"
 #include "scanner.h"
+
 
 std::string getSourceContents(std::string fileName)
 {
@@ -19,14 +21,35 @@ std::string getSourceContents(std::string fileName)
 }
 
 
-void tokenize(std::string contents)
+std::vector<Token> tokenize(std::string contents)
 {
     Scanner* scanner = new Scanner(contents);
-    std::vector<Token> tokens = scanner->scanTokens();
+    return scanner->scanTokens();
+}
+
+
+void outputTokenInfo(std::vector<Token> tokens)
+{
+    std::string headingOne = "Token Type";
+    std::string headingTwo = "Lexeme";
+    std::string headingThree = "Line";
+
+    std::cout << headingOne;
+    std::cout << std::setw(30 - headingOne.length());
+    std::cout << headingTwo;
+    std::cout << std::setw(15);
+    std::cout << headingThree;
+    std::cout << std::endl;
+    std::cout << "----------------------------------------------" << std::endl;
 
     for (auto token : tokens) 
     {
-        std::cout << token.toString() << std::endl;
+        std::cout << token.getTypeStr();
+        std::cout << std::setw(30 - token.getTypeStr().length());
+        std::cout << token.getLexeme();
+        std::cout << std::setw(15);
+        std::cout << token.getLine();
+        std::cout << std::endl;
     }
 }
 
@@ -41,13 +64,9 @@ int main(int argc, char* argv[])
 {
     if (argc == 2)
     {
-        std::string fileContents = getSourceContents(argv[1]);
+        std::vector<Token> tokens = tokenize(getSourceContents(argv[1]));
 
-        tokenize(fileContents);
-
-        std::cout << "\n--- ---  ---  --- ---" << std::endl;
-        std::cout << fileContents << std::endl;
-        std::cout << "--- ---  ---  --- ---\n" << std::endl;
+        outputTokenInfo(tokens);
     }
     else
     {
