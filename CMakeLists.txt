@@ -9,4 +9,7 @@ add_executable(summit
     src/error.cpp
     src/scanner.cpp
     src/token.cpp
+    src/ast.cpp
+    src/parser.cpp
+    src/outpututils.cpp
 )
