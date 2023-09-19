@@ -1,5 +1,6 @@
 fn main()
 {
-    integer number = 4 + 12;
+    var number = 4 + 12;
+    var stringExample = "Hello World";
     return number;
 }

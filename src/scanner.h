@@ -1,27 +1,7 @@
 #include <string>
 #include <vector>
-#include <map>
 
 #include "token.h"
-
-static std::map<std::string, TokenType> keywords = {
-    {"and",    AND},
-    {"class",  CLASS},
-    {"else",   ELSE},
-    {"false",  FALSE},
-    {"for",    FOR},
-    {"fun",    FUN},
-    {"if",     IF},
-    {"nil",    NIL},
-    {"or",     OR},
-    {"print",  PRINT},
-    {"return", RETURN},
-    {"super",  SUPER},
-    {"this",   THIS},
-    {"true",   TRUE},
-    {"var",    VAR},
-    {"while",  WHILE}
-};
 
 class Scanner
 {
@@ -39,12 +19,9 @@ private:
     bool match(char expected) ;
     char peek();
     void string();
-    bool isDigit(char c);
     void number();
     char peekNext();
     void identifier();
-    bool isAlpha(char c);
-    bool isAlphaNumeric(char c);
 
 public:
     Scanner(std::string source);

@@ -12,9 +12,8 @@ std::string getSourceContents(std::string fileName)
     std::string text;
     std::string output;
     while (getline(file, text))
-     {
-        output += text;
-        output += " ";
+    {
+        output = output + text + '\n';
     }
     return output;
 }
@@ -46,7 +45,9 @@ int main(int argc, char* argv[])
 
         tokenize(fileContents);
 
-        std::cout << "\n" << fileContents << std::endl;
+        std::cout << "\n--- ---  ---  --- ---" << std::endl;
+        std::cout << fileContents << std::endl;
+        std::cout << "--- ---  ---  --- ---\n" << std::endl;
     }
     else
     {

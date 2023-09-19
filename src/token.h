@@ -1,4 +1,5 @@
 #include <string>
+#include <map>
 
 enum TokenType 
 {
@@ -16,10 +17,29 @@ enum TokenType
     IDENTIFIER, STRING, NUMBER,
 
     // Keywords.
-    AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
+    AND, CLASS, ELSE, FALSE, FUNCTION, FOR, IF, NIL, OR,
     PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE, 
 
     _EOF
+};
+
+static std::map<std::string, TokenType> keywords = {
+    {"and",    AND},
+    {"class",  CLASS},
+    {"else",   ELSE},
+    {"false",  FALSE},
+    {"for",    FOR},
+    {"fn",     FUNCTION},
+    {"if",     IF},
+    {"nil",    NIL},
+    {"or",     OR},
+    {"print",  PRINT},
+    {"return", RETURN},
+    {"super",  SUPER},
+    {"this",   THIS},
+    {"true",   TRUE},
+    {"var",    VAR},
+    {"while",  WHILE}
 };
 
 class Token 

@@ -1,5 +1,7 @@
 #include "scanner.h"
 
+#include <ctype.h>
+
 #include "error.h"
 
 Scanner::Scanner(std::string source) 
@@ -53,20 +55,21 @@ void Scanner::scanToken()
     else if (c == '\t') {}
     else if (c == '\n') { line++; }
     else if (c == '"') { string(); }
-    else if (c == '0') { if (match('r')) { addToken(OR); } }
+    else if (c == 'o') { if (match('r')) { addToken(OR); } }
     else 
     { 
-        if (isDigit(c)) 
+        if (isdigit(c)) 
         {
             number();
         } 
-        else if (isAlpha(c)) 
+        else if (isalpha(c)) 
         {
             identifier();
         }
         else 
         {
-            ErrorHandler::error(line, "Unexpected character.");        
+            std::cout << c << std::endl;
+            ErrorHandler::error(line, current, "Unexpected character.");        
         }
     }
 }
@@ -83,7 +86,7 @@ char Scanner::advance()
 
 void Scanner::addToken(TokenType type) 
 {
-    std::string text = source.substr(start, current);
+    std::string text = source.substr(start, current - start);
     tokens.push_back(Token(type, text, line));
 }
 
@@ -131,25 +134,20 @@ void Scanner::string()
     advance();
 
     // Trim the surrounding quotes.
-    std::string value = source.substr(start + 1, current - 1);
+    std::string value = source.substr(start + 1, (current - 1) - (start + 1));
     addToken(STRING);
 }
 
-bool Scanner::isDigit(char c) 
-{
-    return c >= '0' && c <= '9';
-} 
-
 void Scanner::number() 
 {
-    while (isDigit(peek())) advance();
+    while (isdigit(peek())) advance();
 
     // Look for a fractional part.
-    if (peek() == '.' && isDigit(peekNext())) {
+    if (peek() == '.' && isdigit(peekNext())) {
         // Consume the "."
         advance();
 
-        while (isDigit(peek())) advance();
+        while (isdigit(peek())) advance();
     }
 
     addToken(NUMBER);
@@ -166,9 +164,9 @@ char Scanner::peekNext()
 
 void Scanner::identifier() 
 {
-    while (isAlphaNumeric(peek())) advance();
+    while (isalnum(peek())) advance();
 
-    std::string text = source.substr(start, current);
+    std::string text = source.substr(start, current - start);
     TokenType type;
     std::map<std::string, TokenType>::const_iterator pos = keywords.find(text);
     if (pos == keywords.end()) 
@@ -182,14 +180,17 @@ void Scanner::identifier()
     addToken(type);
 }
 
-bool Scanner::isAlpha(char c)
-{
-    return (c >= 'a' && c <= 'z') ||
-        (c >= 'A' && c <= 'Z') ||
-        c == '_';
-}
+// bool Scanner::isDigit(char c) 
+// {
+//     return c >= '0' && c <= '9';
+// } 
 
-bool Scanner::isAlphaNumeric(char c) 
-{
-    return isAlpha(c) || isDigit(c);
-}
+// bool Scanner::isAlpha(char c)
+// {
+//     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||  c == '_';
+// }
+
+// bool Scanner::isAlphaNumeric(char c) 
+// {
+//     return isAlpha(c) || isDigit(c);
+// }
