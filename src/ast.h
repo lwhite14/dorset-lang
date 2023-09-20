@@ -38,10 +38,11 @@ namespace AST
     {
     private:
         char Op;
-        std::unique_ptr<ExprAST> LHS, RHS;
+        ExprAST* LHS;
+        ExprAST* RHS;
 
     public:
-        BinaryExprAST(char Op, std::unique_ptr<ExprAST> LHS, std::unique_ptr<ExprAST> RHS);
+        BinaryExprAST(char Op, ExprAST* LHS, ExprAST* RHS);
     };
 
     /// CallExprAST - Expression class for function calls.
@@ -49,10 +50,10 @@ namespace AST
     {
     private:
         std::string Callee;
-        std::vector<std::unique_ptr<ExprAST>> Args;
+        std::vector<ExprAST*> Args;
 
     public:
-        CallExprAST(const std::string &Callee, std::vector<std::unique_ptr<ExprAST>> Args);
+        CallExprAST(const std::string &Callee, std::vector<ExprAST*> Args);
     };
 
     /// PrototypeAST - This class represents the "prototype" for a function,
@@ -72,10 +73,10 @@ namespace AST
     /// FunctionAST - This class represents a function definition itself.
     class FunctionAST
     {
-        std::unique_ptr<PrototypeAST> Proto;
-        std::unique_ptr<ExprAST> Body;
+        PrototypeAST* Proto;
+        ExprAST* Body;
 
     public:
-        FunctionAST(std::unique_ptr<PrototypeAST> Proto, std::unique_ptr<ExprAST> Body);
+        FunctionAST(PrototypeAST* Proto, ExprAST* Body);
     };
 }

@@ -34,4 +34,6 @@ void outputTokenInfo(std::vector<Token> tokens)
         std::cout << token.getLine();
         std::cout << std::endl;
     }
+    std::cout << "----------------------------------------------";
+    std::cout << "----------------------------------------------" << std::endl;
 }
