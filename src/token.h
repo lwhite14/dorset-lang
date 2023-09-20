@@ -52,13 +52,15 @@ private:
     std::string lexeme;
     std::string* literal;
     int line; 
+    int character;
 
 public:
-    Token(TokenType type, std::string lexeme, std::string* literal, int line);
+    Token(TokenType type, std::string lexeme, std::string* literal, int line, int character);
 
     TokenType getType();
     std::string getTypeStr();
     std::string getLexeme();
     std::string getLiteral();
     int getLine();
+    int getCharacter();
 };

@@ -17,7 +17,7 @@ std::vector<Token> Scanner::scanTokens()
       scanToken();
     }
 
-    tokens.push_back(Token(_EOF, "", nullptr, line));
+    tokens.push_back(Token(_EOF, "", nullptr, line, current));
     return tokens;
 }
 
@@ -89,7 +89,7 @@ void Scanner::addToken(TokenType type)
 void Scanner::addToken(TokenType type, std::string* literal)
 {
     std::string text = source.substr(start, current - start);
-    tokens.push_back(Token(type, text, literal, line));
+    tokens.push_back(Token(type, text, literal, line, current));
 }
 
 bool Scanner::match(char expected) 

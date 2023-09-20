@@ -40,13 +40,13 @@ int Parser::getTokPrecedence()
 
 AST::ExprAST *Parser::logError(Token token, std::string message)
 {
-    ErrorHandler::error(token.getLine(), message);
+    ErrorHandler::error(token.getLine(), token.getCharacter(), message);
     return nullptr;
 }
 
 AST::PrototypeAST *Parser::logErrorP(Token token, std::string message)
 {
-    ErrorHandler::error(token.getLine(), message);
+    ErrorHandler::error(token.getLine(), token.getCharacter(), message);
     return nullptr;
 }
 
@@ -232,7 +232,7 @@ AST::PrototypeAST *Parser::parsePrototype()
     {
         ArgNames.push_back(currentToken().getLexeme());
     }
-    if (currentToken().getType() != LEFT_PAREN)
+    if (currentToken().getType() != RIGHT_PAREN)
     {
         return logErrorP(currentToken(), "Expected ')' in prototype");
     }
