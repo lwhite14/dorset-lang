@@ -9,7 +9,6 @@
 #include "outpututils.h"
 #include "parser.h"
 
-
 std::string getSourceContents(std::string fileName)
 {
     std::ifstream file(fileName);
@@ -22,13 +21,11 @@ std::string getSourceContents(std::string fileName)
     return output;
 }
 
-
 std::vector<Token> tokenize(std::string contents)
 {
     std::unique_ptr<Scanner> scanner = std::unique_ptr<Scanner>(new Scanner(contents));
     return scanner->scanTokens();
 }
-
 
 void parserize(std::vector<Token> tokens)
 {
@@ -36,8 +33,7 @@ void parserize(std::vector<Token> tokens)
     parser->parseTokenList();
 }
 
-
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     if (argc == 2)
     {

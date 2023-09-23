@@ -52,11 +52,13 @@ AST::PrototypeAST *Parser::logErrorP(Token token, std::string message)
 
 void Parser::parseTokenList()
 {
+    AST::initializeModule();
     while (true)
     {
         switch (currentToken().getType())
         {
         case _EOF:
+            AST::outputModule();
             return;
         case SEMICOLON: // ignore top-level semicolons.
             advanceToken();
@@ -278,9 +280,14 @@ AST::FunctionAST *Parser::parseTopLevelExpr()
 
 void Parser::handleDefinition()
 {
-    if (parseDefinition())
+    if (auto FnAST = parseDefinition())
     {
-        fprintf(stderr, "Parsed a function definition.\n");
+        if (auto *FnIR = FnAST->codegen())
+        {
+            fprintf(stderr, "Read function definition:");
+            FnIR->print(errs());
+            fprintf(stderr, "\n");
+        }
     }
     else
     {
@@ -291,9 +298,14 @@ void Parser::handleDefinition()
 
 void Parser::handleExtern()
 {
-    if (parseExtern())
+    if (auto ProtoAST = parseExtern())
     {
-        fprintf(stderr, "Parsed an extern\n");
+        if (auto *FnIR = ProtoAST->codegen())
+        {
+            fprintf(stderr, "Read extern: ");
+            FnIR->print(errs());
+            fprintf(stderr, "\n");
+        }
     }
     else
     {
