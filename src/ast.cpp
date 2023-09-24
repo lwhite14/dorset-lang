@@ -1,11 +1,17 @@
 #include "ast.h"
 
+#include <fstream>
+#include <ostream>
+
 namespace AST
 {
-    void initializeModule()
+    void initializeModule(std::string fileName, std::string filePath)
     {
+        sourceFileName = fileName;
+        sourceFileLocation = filePath;
+
         TheContext = new LLVMContext;
-        TheModule = new Module("my cool jit", *TheContext);
+        TheModule = new Module(sourceFileLocation, *TheContext);
 
         // Create a new builder for the module.
         Builder = new IRBuilder<>(*TheContext);
@@ -13,9 +19,31 @@ namespace AST
 
     void outputModule()
     {
-        std::cout << "----------------------------------------------";
-        std::cout << "----------------------------------------------" << std::endl;
-        AST::TheModule->print(errs(), nullptr);
+        std::string ir;
+        raw_string_ostream ostream(ir);
+        ostream << *TheModule;
+        ostream.flush();
+
+        std::ofstream myfile;
+        myfile.open(sourceFileName + ".ll");
+        myfile << ir;
+        myfile.close();
+
+        if (system(("llc " + sourceFileName + ".ll").c_str()) != 0)
+        {
+            std::cout << "Error compiling LLVM IR." << std::endl;
+            return;
+        }
+        if (system(("gcc -c " + sourceFileName + ".s").c_str()) != 0)
+        {
+            std::cout << "Error compiling assembly." << std::endl;
+            return;
+        }
+        if (system(("gcc " + sourceFileName + ".o").c_str()) != 0)
+        {
+            std::cout << "Error compiling object file." << std::endl;
+            return;
+        }
     }
 
     Value *logError(std::string message)

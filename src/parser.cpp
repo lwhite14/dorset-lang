@@ -50,9 +50,9 @@ AST::PrototypeAST *Parser::logErrorP(Token token, std::string message)
     return nullptr;
 }
 
-void Parser::parseTokenList()
+void Parser::parseTokenList(std::string fileName, std::string filePath)
 {
-    AST::initializeModule();
+    AST::initializeModule(fileName, filePath);
     while (true)
     {
         switch (currentToken().getType())
@@ -284,9 +284,7 @@ void Parser::handleDefinition()
     {
         if (auto *FnIR = FnAST->codegen())
         {
-            fprintf(stderr, "Read function definition:");
-            FnIR->print(errs());
-            fprintf(stderr, "\n");
+
         }
     }
     else
@@ -302,9 +300,7 @@ void Parser::handleExtern()
     {
         if (auto *FnIR = ProtoAST->codegen())
         {
-            fprintf(stderr, "Read extern: ");
-            FnIR->print(errs());
-            fprintf(stderr, "\n");
+
         }
     }
     else
@@ -317,9 +313,14 @@ void Parser::handleExtern()
 void Parser::handleTopLevelExpression()
 {
     // Evaluate a top-level expression into an anonymous function.
-    if (parseTopLevelExpr())
+    if (auto FnAST = parseTopLevelExpr())
     {
-        fprintf(stderr, "Parsed a top-level expr\n");
+        if (auto *FnIR = FnAST->codegen())
+        {
+
+            // Remove the anonymous expression.
+            FnIR->eraseFromParent();
+        }
     }
     else
     {

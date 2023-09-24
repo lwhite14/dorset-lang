@@ -56,5 +56,5 @@ private:
 public:
     Parser(std::vector<Token> tokens);
 
-    void parseTokenList();
+    void parseTokenList(std::string fileName, std::string filePath);
 };
