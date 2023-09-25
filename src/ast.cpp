@@ -24,10 +24,10 @@ namespace AST
         ostream << *TheModule;
         ostream.flush();
 
-        std::ofstream myfile;
-        myfile.open(sourceFileName + ".ll");
-        myfile << ir;
-        myfile.close();
+        std::ofstream irFile;
+        irFile.open(sourceFileName + ".ll");
+        irFile << ir;
+        irFile.close();
 
         if (system(("llc " + sourceFileName + ".ll").c_str()) != 0)
         {
@@ -39,7 +39,7 @@ namespace AST
             std::cout << "Error compiling assembly." << std::endl;
             return;
         }
-        if (system(("gcc " + sourceFileName + ".o").c_str()) != 0)
+        if (system(("gcc " + sourceFileName + ".o -o " + sourceFileName + ".out").c_str()) != 0)
         {
             std::cout << "Error compiling object file." << std::endl;
             return;
