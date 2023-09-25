@@ -12,6 +12,7 @@ private:
     std::vector<Token> tokens;
     int start = 0;
     int current = 0;
+    int charactersAtLineStart = 0;
     int line = 1;
 
     bool isAtEnd();
@@ -25,6 +26,7 @@ private:
     void number();
     char peekNext();
     void identifier();
+    void nextLine();
 
 public:
     Scanner(std::string source);

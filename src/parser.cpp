@@ -58,7 +58,10 @@ void Parser::parseTokenList(std::string fileName, std::string filePath)
         switch (currentToken().getType())
         {
         case _EOF:
-            AST::outputModule();
+            if (!ErrorHandler::HadError) 
+            {
+                AST::outputModule();
+            }
             return;
         case SEMICOLON: // ignore top-level semicolons.
             advanceToken();
@@ -149,8 +152,7 @@ AST::ExprAST *Parser::parsePrimary()
     switch (currentToken().getType())
     {
     default:
-
-        return logError(currentToken(), "unknown token when expecting an expression");
+        return logError(currentToken(), "unknown token when expecting an expression, token type: " + currentToken().getTypeStr());
     case IDENTIFIER:
         return parseIdentifierExpr();
     case NUMBER:

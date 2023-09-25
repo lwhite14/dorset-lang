@@ -71,7 +71,7 @@ namespace AST
         // Look this variable up in the function.
         Value *V = NamedValues[Name];
         if (!V)
-            logError("Unknown variable name");
+            logError("Unknown variable: '" + Name + "'");
         return V;
     }
 
