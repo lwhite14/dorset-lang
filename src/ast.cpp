@@ -39,7 +39,7 @@ namespace AST
             std::cout << "Error compiling assembly." << std::endl;
             return;
         }
-        if (system(("gcc " + sourceFileName + ".o -o " + sourceFileName + ".out").c_str()) != 0)
+        if (system(("gcc " + sourceFileName + ".o -o " + sourceFileName + ".out -no-pie").c_str()) != 0)
         {
             std::cout << "Error compiling object file." << std::endl;
             return;
@@ -59,6 +59,15 @@ namespace AST
     Value *NumberExprAST::codegen()
     {
         return ConstantFP::get(*TheContext, APFloat(Val));
+    }
+
+    StringExprAST::StringExprAST(std::string Val) : Val(Val)
+    {
+    }
+
+    Value *StringExprAST::codegen()
+    {
+        return Builder->CreateGlobalString(Val);
     }
 
     VariableExprAST::VariableExprAST(const std::string &Name)
@@ -199,5 +208,16 @@ namespace AST
         // Error reading body, remove function.
         TheFunction->eraseFromParent();
         return nullptr;
+    }
+
+    void createExternalFunctions()
+    {
+        auto bytePtrTy = Builder->getInt8Ty()->getPointerTo();
+
+        TheModule->getOrInsertFunction("printf",
+                                       llvm::FunctionType::get(
+                                           /* return type */ Builder->getDoubleTy(),
+                                           /* format arg */ bytePtrTy,
+                                           /* vararg */ true));
     }
 }

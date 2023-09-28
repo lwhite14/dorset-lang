@@ -1,3 +1,0 @@
-fn average(x y) (x + y) * 0.5;
-
-fn main() average(3, 5);

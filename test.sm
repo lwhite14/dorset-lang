@@ -1,6 +1,0 @@
-fn main()
-{
-    var number = 4 + 12;
-    var stringExample = "Hello World";
-    return number;
-}

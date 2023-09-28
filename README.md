@@ -1,4 +1,4 @@
-# Summit-Lang
+# Dorset-Lang
 Very fragile, handle with care :worried:
 
 ### Syntax
@@ -11,10 +11,10 @@ fn main()
 }
 ```
 ### Building
-Summit requires cmake, LLVM, and of course a C++ compiler (gcc [<--- recommended], msvc, clang).
+Dorset requires cmake, LLVM, and of course a C++ compiler (gcc, msvc, clang [<--- recommended]).
 ```
-cd summit-lang
+cd dorset-lang
 cmake -B build -S .
 cmake --build build
-build/summit test.sm
+build/dorset test.sm
 ```

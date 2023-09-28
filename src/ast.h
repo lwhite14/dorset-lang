@@ -53,6 +53,16 @@ namespace AST
         Value *codegen() override;
     };
 
+    class StringExprAST : public ExprAST
+    {
+    private:
+        std::string Val;
+
+    public:
+        StringExprAST(std::string Val);
+        Value *codegen() override;
+    };
+
     /// VariableExprAST - Expression class for referencing a variable, like "a".
     class VariableExprAST : public ExprAST
     {
@@ -114,4 +124,6 @@ namespace AST
         FunctionAST(PrototypeAST* Proto, ExprAST* Body);
         Function *codegen();
     };
+
+    void createExternalFunctions();
 }

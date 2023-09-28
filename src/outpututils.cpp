@@ -5,7 +5,7 @@
 
 void printUsage()
 {
-    std::cout << "Usage: summit [file]" << std::endl;
+    std::cout << "Usage: dorset [file]" << std::endl;
 }
 
 void outputTokenInfo(std::vector<Token> tokens)

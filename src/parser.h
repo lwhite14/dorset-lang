@@ -39,6 +39,7 @@ private:
     AST::PrototypeAST *logErrorP(Token token, std::string message);
 
     AST::ExprAST *parseNumberExpr();
+    AST::ExprAST *parseStringExpr();
     AST::ExprAST *parseParenExpr();
     AST::ExprAST *parseIdentifierExpr();
     AST::ExprAST *parsePrimary();

@@ -53,6 +53,7 @@ AST::PrototypeAST *Parser::logErrorP(Token token, std::string message)
 void Parser::parseTokenList(std::string fileName, std::string filePath)
 {
     AST::initializeModule(fileName, filePath);
+    AST::createExternalFunctions();
     while (true)
     {
         switch (currentToken().getType())
@@ -82,6 +83,13 @@ void Parser::parseTokenList(std::string fileName, std::string filePath)
 AST::ExprAST *Parser::parseNumberExpr()
 {
     AST::NumberExprAST *output = new AST::NumberExprAST(std::stod(currentToken().getLiteral()));
+    advanceToken();
+    return output;
+}
+
+AST::ExprAST *Parser::parseStringExpr()
+{
+    AST::StringExprAST *output = new AST::StringExprAST(currentToken().getLiteral());
     advanceToken();
     return output;
 }
@@ -157,6 +165,8 @@ AST::ExprAST *Parser::parsePrimary()
         return parseIdentifierExpr();
     case NUMBER:
         return parseNumberExpr();
+    case STRING:
+        return parseStringExpr();
     case LEFT_PAREN:
         return parseParenExpr();
     }
