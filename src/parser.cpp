@@ -40,13 +40,13 @@ int Parser::getTokPrecedence()
 
 AST::ExprAST *Parser::logError(Token token, std::string message)
 {
-    ErrorHandler::error(token.getLine(), token.getCharacter(), message);
+    ErrorHandler::error(message, token.getLine(), token.getCharacter());
     return nullptr;
 }
 
 AST::PrototypeAST *Parser::logErrorP(Token token, std::string message)
 {
-    ErrorHandler::error(token.getLine(), token.getCharacter(), message);
+    ErrorHandler::error(message, token.getLine(), token.getCharacter());
     return nullptr;
 }
 

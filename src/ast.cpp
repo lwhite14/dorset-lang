@@ -3,6 +3,8 @@
 #include <fstream>
 #include <ostream>
 
+#include "error.h"
+
 namespace AST
 {
     void initializeModule(std::string fileName, std::string filePath)
@@ -48,7 +50,7 @@ namespace AST
 
     Value *logError(std::string message)
     {
-        std::cout << message << std::endl;
+        ErrorHandler::error(message);
         return nullptr;
     }
 

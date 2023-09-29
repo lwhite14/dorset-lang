@@ -123,7 +123,7 @@ void Scanner::scanToken()
         else
         {
             std::cout << c << std::endl;
-            ErrorHandler::error(line, current, "Unexpected character.");
+            ErrorHandler::error("Unexpected character.", line, current);
         }
     }
 }
@@ -186,7 +186,7 @@ void Scanner::string()
 
     if (isAtEnd())
     {
-        ErrorHandler::error(line, "Unterminated string.");
+        ErrorHandler::error("Unterminated string.", line);
         return;
     }
 

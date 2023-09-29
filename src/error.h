@@ -6,12 +6,14 @@
 class ErrorHandler
 {
 private:
-    static void report(int line, std::string where, std::string message);
-    static void report(int line, int character, std::string where, std::string message);
+    static void report(std::string where, std::string message);
+    static void report(std::string where, std::string message, int line);
+    static void report(std::string where, std::string message, int line, int character);
 
 public:
     inline static bool HadError = false;
 
-    static void error(int line, std::string message);
-    static void error(int line, int character, std::string message);
+    static void error(std::string message);
+    static void error(std::string message, int line);
+    static void error(std::string message, int line, int character);
 };

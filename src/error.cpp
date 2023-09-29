@@ -1,23 +1,42 @@
 #include "error.h"
 
-void ErrorHandler::report(int line, std::string where, std::string message)
+/////////////////////////
+/// Private Functions ///
+/////////////////////////
+
+void ErrorHandler::report(std::string where, std::string message)
+{
+    std::cout << "[unknown] Error" << where << ": " << message << std::endl;
+    HadError = true;
+}
+
+void ErrorHandler::report(std::string where, std::string message, int line)
 {
     std::cout << "[line " << line << "] Error" << where << ": " << message << std::endl;
     HadError = true;
 }
 
-void ErrorHandler::report(int line, int character, std::string where, std::string message)
+void ErrorHandler::report(std::string where, std::string message, int line, int character)
 {
     std::cout << "[line " << line << ", char " << character << "] Error" << where << ": " << message << std::endl;
     HadError = true;
 }
 
-void ErrorHandler::error(int line, std::string message)
+////////////////////////
+/// Public Functions ///
+////////////////////////
+
+void ErrorHandler::error(std::string message)
 {
-    report(line, "", message);
+    report("", message);
 }
 
-void ErrorHandler::error(int line, int character, std::string message)
+void ErrorHandler::error(std::string message, int line)
 {
-    report(line, character, "", message);
+    report("", message, line);
+}
+
+void ErrorHandler::error(std::string message, int line, int character)
+{
+    report("", message, line, character);
 }
