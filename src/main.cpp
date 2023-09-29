@@ -6,9 +6,9 @@
 #include <filesystem>
 
 #include "error.h"
-#include "scanner.h"
+#include "lexer.h"
 #include "outpututils.h"
-#include "parser.h"
+#include "astbuilder.h"
 
 bool fileExists(std::string fileName)
 {
@@ -37,13 +37,13 @@ std::string getSourceContents(std::string fileName)
 
 std::vector<Token> tokenize(std::string contents)
 {
-    std::unique_ptr<Scanner> scanner = std::unique_ptr<Scanner>(new Scanner(contents));
-    return scanner->scanTokens();
+    std::unique_ptr<Lexer> lexer = std::unique_ptr<Lexer>(new Lexer(contents));
+    return lexer->scanTokens();
 }
 
 void parserize(std::vector<Token> tokens, std::string fileName, std::string filePath)
 {
-    std::unique_ptr<Parser> parser = std::unique_ptr<Parser>(new Parser(tokens));
+    std::unique_ptr<ASTBuilder> parser = std::unique_ptr<ASTBuilder>(new ASTBuilder(tokens));
     parser->parseTokenList(fileName, filePath);
 }
 

@@ -19,7 +19,7 @@
 #include "llvm/IR/Type.h"
 #include "llvm/IR/Verifier.h"
 
-class Parser
+class ASTBuilder
 {
 private:
     std::map<char, int> binopPrecedence = {
@@ -55,7 +55,7 @@ private:
     void handleTopLevelExpression();
 
 public:
-    Parser(std::vector<Token> tokens);
+    ASTBuilder(std::vector<Token> tokens);
 
     void parseTokenList(std::string fileName, std::string filePath);
 };

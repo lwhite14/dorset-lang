@@ -5,7 +5,7 @@
 
 #include "token.h"
 
-class Scanner
+class Lexer
 {
 private:
     std::string source;
@@ -29,7 +29,7 @@ private:
     void nextLine();
 
 public:
-    Scanner(std::string source);
+    Lexer(std::string source);
     std::vector<Token> scanTokens();
 
 };

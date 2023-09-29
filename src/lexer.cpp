@@ -1,15 +1,15 @@
-#include "scanner.h"
+#include "lexer.h"
 
 #include <ctype.h>
 
 #include "error.h"
 
-Scanner::Scanner(std::string source)
+Lexer::Lexer(std::string source)
 {
     this->source = source;
 }
 
-std::vector<Token> Scanner::scanTokens()
+std::vector<Token> Lexer::scanTokens()
 {
     while (!isAtEnd())
     {
@@ -21,7 +21,7 @@ std::vector<Token> Scanner::scanTokens()
     return tokens;
 }
 
-void Scanner::scanToken()
+void Lexer::scanToken()
 {
     char c = advance();
     if (c == '(')
@@ -128,28 +128,28 @@ void Scanner::scanToken()
     }
 }
 
-bool Scanner::isAtEnd()
+bool Lexer::isAtEnd()
 {
     return current >= source.size();
 }
 
-char Scanner::advance()
+char Lexer::advance()
 {
     return source[current++];
 }
 
-void Scanner::addToken(TokenType type)
+void Lexer::addToken(TokenType type)
 {
     addToken(type, nullptr);
 }
 
-void Scanner::addToken(TokenType type, std::string *literal)
+void Lexer::addToken(TokenType type, std::string *literal)
 {
     std::string text = source.substr(start, current - start);
     tokens.push_back(Token(type, text, literal, line, start - charactersAtLineStart));
 }
 
-bool Scanner::match(char expected)
+bool Lexer::match(char expected)
 {
     if (isAtEnd())
     {
@@ -165,7 +165,7 @@ bool Scanner::match(char expected)
     return true;
 }
 
-char Scanner::peek()
+char Lexer::peek()
 {
     if (isAtEnd())
     {
@@ -175,7 +175,7 @@ char Scanner::peek()
     return source[current];
 }
 
-void Scanner::string()
+void Lexer::string()
 {
     while (peek() != '"' && !isAtEnd())
     {
@@ -196,7 +196,7 @@ void Scanner::string()
     addToken(STRING, value);
 }
 
-void Scanner::number()
+void Lexer::number()
 {
     while (isdigit(peek()))
     {
@@ -216,7 +216,7 @@ void Scanner::number()
     addToken(NUMBER, value);
 }
 
-char Scanner::peekNext()
+char Lexer::peekNext()
 {
     if (current + 1 >= source.length())
     {
@@ -225,7 +225,7 @@ char Scanner::peekNext()
     return source[current + 1];
 }
 
-void Scanner::identifier()
+void Lexer::identifier()
 {
     while (isalnum(peek()))
     {
@@ -246,7 +246,7 @@ void Scanner::identifier()
     addToken(type);
 }
 
-void Scanner::nextLine()
+void Lexer::nextLine()
 {
     line++;
     charactersAtLineStart = start;

@@ -1,23 +1,23 @@
-#include "parser.h"
+#include "astbuilder.h"
 
-Parser::Parser(std::vector<Token> tokens)
+ASTBuilder::ASTBuilder(std::vector<Token> tokens)
 {
     this->tokens = tokens;
     this->currentTokenIndex = 0;
 }
 
-Token Parser::currentToken()
+Token ASTBuilder::currentToken()
 {
     return tokens[currentTokenIndex];
 }
 
-Token Parser::advanceToken()
+Token ASTBuilder::advanceToken()
 {
     currentTokenIndex++;
     return currentToken();
 }
 
-int Parser::getTokPrecedence()
+int ASTBuilder::getTokPrecedence()
 {
     if (currentToken().getLexeme().length() != 1)
     {
@@ -38,19 +38,19 @@ int Parser::getTokPrecedence()
     return TokPrec;
 }
 
-AST::ExprAST *Parser::logError(Token token, std::string message)
+AST::ExprAST *ASTBuilder::logError(Token token, std::string message)
 {
     ErrorHandler::error(message, token.getLine(), token.getCharacter());
     return nullptr;
 }
 
-AST::PrototypeAST *Parser::logErrorP(Token token, std::string message)
+AST::PrototypeAST *ASTBuilder::logErrorP(Token token, std::string message)
 {
     ErrorHandler::error(message, token.getLine(), token.getCharacter());
     return nullptr;
 }
 
-void Parser::parseTokenList(std::string fileName, std::string filePath)
+void ASTBuilder::parseTokenList(std::string fileName, std::string filePath)
 {
     AST::initializeModule(fileName, filePath);
     AST::createExternalFunctions();
@@ -80,21 +80,21 @@ void Parser::parseTokenList(std::string fileName, std::string filePath)
     }
 }
 
-AST::ExprAST *Parser::parseNumberExpr()
+AST::ExprAST *ASTBuilder::parseNumberExpr()
 {
     AST::NumberExprAST *output = new AST::NumberExprAST(std::stod(currentToken().getLiteral()));
     advanceToken();
     return output;
 }
 
-AST::ExprAST *Parser::parseStringExpr()
+AST::ExprAST *ASTBuilder::parseStringExpr()
 {
     AST::StringExprAST *output = new AST::StringExprAST(currentToken().getLiteral());
     advanceToken();
     return output;
 }
 
-AST::ExprAST *Parser::parseParenExpr()
+AST::ExprAST *ASTBuilder::parseParenExpr()
 {
     advanceToken(); // eat (.
     AST::ExprAST *V = parseExpression();
@@ -111,7 +111,7 @@ AST::ExprAST *Parser::parseParenExpr()
     return V;
 }
 
-AST::ExprAST *Parser::parseIdentifierExpr()
+AST::ExprAST *ASTBuilder::parseIdentifierExpr()
 {
     std::string IdName = currentToken().getLexeme();
 
@@ -155,7 +155,7 @@ AST::ExprAST *Parser::parseIdentifierExpr()
     return new AST::CallExprAST(IdName, Args);
 }
 
-AST::ExprAST *Parser::parsePrimary()
+AST::ExprAST *ASTBuilder::parsePrimary()
 {
     switch (currentToken().getType())
     {
@@ -172,7 +172,7 @@ AST::ExprAST *Parser::parsePrimary()
     }
 }
 
-AST::ExprAST *Parser::parseExpression()
+AST::ExprAST *ASTBuilder::parseExpression()
 {
     auto LHS = parsePrimary();
     if (!LHS)
@@ -183,7 +183,7 @@ AST::ExprAST *Parser::parseExpression()
     return parseBinOpRHS(0, LHS);
 }
 
-AST::ExprAST *Parser::parseBinOpRHS(int ExprPrec, AST::ExprAST *LHS)
+AST::ExprAST *ASTBuilder::parseBinOpRHS(int ExprPrec, AST::ExprAST *LHS)
 {
     // If this is a binop, find its precedence.
     while (true)
@@ -225,7 +225,7 @@ AST::ExprAST *Parser::parseBinOpRHS(int ExprPrec, AST::ExprAST *LHS)
     }
 }
 
-AST::PrototypeAST *Parser::parsePrototype()
+AST::PrototypeAST *ASTBuilder::parsePrototype()
 {
     if (currentToken().getType() != IDENTIFIER)
     {
@@ -257,7 +257,7 @@ AST::PrototypeAST *Parser::parsePrototype()
     return new AST::PrototypeAST(FnName, ArgNames);
 }
 
-AST::FunctionAST *Parser::parseDefinition()
+AST::FunctionAST *ASTBuilder::parseDefinition()
 {
     advanceToken(); // eat def.
     auto Proto = parsePrototype();
@@ -273,13 +273,13 @@ AST::FunctionAST *Parser::parseDefinition()
     return nullptr;
 }
 
-AST::PrototypeAST *Parser::parseExtern()
+AST::PrototypeAST *ASTBuilder::parseExtern()
 {
     advanceToken(); // eat extern.
     return parsePrototype();
 }
 
-AST::FunctionAST *Parser::parseTopLevelExpr()
+AST::FunctionAST *ASTBuilder::parseTopLevelExpr()
 {
     if (auto E = parseExpression())
     {
@@ -290,7 +290,7 @@ AST::FunctionAST *Parser::parseTopLevelExpr()
     return nullptr;
 }
 
-void Parser::handleDefinition()
+void ASTBuilder::handleDefinition()
 {
     if (auto FnAST = parseDefinition())
     {
@@ -306,7 +306,7 @@ void Parser::handleDefinition()
     }
 }
 
-void Parser::handleExtern()
+void ASTBuilder::handleExtern()
 {
     if (auto ProtoAST = parseExtern())
     {
@@ -322,7 +322,7 @@ void Parser::handleExtern()
     }
 }
 
-void Parser::handleTopLevelExpression()
+void ASTBuilder::handleTopLevelExpression()
 {
     // Evaluate a top-level expression into an anonymous function.
     if (auto FnAST = parseTopLevelExpr())

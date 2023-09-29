@@ -14,10 +14,10 @@ add_definitions(${LLVM_DEFINITIONS})
 add_executable(dorset 
     src/main.cpp
     src/error.cpp
-    src/scanner.cpp
+    src/lexer.cpp
     src/token.cpp
     src/ast.cpp
-    src/parser.cpp
+    src/astbuilder.cpp
     src/outpututils.cpp
 )
 
