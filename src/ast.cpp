@@ -46,6 +46,9 @@ namespace AST
             std::cout << "Error compiling object file." << std::endl;
             return;
         }
+
+        system(("rm " + sourceFileName + ".o").c_str());
+        system(("rm " + sourceFileName + ".s").c_str());
     }
 
     Value *logError(std::string message)

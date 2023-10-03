@@ -17,7 +17,7 @@ std::vector<Token> Lexer::scanTokens()
         scanToken();
     }
 
-    tokens.push_back(Token(_EOF, "", nullptr, line, start - charactersAtLineStart));
+    tokens.push_back(Token(_EOF, "", "", line, start - charactersAtLineStart));
     return tokens;
 }
 
@@ -123,7 +123,7 @@ void Lexer::scanToken()
         else
         {
             std::cout << c << std::endl;
-            ErrorHandler::error("Unexpected character.", line, current);
+            ErrorHandler::error("unexpected character", line, current);
         }
     }
 }
@@ -140,10 +140,10 @@ char Lexer::advance()
 
 void Lexer::addToken(TokenType type)
 {
-    addToken(type, nullptr);
+    addToken(type, "");
 }
 
-void Lexer::addToken(TokenType type, std::string *literal)
+void Lexer::addToken(TokenType type, std::string literal)
 {
     std::string text = source.substr(start, current - start);
     tokens.push_back(Token(type, text, literal, line, start - charactersAtLineStart));
@@ -186,13 +186,13 @@ void Lexer::string()
 
     if (isAtEnd())
     {
-        ErrorHandler::error("Unterminated string.", line);
+        ErrorHandler::error("unterminated string", line);
         return;
     }
 
     advance();
 
-    std::string *value = new std::string(source.substr(start + 1, (current - 1) - (start + 1)));
+    std::string value = source.substr(start + 1, (current - 1) - (start + 1));
     addToken(STRING, value);
 }
 
@@ -212,7 +212,7 @@ void Lexer::number()
         }
     }
 
-    std::string *value = new std::string(source.substr(start, current - start));
+    std::string value = source.substr(start, current - start);
     addToken(NUMBER, value);
 }
 

@@ -19,7 +19,7 @@ private:
     void scanToken();
     char advance();
     void addToken(TokenType type);
-    void addToken(TokenType type, std::string* literal);
+    void addToken(TokenType type, std::string literal);
     bool match(char expected) ;
     char peek();
     void string();

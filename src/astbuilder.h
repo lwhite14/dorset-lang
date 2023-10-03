@@ -6,6 +6,7 @@
 #include "token.h"
 #include "ast.h"
 #include "error.h"
+#include "expressionbuilder.h"
 
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
@@ -22,37 +23,17 @@
 class ASTBuilder
 {
 private:
-    std::map<char, int> binopPrecedence = {
-        {'<', 10},
-        {'+', 20},
-        {'-', 30},
-        {'*', 40}};
-
     std::vector<Token> tokens;
     int currentTokenIndex;
 
     Token currentToken();
     Token advanceToken();
-    int getTokPrecedence();
 
-    AST::ExprAST *logError(Token token, std::string message);
-    AST::PrototypeAST *logErrorP(Token token, std::string message);
-
-    AST::ExprAST *parseNumberExpr();
-    AST::ExprAST *parseStringExpr();
-    AST::ExprAST *parseParenExpr();
-    AST::ExprAST *parseIdentifierExpr();
-    AST::ExprAST *parsePrimary();
     AST::ExprAST *parseExpression();
-    AST::ExprAST *parseBinOpRHS(int ExprPrec, AST::ExprAST *LHS);
-    AST::PrototypeAST *parsePrototype();
-    AST::FunctionAST *parseDefinition();
-    AST::PrototypeAST *parseExtern();
-    AST::FunctionAST *parseTopLevelExpr();
+    AST::PrototypeAST *parsePrototype(); 
+    AST::FunctionAST *parseDefinition(); 
 
-    void handleDefinition();
-    void handleExtern();
-    void handleTopLevelExpression();
+    void handleDefinition(); 
 
 public:
     ASTBuilder(std::vector<Token> tokens);

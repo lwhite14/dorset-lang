@@ -22,7 +22,8 @@ enum TokenType
     AND, CLASS, ELSE, FALSE, FUNCTION, FOR, IF, NIL, OR,
     PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE, EXTERN,
 
-    _EOF
+    // Special
+    _EOF, TERMINATING
 };
 
 static std::map<std::string, TokenType> keywords = {
@@ -50,12 +51,12 @@ class Token
 private:
     TokenType type;
     std::string lexeme;
-    std::string* literal;
+    std::string literal;
     int line; 
     int character;
 
 public:
-    Token(TokenType type, std::string lexeme, std::string* literal, int line, int character);
+    Token(TokenType type, std::string lexeme, std::string literal, int line, int character);
 
     TokenType getType();
     std::string getTypeStr();

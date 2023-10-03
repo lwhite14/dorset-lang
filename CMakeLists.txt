@@ -19,6 +19,7 @@ add_executable(dorset
     src/ast.cpp
     src/astbuilder.cpp
     src/outpututils.cpp
+    src/expressionbuilder.cpp
 )
 
 

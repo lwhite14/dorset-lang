@@ -35,13 +35,13 @@ std::string getSourceContents(std::string fileName)
     return output;
 }
 
-std::vector<Token> tokenize(std::string contents)
+std::vector<Token> lex(std::string contents)
 {
     std::unique_ptr<Lexer> lexer = std::unique_ptr<Lexer>(new Lexer(contents));
     return lexer->scanTokens();
 }
 
-void parserize(std::vector<Token> tokens, std::string fileName, std::string filePath)
+void buildAST(std::vector<Token> tokens, std::string fileName, std::string filePath)
 {
     std::unique_ptr<ASTBuilder> parser = std::unique_ptr<ASTBuilder>(new ASTBuilder(tokens));
     parser->parseTokenList(fileName, filePath);
@@ -59,9 +59,9 @@ int main(int argc, char *argv[])
     {
         if (fileExists(argv[1]))
         {
-            std::vector<Token> tokens = tokenize(getSourceContents(argv[1]));
+            std::vector<Token> tokens = lex(getSourceContents(argv[1]));
             outputTokenInfo(tokens);
-            parserize(tokens, removeFileExtension(argv[1]), std::filesystem::absolute(argv[1]));
+            buildAST(tokens, removeFileExtension(argv[1]), std::filesystem::absolute(argv[1]));
         }
         else
         {
