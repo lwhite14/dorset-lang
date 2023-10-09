@@ -136,7 +136,7 @@ AST::ExprAST *ExpressionBuilder::parsePrimary()
     }
     else
     {
-        ErrorHandler::error("unknown token when expecting an expression, token type", currentToken().getLine(), currentToken().getCharacter());
+        ErrorHandler::error("unknown token when expecting an expression", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;
     }
 }
