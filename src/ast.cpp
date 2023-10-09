@@ -72,7 +72,7 @@ namespace AST
 
     Value *StringExprAST::codegen()
     {
-        return Builder->CreateGlobalString(Val);
+        return Builder->CreateGlobalString(Val + "\n");
     }
 
     VariableExprAST::VariableExprAST(const std::string &Name)
