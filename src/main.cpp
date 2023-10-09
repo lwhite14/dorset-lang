@@ -9,6 +9,7 @@
 #include "lexer.h"
 #include "outpututils.h"
 #include "astbuilder.h"
+#include "cli.h"
 
 bool fileExists(std::string fileName)
 {
@@ -47,26 +48,25 @@ void buildAST(std::vector<Token> tokens, std::string fileName, std::string fileP
     parser->parseTokenList(fileName, filePath);
 }
 
-std::string removeFileExtension(std::string fileName)
-{
-    size_t lastindex = fileName.find_last_of(".");
-    return fileName.substr(0, lastindex);
-}
-
 int main(int argc, char *argv[])
 {
-    if (argc == 2)
+    CompilerOptions options = CompilerOptions(argc, argv);
+
+    if (!options.getHadError())
     {
-        if (fileExists(argv[1]))
+        if (options.getIsHelp())
         {
-            std::vector<Token> tokens = lex(getSourceContents(argv[1]));
-            outputTokenInfo(tokens);
-            buildAST(tokens, removeFileExtension(argv[1]), std::filesystem::absolute(argv[1]));
-        }
-        else
-        {
-            std::cout << "File does not exist." << std::endl;
             printUsage();
+        }
+        if (options.getIsVersion())
+        {
+            printVersion();
+        }
+        if (options.getHasSourceFile())
+        {
+            std::vector<Token> tokens = lex(getSourceContents(options.getSourceFileLocation()));
+            if (options.getIsTokens()) { printTokens(tokens); }
+            buildAST(tokens, options.getSourceFile(), options.getSourceFileLocation());
         }
     }
     else

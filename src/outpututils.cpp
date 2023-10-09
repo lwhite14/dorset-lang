@@ -5,10 +5,21 @@
 
 void printUsage()
 {
-    std::cout << "Usage: dorset [file]" << std::endl;
+    std::cout << "Usage: dorset [file] [options]            " << std::endl;
+    std::cout << "                                          " << std::endl;
+    std::cout << "Options:                                  " << std::endl;
+    std::cout << "    -t = list all the tokens              " << std::endl;
+    std::cout << "    -h = print the usage                  " << std::endl;
+    std::cout << "    -v = print the version                " << std::endl;
+    std::cout << "                                          " << std::endl;
 }
 
-void outputTokenInfo(std::vector<Token> tokens)
+void printVersion()
+{
+    std::cout << "Version: 0.1.0                            " << std::endl;
+}
+
+void printTokens(std::vector<Token> tokens)
 {
     std::cout << std::setw(20);
     std::cout << "Token Type";

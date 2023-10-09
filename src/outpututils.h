@@ -5,4 +5,5 @@
 #include "token.h"
 
 void printUsage();
-void outputTokenInfo(std::vector<Token> tokens);
+void printVersion();
+void printTokens(std::vector<Token> tokens);
