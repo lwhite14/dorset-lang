@@ -15,13 +15,13 @@
 
 void printUsage()
 {
-    std::cout << "Usage: dorset [file] [options]            " << std::endl;
-    std::cout << "                                          " << std::endl;
-    std::cout << "Options:                                  " << std::endl;
-    std::cout << "    -t = list all the tokens              " << std::endl;
-    std::cout << "    -h = print the usage                  " << std::endl;
-    std::cout << "    -v = print the version                " << std::endl;
-    std::cout << "                                          " << std::endl;
+    std::cout << "Usage: dorset [file] [options]                    " << std::endl;
+    std::cout << "                                                  " << std::endl;
+    std::cout << "Options:                                          " << std::endl;
+    std::cout << "    -t --tokens  = list all the tokens            " << std::endl;
+    std::cout << "    -h --help    = print the usage                " << std::endl;
+    std::cout << "    -v --version = print the version              " << std::endl;
+    std::cout << "                                                  " << std::endl;
 }
 
 void printVersion()

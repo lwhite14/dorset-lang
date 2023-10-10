@@ -25,8 +25,11 @@ private:
     void advanceArgument();
     std::string currentArgument();
     bool isAtEnd();
+    void error(std::string message);
+
     std::string removeFileExtension(std::string fileName);
     bool fileExists(std::string fileName);
+
 
 public:
     CompilerOptions(int argc, char *argv[]);

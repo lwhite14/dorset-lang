@@ -21,6 +21,12 @@ bool CompilerOptions::isAtEnd()
     return false;
 }
 
+void CompilerOptions::error(std::string message)
+{
+    std::cout << message << std::endl;
+    hadError = true;
+}
+
 std::string CompilerOptions::removeFileExtension(std::string fileName)
 {
     size_t lastindex = fileName.find_last_of(".");
@@ -47,26 +53,31 @@ CompilerOptions::CompilerOptions(int argc, char *argv[])
         arguments.push_back(argv[i]);
     }
 
+    if (arguments.size() == 0)
+    {
+        error("No arguments.");
+        return;
+    }
+
     while (!isAtEnd())
     {
         if (currentArgument()[0] == '-')
         {
-            if (currentArgument() == "-v")
+            if (currentArgument() == "-v" || currentArgument() == "--version")
             {
                 isVersion = true;
             }
-            else if (currentArgument() == "-h")
+            else if (currentArgument() == "-h" || currentArgument() == "--help")
             {
                 isHelp = true;
             }
-            else if (currentArgument() == "-t")
+            else if (currentArgument() == "-t" || currentArgument() == "--tokens")
             {
                 isTokens = true;
             }
             else
             {
-                std::cout << "Flag not recognised." << std::endl;
-                hadError = true;
+                error("Flag not recognised.");
             }
         }
         else
@@ -79,8 +90,7 @@ CompilerOptions::CompilerOptions(int argc, char *argv[])
             }
             else
             {
-                std::cout << "File does not exist." << std::endl;
-                hadError = true;
+                error("File does not exist.");
             }
         }
 
@@ -89,8 +99,7 @@ CompilerOptions::CompilerOptions(int argc, char *argv[])
 
     if (isTokens && !hasSourceFile)
     {
-        std::cout << "Cannot display tokens with input source file." << std::endl;
-        hadError = true;
+        error("Cannot display tokens with input source file.");
     }
 }
 
