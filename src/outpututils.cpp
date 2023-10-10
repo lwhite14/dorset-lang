@@ -3,6 +3,16 @@
 #include <iostream>
 #include <iomanip>
 
+#include "version.h"
+
+#ifndef GIT_COMMIT_HASH
+#define GIT_COMMIT_HASH "?"
+#endif
+
+#ifndef GIT_BRANCH
+#define GIT_BRANCH "?"
+#endif
+
 void printUsage()
 {
     std::cout << "Usage: dorset [file] [options]            " << std::endl;
@@ -16,7 +26,8 @@ void printUsage()
 
 void printVersion()
 {
-    std::cout << "Version: 0.1.0                            " << std::endl;
+    std::cout << "dorset-lang " << Version.to_string() << std::endl; 
+    std::cout << "(" << GIT_COMMIT_HASH << ")" << std::endl;
 }
 
 void printTokens(std::vector<Token> tokens)
@@ -33,7 +44,7 @@ void printTokens(std::vector<Token> tokens)
     std::cout << "----------------------------------------------";
     std::cout << "----------------------------------------------" << std::endl;
 
-    for (auto token : tokens) 
+    for (auto token : tokens)
     {
         std::cout << std::setw(20);
         std::cout << token.getTypeStr();
