@@ -46,6 +46,39 @@ bool CompilerOptions::fileExists(std::string fileName)
     }
 }
 
+void CompilerOptions::processFlag()
+{
+    if (currentArgument() == "-v" || currentArgument() == "--version")
+    {
+        isVersion = true;
+    }
+    else if (currentArgument() == "-h" || currentArgument() == "--help")
+    {
+        isHelp = true;
+    }
+    else if (currentArgument() == "-t" || currentArgument() == "--tokens")
+    {
+        isTokens = true;
+    }
+    else
+    {
+        error("Flag not recognised.");
+    }
+}
+
+void CompilerOptions::processFile()
+{
+    if (!fileExists(currentArgument()))
+    {
+        error("File does not exist.");
+        return;
+    }
+
+    sourceFile = removeFileExtension(currentArgument());
+    sourceFileLocation = std::filesystem::absolute(currentArgument());
+    hasSourceFile = true;
+}
+
 CompilerOptions::CompilerOptions(int argc, char *argv[])
 {
     for (unsigned int i = 1; i < argc; i++)
@@ -63,35 +96,11 @@ CompilerOptions::CompilerOptions(int argc, char *argv[])
     {
         if (currentArgument()[0] == '-')
         {
-            if (currentArgument() == "-v" || currentArgument() == "--version")
-            {
-                isVersion = true;
-            }
-            else if (currentArgument() == "-h" || currentArgument() == "--help")
-            {
-                isHelp = true;
-            }
-            else if (currentArgument() == "-t" || currentArgument() == "--tokens")
-            {
-                isTokens = true;
-            }
-            else
-            {
-                error("Flag not recognised.");
-            }
+            processFlag();
         }
         else
         {
-            if (fileExists(currentArgument()))
-            {
-                sourceFile = removeFileExtension(currentArgument());
-                sourceFileLocation = std::filesystem::absolute(currentArgument());
-                hasSourceFile = true;
-            }
-            else
-            {
-                error("File does not exist.");
-            }
+            processFile();
         }
 
         advanceArgument();
@@ -99,7 +108,7 @@ CompilerOptions::CompilerOptions(int argc, char *argv[])
 
     if (isTokens && !hasSourceFile)
     {
-        error("Cannot display tokens with input source file.");
+        error("Cannot display tokens without an input source file.");
     }
 }
 

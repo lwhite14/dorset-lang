@@ -52,22 +52,28 @@ int main(int argc, char *argv[])
 {
     CompilerOptions options = CompilerOptions(argc, argv);
 
-    if (!options.getHadError())
+    if (options.getHadError())
     {
-        if (options.getIsHelp())
+        printUsage();
+        return 0;
+    }
+
+    if (options.getIsHelp())
+    {
+        printUsage();
+    }
+    else if (options.getIsVersion())
+    {
+        printVersion();
+    }
+    else if (options.getHasSourceFile())
+    {
+        std::vector<Token> tokens = lex(getSourceContents(options.getSourceFileLocation()));
+        if (options.getIsTokens())
         {
-            printUsage();
+            printTokens(tokens);
         }
-        if (options.getIsVersion())
-        {
-            printVersion();
-        }
-        if (options.getHasSourceFile())
-        {
-            std::vector<Token> tokens = lex(getSourceContents(options.getSourceFileLocation()));
-            if (options.getIsTokens()) { printTokens(tokens); }
-            buildAST(tokens, options.getSourceFile(), options.getSourceFileLocation());
-        }
+        buildAST(tokens, options.getSourceFile(), options.getSourceFileLocation());
     }
     else
     {

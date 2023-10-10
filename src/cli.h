@@ -30,6 +30,9 @@ private:
     std::string removeFileExtension(std::string fileName);
     bool fileExists(std::string fileName);
 
+    void processFlag();
+    void processFile();
+
 
 public:
     CompilerOptions(int argc, char *argv[]);
