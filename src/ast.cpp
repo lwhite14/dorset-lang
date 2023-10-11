@@ -4,16 +4,14 @@
 #include <ostream>
 
 #include "error.h"
+#include "cli.h"
 
 namespace AST
 {
-    void initializeModule(std::string fileName, std::string filePath)
+    void initializeModule()
     {
-        sourceFileName = fileName;
-        sourceFileLocation = filePath;
-
         TheContext = new LLVMContext;
-        TheModule = new Module(sourceFileLocation, *TheContext);
+        TheModule = new Module(CompilerOptions::SourceFileLocation, *TheContext);
 
         // Create a new builder for the module.
         Builder = new IRBuilder<>(*TheContext);
@@ -27,28 +25,28 @@ namespace AST
         ostream.flush();
 
         std::ofstream irFile;
-        irFile.open(sourceFileName + ".ll");
+        irFile.open(CompilerOptions::SourceFile + ".ll");
         irFile << ir;
         irFile.close();
 
-        if (system(("llc " + sourceFileName + ".ll").c_str()) != 0)
+        if (system(("llc " + CompilerOptions::SourceFile + ".ll").c_str()) != 0)
         {
             std::cout << "Error compiling LLVM IR." << std::endl;
             return;
         }
-        if (system(("gcc -c " + sourceFileName + ".s").c_str()) != 0)
+        if (system(("gcc -c " + CompilerOptions::SourceFile + ".s").c_str()) != 0)
         {
             std::cout << "Error compiling assembly." << std::endl;
             return;
         }
-        if (system(("gcc " + sourceFileName + ".o -o " + sourceFileName + ".out -no-pie").c_str()) != 0)
+        if (system(("gcc " + CompilerOptions::SourceFile + ".o -o " + CompilerOptions::SourceFile + ".out -no-pie").c_str()) != 0)
         {
             std::cout << "Error compiling object file." << std::endl;
             return;
         }
 
-        system(("rm " + sourceFileName + ".o").c_str());
-        system(("rm " + sourceFileName + ".s").c_str());
+        system(("rm " + CompilerOptions::SourceFile + ".o").c_str());
+        system(("rm " + CompilerOptions::SourceFile + ".s").c_str());
     }
 
     Value *logError(std::string message)

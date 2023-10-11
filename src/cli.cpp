@@ -74,8 +74,8 @@ void CompilerOptions::processFile()
         return;
     }
 
-    sourceFile = removeFileExtension(currentArgument());
-    sourceFileLocation = std::filesystem::absolute(currentArgument());
+    SourceFile = removeFileExtension(currentArgument());
+    SourceFileLocation = std::filesystem::absolute(currentArgument());
     hasSourceFile = true;
 }
 
@@ -132,17 +132,68 @@ bool CompilerOptions::getHasSourceFile()
     return hasSourceFile;
 }
 
-std::string CompilerOptions::getSourceFile()
-{
-    return sourceFile;
-}
-
-std::string CompilerOptions::getSourceFileLocation()
-{
-    return sourceFileLocation;
-}
-
 bool CompilerOptions::getHadError()
 {
     return hadError;
+}
+
+std::string Compiler::getSourceContents(std::string fileName)
+{
+    std::ifstream file(fileName);
+    std::string text;
+    std::string output;
+    while (getline(file, text))
+    {
+        output = output + text + '\n';
+    }
+    return output;
+}
+
+std::vector<Token> Compiler::lex(std::string contents)
+{
+    Lexer lexer = Lexer(contents);
+    return lexer.scanTokens();
+}
+
+void Compiler::buildAST(std::vector<Token> tokens)
+{
+    ASTBuilder parser = ASTBuilder(tokens);
+    parser.parseTokenList();
+}
+
+Compiler::Compiler(CompilerOptions options) : options{options}
+{
+}
+
+int Compiler::compile()
+{
+    if (options.getHadError())
+    {
+        printUsage();
+        return 0;
+    }
+
+    if (options.getIsHelp())
+    {
+        printUsage();
+    }
+    else if (options.getIsVersion())
+    {
+        printVersion();
+    }
+    else if (options.getHasSourceFile())
+    {
+        std::vector<Token> tokens = lex(getSourceContents(CompilerOptions::SourceFileLocation));
+        if (options.getIsTokens())
+        {
+            printTokens(tokens);
+        }
+        buildAST(tokens);
+    }
+    else
+    {
+        printUsage();
+    }
+
+    return 0;
 }

@@ -22,9 +22,9 @@ Token ASTBuilder::advanceToken()
     return currentToken();
 }
 
-void ASTBuilder::parseTokenList(std::string fileName, std::string filePath)
+void ASTBuilder::parseTokenList()
 {
-    AST::initializeModule(fileName, filePath);
+    AST::initializeModule();
     AST::createExternalFunctions();
     while (true)
     {

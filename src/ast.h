@@ -22,15 +22,12 @@ using namespace llvm;
 
 namespace AST
 {
-    static std::string sourceFileName;
-    static std::string sourceFileLocation;
-
     static LLVMContext* TheContext;
     static Module* TheModule;
     static IRBuilder<>* Builder;
     static std::map<std::string, Value *> NamedValues;
 
-    void initializeModule(std::string fileName, std::string filePath);
+    void initializeModule();
     void outputModule();
     Value* logError(std::string message);
 

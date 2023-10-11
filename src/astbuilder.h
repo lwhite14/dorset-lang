@@ -38,5 +38,5 @@ private:
 public:
     ASTBuilder(std::vector<Token> tokens);
 
-    void parseTokenList(std::string fileName, std::string filePath);
+    void parseTokenList();
 };

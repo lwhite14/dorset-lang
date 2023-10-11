@@ -1,9 +1,16 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
+#include <memory>
 #include <filesystem>
+
+#include "error.h"
+#include "lexer.h"
+#include "outpututils.h"
+#include "astbuilder.h"
 
 class CompilerOptions
 {
@@ -19,9 +26,6 @@ private:
 
     bool hadError = false;
 
-    std::string sourceFile;
-    std::string sourceFileLocation;
-
     void advanceArgument();
     std::string currentArgument();
     bool isAtEnd();
@@ -33,16 +37,31 @@ private:
     void processFlag();
     void processFile();
 
-
 public:
+    static inline std::string SourceFile;
+    static inline std::string SourceFileLocation;
+
     CompilerOptions(int argc, char *argv[]);
 
     bool getIsHelp();
     bool getIsVersion();
     bool getIsTokens();
     bool getHasSourceFile();
-    std::string getSourceFile();
-    std::string getSourceFileLocation();
     bool getHadError();
 };
 
+class Compiler
+{
+private:
+    CompilerOptions options;
+
+    std::string getSourceContents(std::string fileName);
+    std::vector<Token> lex(std::string contents);
+    void buildAST(std::vector<Token> tokens);
+
+public:
+    Compiler(CompilerOptions options);
+
+    int compile();
+
+};
