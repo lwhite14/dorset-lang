@@ -25,28 +25,28 @@ namespace AST
         ostream.flush();
 
         std::ofstream irFile;
-        irFile.open(CompilerOptions::SourceFile + ".ll");
+        irFile.open(CompilerOptions::OutputLL);
         irFile << ir;
         irFile.close();
 
-        if (system(("llc " + CompilerOptions::SourceFile + ".ll").c_str()) != 0)
+        if (system(("llc " + CompilerOptions::OutputLL).c_str()) != 0)
         {
             std::cout << "Error compiling LLVM IR." << std::endl;
             return;
         }
-        if (system(("gcc -c " + CompilerOptions::SourceFile + ".s").c_str()) != 0)
+        if (system(("gcc -c " + CompilerOptions::OutputS).c_str()) != 0)
         {
             std::cout << "Error compiling assembly." << std::endl;
             return;
         }
-        if (system(("gcc " + CompilerOptions::SourceFile + ".o -o " + CompilerOptions::SourceFile + ".out -no-pie").c_str()) != 0)
+        if (system(("gcc " + CompilerOptions::OutputO + " -o " + CompilerOptions::OutputFinal + " -no-pie").c_str()) != 0)
         {
             std::cout << "Error compiling object file." << std::endl;
             return;
         }
 
-        system(("rm " + CompilerOptions::SourceFile + ".o").c_str());
-        system(("rm " + CompilerOptions::SourceFile + ".s").c_str());
+        system(("rm " + CompilerOptions::OutputO).c_str());
+        system(("rm " + CompilerOptions::OutputS).c_str());
     }
 
     Value *logError(std::string message)

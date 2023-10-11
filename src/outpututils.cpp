@@ -18,15 +18,16 @@ void printUsage()
     std::cout << "Usage: dorset [file] [options]                    " << std::endl;
     std::cout << "                                                  " << std::endl;
     std::cout << "Options:                                          " << std::endl;
-    std::cout << "    -t --tokens  = list all the tokens            " << std::endl;
-    std::cout << "    -h --help    = print the usage                " << std::endl;
-    std::cout << "    -v --version = print the version              " << std::endl;
+    std::cout << "    -t --tokens   = list all the tokens           " << std::endl;
+    std::cout << "    -h --help     = print the usage               " << std::endl;
+    std::cout << "    -v --version  = print the version             " << std::endl;
+    std::cout << "    -o <filename> = specify the output name       " << std::endl;
     std::cout << "                                                  " << std::endl;
 }
 
 void printVersion()
 {
-    std::cout << "dorset-lang " << Version.to_string() << std::endl; 
+    std::cout << "dorset-lang " << Version.to_string() << std::endl;
     std::cout << "(" << GIT_COMMIT_HASH << ")" << std::endl;
 }
 

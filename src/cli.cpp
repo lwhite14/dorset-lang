@@ -60,6 +60,16 @@ void CompilerOptions::processFlag()
     {
         isTokens = true;
     }
+    else if (currentArgument() == "-o")
+    {
+        advanceArgument();
+        OutputFinal = currentArgument();
+        hasOutputName = true;
+    }
+    else if (currentArgument() == "-l" || currentArgument() == "--library")
+    {
+        isLibrary = true;
+    }
     else
     {
         error("Flag not recognised.");
@@ -77,6 +87,24 @@ void CompilerOptions::processFile()
     SourceFile = removeFileExtension(currentArgument());
     SourceFileLocation = std::filesystem::absolute(currentArgument());
     hasSourceFile = true;
+}
+
+void CompilerOptions::constructOutputBinaryNames()
+{
+    if (hasOutputName)
+    {
+        std::string name = removeFileExtension(OutputFinal);
+        OutputLL = name + ".ll";
+        OutputO = name + ".o";
+        OutputS = name + ".s";
+    }
+    else
+    {
+        OutputFinal = SourceFile + ".out";
+        OutputLL = SourceFile + ".ll";
+        OutputO = SourceFile + ".o";
+        OutputS = SourceFile + ".s";
+    }
 }
 
 CompilerOptions::CompilerOptions(int argc, char *argv[])
@@ -105,6 +133,8 @@ CompilerOptions::CompilerOptions(int argc, char *argv[])
 
         advanceArgument();
     }
+
+    constructOutputBinaryNames();
 
     if (isTokens && !hasSourceFile)
     {
@@ -136,6 +166,21 @@ bool CompilerOptions::getHadError()
 {
     return hadError;
 }
+
+bool CompilerOptions::getHasOutputName()
+{
+    return hasOutputName;
+}
+
+bool CompilerOptions::getIsLibrary()
+{
+    return isLibrary;
+}
+
+
+//////////////////
+//// Compiler ////
+//////////////////
 
 std::string Compiler::getSourceContents(std::string fileName)
 {

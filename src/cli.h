@@ -23,6 +23,8 @@ private:
     bool isVersion = false;
     bool isTokens = false;
     bool hasSourceFile = false;
+    bool hasOutputName = false;
+    bool isLibrary = false;
 
     bool hadError = false;
 
@@ -37,9 +39,16 @@ private:
     void processFlag();
     void processFile();
 
+    void constructOutputBinaryNames();
+
 public:
     static inline std::string SourceFile;
     static inline std::string SourceFileLocation;
+
+    static inline std::string OutputLL;
+    static inline std::string OutputS;
+    static inline std::string OutputO;
+    static inline std::string OutputFinal;
 
     CompilerOptions(int argc, char *argv[]);
 
@@ -48,6 +57,8 @@ public:
     bool getIsTokens();
     bool getHasSourceFile();
     bool getHadError();
+    bool getHasOutputName();
+    bool getIsLibrary();
 };
 
 class Compiler
