@@ -68,7 +68,7 @@ void CompilerOptions::processFlag()
     }
     else if (currentArgument() == "-l" || currentArgument() == "--library")
     {
-        isLibrary = true;
+        IsLibrary = true;
     }
     else
     {
@@ -174,7 +174,7 @@ bool CompilerOptions::getHasOutputName()
 
 bool CompilerOptions::getIsLibrary()
 {
-    return isLibrary;
+    return IsLibrary;
 }
 
 

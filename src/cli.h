@@ -24,7 +24,6 @@ private:
     bool isTokens = false;
     bool hasSourceFile = false;
     bool hasOutputName = false;
-    bool isLibrary = false;
 
     bool hadError = false;
 
@@ -49,6 +48,8 @@ public:
     static inline std::string OutputS;
     static inline std::string OutputO;
     static inline std::string OutputFinal;
+
+    static inline bool IsLibrary = false;
 
     CompilerOptions(int argc, char *argv[]);
 

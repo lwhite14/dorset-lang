@@ -29,23 +29,29 @@ namespace AST
         irFile << ir;
         irFile.close();
 
-        if (system(("llc " + CompilerOptions::OutputLL).c_str()) != 0)
+        if (system(("llc " + CompilerOptions::OutputLL + " -o " + CompilerOptions::OutputS).c_str()) != 0)
         {
             std::cout << "Error compiling LLVM IR." << std::endl;
             return;
         }
-        if (system(("gcc -c " + CompilerOptions::OutputS).c_str()) != 0)
+        if (system(("gcc -c " + CompilerOptions::OutputS + " -o " + CompilerOptions::OutputO).c_str()) != 0)
         {
             std::cout << "Error compiling assembly." << std::endl;
             return;
         }
-        if (system(("gcc " + CompilerOptions::OutputO + " -o " + CompilerOptions::OutputFinal + " -no-pie").c_str()) != 0)
+        if (!CompilerOptions::IsLibrary)
         {
-            std::cout << "Error compiling object file." << std::endl;
-            return;
+            if (system(("gcc " + CompilerOptions::OutputO + " -o " + CompilerOptions::OutputFinal + " -no-pie").c_str()) != 0)
+            {
+                std::cout << "Error compiling object file." << std::endl;
+                return;
+            }
         }
 
-        system(("rm " + CompilerOptions::OutputO).c_str());
+        if (!CompilerOptions::IsLibrary)
+        {
+            system(("rm " + CompilerOptions::OutputO).c_str());
+        }
         system(("rm " + CompilerOptions::OutputS).c_str());
     }
 

@@ -1,4 +1,4 @@
-fn main() 
+fn foo(x) 
 {
-    printf("welcome!");
+    x + 2;
 }
