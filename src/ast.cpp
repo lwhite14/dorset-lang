@@ -60,10 +60,17 @@ namespace AST
                 return;
             }
         }
+    }
 
+    void removeBuildFiles()
+    {
         if (!CompilerOptions::IsLibrary)
         {
             system(("rm " + CompilerOptions::OutputO).c_str());
+        }
+        if (!CompilerOptions::GenerateLLVMIR)
+        {
+            system(("rm " + CompilerOptions::OutputLL).c_str());
         }
         system(("rm " + CompilerOptions::OutputS).c_str());
     }

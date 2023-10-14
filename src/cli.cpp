@@ -70,6 +70,10 @@ void CompilerOptions::processFlag()
     {
         IsLibrary = true;
     }
+    else if (currentArgument() == "-r" || currentArgument() == "--llvmir")
+    {
+        GenerateLLVMIR = true;
+    }
     else
     {
         error("Flag not recognised.");

@@ -36,6 +36,7 @@ namespace AST
 
     void initializeModule();
     void outputModule();
+    void removeBuildFiles();
     Value* logError(std::string message);
 
     /// ExprAST - Base class for all expression nodes.

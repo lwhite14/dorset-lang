@@ -50,6 +50,7 @@ public:
     static inline std::string OutputFinal;
 
     static inline bool IsLibrary = false;
+    static inline bool GenerateLLVMIR = false;
 
     CompilerOptions(int argc, char *argv[]);
 

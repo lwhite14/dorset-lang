@@ -34,6 +34,7 @@ void ASTBuilder::parseTokenList()
             if (!ErrorHandler::HadError)
             {
                 AST::outputModule();
+                AST::removeBuildFiles();
             }
             return;
         case FUNCTION:
