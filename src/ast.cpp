@@ -13,6 +13,19 @@ namespace AST
         TheContext = new LLVMContext;
         TheModule = new Module(CompilerOptions::SourceFileLocation, *TheContext);
 
+        TheFPM = new legacy::FunctionPassManager(TheModule);
+
+        // Do simple "peephole" optimizations and bit-twiddling optzns.
+        TheFPM->add(createInstructionCombiningPass());
+        // Reassociate expressions.
+        TheFPM->add(createReassociatePass());
+        // Eliminate Common SubExpressions.
+        TheFPM->add(createGVNPass());
+        // Simplify the control flow graph (deleting unreachable blocks, etc).
+        TheFPM->add(createCFGSimplificationPass());
+
+        TheFPM->doInitialization();
+
         // Create a new builder for the module.
         Builder = new IRBuilder<>(*TheContext);
     }
@@ -210,6 +223,8 @@ namespace AST
 
             // Validate the generated code, checking for consistency.
             verifyFunction(*TheFunction);
+
+            TheFPM->run(*TheFunction);
 
             return TheFunction;
         }
