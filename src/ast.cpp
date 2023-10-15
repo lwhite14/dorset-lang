@@ -8,7 +8,13 @@
 
 namespace AST
 {
-    void initializeModule()
+    Value *logError(std::string message)
+    {
+        ErrorHandler::error(message);
+        return nullptr;
+    }
+
+    void MasterAST::initializeModule()
     {
         TheContext = new LLVMContext;
         TheModule = new Module(CompilerOptions::SourceFileLocation, *TheContext);
@@ -30,7 +36,7 @@ namespace AST
         Builder = new IRBuilder<>(*TheContext);
     }
 
-    void outputModule()
+    void  MasterAST::outputModule()
     {
         std::string ir;
         raw_string_ostream ostream(ir);
@@ -62,7 +68,7 @@ namespace AST
         }
     }
 
-    void removeBuildFiles()
+    void  MasterAST::removeBuildFiles()
     {
         if (!CompilerOptions::IsLibrary)
         {
@@ -75,19 +81,13 @@ namespace AST
         system(("rm " + CompilerOptions::OutputS).c_str());
     }
 
-    Value *logError(std::string message)
-    {
-        ErrorHandler::error(message);
-        return nullptr;
-    }
-
     NumberExprAST::NumberExprAST(double Val) : Val(Val)
     {
     }
 
     Value *NumberExprAST::codegen()
     {
-        return ConstantFP::get(*TheContext, APFloat(Val));
+        return ConstantFP::get(*MasterAST::TheContext, APFloat(Val));
     }
 
     StringExprAST::StringExprAST(std::string Val) : Val(Val)
@@ -96,7 +96,7 @@ namespace AST
 
     Value *StringExprAST::codegen()
     {
-        return Builder->CreateGlobalString(Val + "\n");
+        return MasterAST::Builder->CreateGlobalString(Val + "\n");
     }
 
     VariableExprAST::VariableExprAST(const std::string &Name)
@@ -107,7 +107,7 @@ namespace AST
     Value *VariableExprAST::codegen()
     {
         // Look this variable up in the function.
-        Value *V = NamedValues[Name];
+        Value *V = MasterAST::NamedValues[Name];
         if (!V)
             logError("Unknown variable: '" + Name + "'");
         return V;
@@ -128,15 +128,15 @@ namespace AST
         switch (Op)
         {
         case '+':
-            return Builder->CreateFAdd(L, R, "addtmp");
+            return MasterAST::Builder->CreateFAdd(L, R, "addtmp");
         case '-':
-            return Builder->CreateFSub(L, R, "subtmp");
+            return MasterAST::Builder->CreateFSub(L, R, "subtmp");
         case '*':
-            return Builder->CreateFMul(L, R, "multmp");
+            return MasterAST::Builder->CreateFMul(L, R, "multmp");
         case '<':
-            L = Builder->CreateFCmpULT(L, R, "cmptmp");
+            L = MasterAST::Builder->CreateFCmpULT(L, R, "cmptmp");
             // Convert bool 0/1 to double 0.0 or 1.0
-            return Builder->CreateUIToFP(L, Type::getDoubleTy(*TheContext), "booltmp");
+            return MasterAST::Builder->CreateUIToFP(L, Type::getDoubleTy(*MasterAST::TheContext), "booltmp");
         default:
             return logError("invalid binary operator");
         }
@@ -150,7 +150,7 @@ namespace AST
     Value *CallExprAST::codegen()
     {
         // Look up the name in the global module table.
-        Function *CalleeF = TheModule->getFunction(Callee);
+        Function *CalleeF = MasterAST::TheModule->getFunction(Callee);
         if (!CalleeF)
             return logError("Unknown function referenced");
 
@@ -166,7 +166,7 @@ namespace AST
                 return nullptr;
         }
 
-        return Builder->CreateCall(CalleeF, ArgsV, "calltmp");
+        return MasterAST::Builder->CreateCall(CalleeF, ArgsV, "calltmp");
     }
 
     PrototypeAST::PrototypeAST(const std::string &Name, std::vector<std::string> Args)
@@ -182,11 +182,11 @@ namespace AST
     Function *PrototypeAST::codegen()
     {
         // Make the function type:  double(double,double) etc.
-        std::vector<Type *> Doubles(Args.size(), Type::getDoubleTy(*TheContext));
+        std::vector<Type *> Doubles(Args.size(), Type::getDoubleTy(*MasterAST::TheContext));
 
-        FunctionType *FT = FunctionType::get(Type::getDoubleTy(*TheContext), Doubles, false);
+        FunctionType *FT = FunctionType::get(Type::getDoubleTy(*MasterAST::TheContext), Doubles, false);
 
-        Function *F = Function::Create(FT, Function::ExternalLinkage, Name, TheModule);
+        Function *F = Function::Create(FT, Function::ExternalLinkage, Name, MasterAST::TheModule);
 
         // Set names for all arguments.
         unsigned Idx = 0;
@@ -206,7 +206,7 @@ namespace AST
     Function *FunctionAST::codegen()
     {
         // First, check for an existing function from a previous 'extern' declaration.
-        Function *TheFunction = TheModule->getFunction(Proto->getName());
+        Function *TheFunction = MasterAST::TheModule->getFunction(Proto->getName());
 
         if (!TheFunction)
             TheFunction = Proto->codegen();
@@ -215,23 +215,23 @@ namespace AST
             return nullptr;
 
         // Create a new basic block to start insertion into.
-        BasicBlock *BB = BasicBlock::Create(*TheContext, "entry", TheFunction);
-        Builder->SetInsertPoint(BB);
+        BasicBlock *BB = BasicBlock::Create(*MasterAST::TheContext, "entry", TheFunction);
+        MasterAST::Builder->SetInsertPoint(BB);
 
         // Record the function arguments in the NamedValues map.
-        NamedValues.clear();
+        MasterAST::NamedValues.clear();
         for (auto &Arg : TheFunction->args())
-            NamedValues[std::string(Arg.getName())] = &Arg;
+            MasterAST::NamedValues[std::string(Arg.getName())] = &Arg;
 
         if (Value *RetVal = Body->codegen())
         {
             // Finish off the function.
-            Builder->CreateRet(RetVal);
+            MasterAST::Builder->CreateRet(RetVal);
 
             // Validate the generated code, checking for consistency.
             verifyFunction(*TheFunction);
 
-            TheFPM->run(*TheFunction);
+            MasterAST::TheFPM->run(*TheFunction);
 
             return TheFunction;
         }
@@ -243,11 +243,11 @@ namespace AST
 
     void createExternalFunctions()
     {
-        auto bytePtrTy = Builder->getInt8Ty()->getPointerTo();
+        auto bytePtrTy = MasterAST::Builder->getInt8Ty()->getPointerTo();
 
-        TheModule->getOrInsertFunction("printf",
+        MasterAST::TheModule->getOrInsertFunction("printf",
                                        llvm::FunctionType::get(
-                                           /* return type */ Builder->getDoubleTy(),
+                                           /* return type */ MasterAST::Builder->getDoubleTy(),
                                            /* format arg */ bytePtrTy,
                                            /* vararg */ true));
     }

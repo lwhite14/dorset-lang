@@ -1,1 +1,4 @@
-fn test(x) { (1+2+x)*(x+(1+2)); }
+fn main()
+{
+    printf("Hello World!");
+}

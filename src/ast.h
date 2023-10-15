@@ -28,16 +28,21 @@ using namespace llvm;
 
 namespace AST
 {
-    static LLVMContext* TheContext;
-    static Module* TheModule;
-    static IRBuilder<>* Builder;
-    static std::map<std::string, Value *> NamedValues;
-    static legacy::FunctionPassManager* TheFPM;
+    Value *logError(std::string message);
 
-    void initializeModule();
-    void outputModule();
-    void removeBuildFiles();
-    Value* logError(std::string message);
+    class MasterAST
+    {
+    public:
+        static inline LLVMContext *TheContext;
+        static inline Module *TheModule;
+        static inline IRBuilder<> *Builder;
+        static inline std::map<std::string, Value *> NamedValues;
+        static inline legacy::FunctionPassManager *TheFPM;
+
+        static void initializeModule();
+        static void outputModule();
+        static void removeBuildFiles();
+    };
 
     /// ExprAST - Base class for all expression nodes.
     class ExprAST
@@ -84,11 +89,11 @@ namespace AST
     {
     private:
         char Op;
-        ExprAST* LHS;
-        ExprAST* RHS;
+        ExprAST *LHS;
+        ExprAST *RHS;
 
     public:
-        BinaryExprAST(char Op, ExprAST* LHS, ExprAST* RHS);
+        BinaryExprAST(char Op, ExprAST *LHS, ExprAST *RHS);
         Value *codegen() override;
     };
 
@@ -97,10 +102,10 @@ namespace AST
     {
     private:
         std::string Callee;
-        std::vector<ExprAST*> Args;
+        std::vector<ExprAST *> Args;
 
     public:
-        CallExprAST(const std::string &Callee, std::vector<ExprAST*> Args);
+        CallExprAST(const std::string &Callee, std::vector<ExprAST *> Args);
         Value *codegen() override;
     };
 
@@ -122,11 +127,11 @@ namespace AST
     /// FunctionAST - This class represents a function definition itself.
     class FunctionAST
     {
-        PrototypeAST* Proto;
-        ExprAST* Body;
+        PrototypeAST *Proto;
+        ExprAST *Body;
 
     public:
-        FunctionAST(PrototypeAST* Proto, ExprAST* Body);
+        FunctionAST(PrototypeAST *Proto, ExprAST *Body);
         Function *codegen();
     };
 

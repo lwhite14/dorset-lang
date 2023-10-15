@@ -24,7 +24,7 @@ Token ASTBuilder::advanceToken()
 
 void ASTBuilder::parseTokenList()
 {
-    AST::initializeModule();
+    AST::MasterAST::initializeModule();
     AST::createExternalFunctions();
     while (true)
     {
@@ -33,8 +33,8 @@ void ASTBuilder::parseTokenList()
         case _EOF:
             if (!ErrorHandler::HadError)
             {
-                AST::outputModule();
-                AST::removeBuildFiles();
+                AST::MasterAST::outputModule();
+                AST::MasterAST::removeBuildFiles();
             }
             return;
         case FUNCTION:
