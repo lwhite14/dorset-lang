@@ -1,4 +1,6 @@
+extern putchard(x)
+
 fn main()
 {
-    printf("Hello World!");
+    putchard(40);
 }

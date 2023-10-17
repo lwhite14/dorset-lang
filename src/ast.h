@@ -23,26 +23,14 @@
 #include "llvm/Transforms/InstCombine/InstCombine.h"
 #include "llvm/Transforms/Scalar.h"
 #include "llvm/Transforms/Scalar/GVN.h"
+#include "../deps/JIT.h"
 
 using namespace llvm;
 
 namespace AST
 {
     Value *logError(std::string message);
-
-    class MasterAST
-    {
-    public:
-        static inline LLVMContext *TheContext;
-        static inline Module *TheModule;
-        static inline IRBuilder<> *Builder;
-        static inline std::map<std::string, Value *> NamedValues;
-        static inline legacy::FunctionPassManager *TheFPM;
-
-        static void initializeModule();
-        static void outputModule();
-        static void removeBuildFiles();
-    };
+    Function *getFunction(std::string Name);
 
     /// ExprAST - Base class for all expression nodes.
     class ExprAST
@@ -133,6 +121,24 @@ namespace AST
     public:
         FunctionAST(PrototypeAST *Proto, ExprAST *Body);
         Function *codegen();
+    };
+
+    class MasterAST
+    {
+    public:
+        static inline LLVMContext *TheContext;
+        static inline Module *TheModule;
+        static inline IRBuilder<> *Builder;
+        static inline std::map<std::string, Value *> NamedValues;
+        static inline legacy::FunctionPassManager *TheFPM;
+        static inline orc::JIT* TheJIT;
+        static inline std::map<std::string, PrototypeAST *> FunctionProtos;
+        static inline ExitOnError ExitOnErr;
+
+        static void initializeJIT();
+        static void initializeModule();
+        static void outputModule();
+        static void removeBuildFiles();
     };
 
     void createExternalFunctions();

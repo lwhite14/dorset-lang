@@ -1,5 +1,7 @@
 #include "astbuilder.h"
 
+#include "llvm/ExecutionEngine/Orc/ThreadSafeModule.h"
+
 ASTBuilder::ASTBuilder(std::vector<Token> tokens)
 {
     this->tokens = tokens;
@@ -24,6 +26,7 @@ Token ASTBuilder::advanceToken()
 
 void ASTBuilder::parseTokenList()
 {
+    AST::MasterAST::initializeJIT();
     AST::MasterAST::initializeModule();
     AST::createExternalFunctions();
     while (true)
@@ -40,14 +43,16 @@ void ASTBuilder::parseTokenList()
         case FUNCTION:
             handleDefinition();
             break;
+        case EXTERN:
+            handleExtern();
+            break;
         default:
-            ErrorHandler::error("only functions allowed at the top level", currentToken().getLine(), currentToken().getCharacter());
+            ErrorHandler::error("unkown token at the top level", currentToken().getLine(), currentToken().getCharacter());
             advanceToken(); // ignore non function tokens
             break;
         }
     }
 }
-
 
 AST::ExprAST *ASTBuilder::parseExpression()
 {
@@ -136,13 +141,41 @@ AST::FunctionAST *ASTBuilder::parseDefinition()
     return nullptr;
 }
 
+AST::PrototypeAST *ASTBuilder::parseExtern()
+{
+    advanceToken(); // eat extern.
+    return parsePrototype();
+}
+
 void ASTBuilder::handleDefinition()
 {
     if (auto FnAST = parseDefinition())
     {
         if (auto *FnIR = FnAST->codegen())
         {
+            AST::MasterAST::ExitOnErr(AST::MasterAST::TheJIT->addModule(
+                orc::ThreadSafeModule
+                (
+                    std::unique_ptr<Module>(AST::MasterAST::TheModule), 
+                    std::unique_ptr<LLVMContext>(AST::MasterAST::TheContext)
+                )));
+            //AST::MasterAST::initializeModule();
+        }
+    }
+    else
+    {
+        // Skip token for error recovery.
+        advanceToken();
+    }
+}
 
+void ASTBuilder::handleExtern()
+{
+    if (auto ProtoAST = parseExtern())
+    {
+        if (auto *FnIR = ProtoAST->codegen())
+        {
+            AST::MasterAST::FunctionProtos[ProtoAST->getName()] = std::move(ProtoAST);
         }
     }
     else

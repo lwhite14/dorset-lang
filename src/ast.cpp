@@ -14,10 +14,39 @@ namespace AST
         return nullptr;
     }
 
+    Function *getFunction(std::string Name)
+    {
+        // First, see if the function has already been added to the current module.
+        if (auto *F = MasterAST::TheModule->getFunction(Name))
+            return F;
+
+        // If not, check whether we can codegen the declaration from some existing
+        // prototype.
+        auto FI =  MasterAST::FunctionProtos.find(Name);
+        if (FI !=  MasterAST::FunctionProtos.end())
+            return FI->second->codegen();
+
+        // If no existing prototype exists, return null.
+        return nullptr;
+    }
+
+    void MasterAST::initializeJIT()
+    {
+        InitializeNativeTarget();
+        InitializeNativeTargetAsmPrinter();
+        InitializeNativeTargetAsmParser();
+
+        TheJIT = ExitOnErr(orc::JIT::Create());
+    }
+
     void MasterAST::initializeModule()
     {
         TheContext = new LLVMContext;
         TheModule = new Module(CompilerOptions::SourceFileLocation, *TheContext);
+        TheModule->setDataLayout(TheJIT->getDataLayout());
+
+        // Create a new builder for the module.
+        Builder = new IRBuilder<>(*TheContext);
 
         TheFPM = new legacy::FunctionPassManager(TheModule);
 
@@ -31,12 +60,9 @@ namespace AST
         TheFPM->add(createCFGSimplificationPass());
 
         TheFPM->doInitialization();
-
-        // Create a new builder for the module.
-        Builder = new IRBuilder<>(*TheContext);
     }
 
-    void  MasterAST::outputModule()
+    void MasterAST::outputModule()
     {
         std::string ir;
         raw_string_ostream ostream(ir);
@@ -68,7 +94,7 @@ namespace AST
         }
     }
 
-    void  MasterAST::removeBuildFiles()
+    void MasterAST::removeBuildFiles()
     {
         if (!CompilerOptions::IsLibrary)
         {
@@ -150,7 +176,7 @@ namespace AST
     Value *CallExprAST::codegen()
     {
         // Look up the name in the global module table.
-        Function *CalleeF = MasterAST::TheModule->getFunction(Callee);
+        Function *CalleeF = getFunction(Callee);
         if (!CalleeF)
             return logError("Unknown function referenced");
 
@@ -205,12 +231,11 @@ namespace AST
 
     Function *FunctionAST::codegen()
     {
-        // First, check for an existing function from a previous 'extern' declaration.
-        Function *TheFunction = MasterAST::TheModule->getFunction(Proto->getName());
-
-        if (!TheFunction)
-            TheFunction = Proto->codegen();
-
+        // Transfer ownership of the prototype to the FunctionProtos map, but keep a
+        // reference to it for use below.
+        auto &P = *Proto;
+        MasterAST::FunctionProtos[Proto->getName()] = std::move(Proto);
+        Function *TheFunction = getFunction(P.getName());
         if (!TheFunction)
             return nullptr;
 
@@ -231,6 +256,7 @@ namespace AST
             // Validate the generated code, checking for consistency.
             verifyFunction(*TheFunction);
 
+            // Run the optimizer on the function.
             MasterAST::TheFPM->run(*TheFunction);
 
             return TheFunction;
@@ -246,9 +272,9 @@ namespace AST
         auto bytePtrTy = MasterAST::Builder->getInt8Ty()->getPointerTo();
 
         MasterAST::TheModule->getOrInsertFunction("printf",
-                                       llvm::FunctionType::get(
-                                           /* return type */ MasterAST::Builder->getDoubleTy(),
-                                           /* format arg */ bytePtrTy,
-                                           /* vararg */ true));
+                                                  llvm::FunctionType::get(
+                                                      /* return type */ MasterAST::Builder->getDoubleTy(),
+                                                      /* format arg */ bytePtrTy,
+                                                      /* vararg */ true));
     }
 }
