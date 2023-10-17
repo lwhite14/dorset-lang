@@ -47,3 +47,5 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     "-DGIT_BRANCH=\"${GIT_BRANCH}\"")
+
+install(TARGETS dorset PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dorset-lang)
