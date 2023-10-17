@@ -89,7 +89,7 @@ void CompilerOptions::processFile()
     }
 
     SourceFile = removeFileExtension(currentArgument());
-    SourceFileLocation = std::filesystem::absolute(currentArgument());
+    SourceFileLocation = std::filesystem::absolute(currentArgument()).generic_string();
     hasSourceFile = true;
 }
 
