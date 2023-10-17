@@ -29,6 +29,7 @@ using namespace llvm;
 namespace AST
 {
     Value *logError(std::string message);
+    bool fileExists(std::string fileName);
 
     class MasterAST
     {

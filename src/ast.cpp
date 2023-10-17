@@ -14,6 +14,19 @@ namespace AST
         return nullptr;
     }
 
+    bool fileExists(std::string fileName)
+    {
+        if (FILE* file = fopen(fileName.c_str(), "r"))
+        {
+            fclose(file);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     void MasterAST::initializeModule()
     {
         TheContext = new LLVMContext;
@@ -72,13 +85,16 @@ namespace AST
     {
         if (!CompilerOptions::IsLibrary)
         {
-            system(("rm " + CompilerOptions::OutputO).c_str());
+            if (fileExists(CompilerOptions::OutputO))
+                system(("rm " + CompilerOptions::OutputO).c_str());
         }
         if (!CompilerOptions::GenerateLLVMIR)
         {
-            system(("rm " + CompilerOptions::OutputLL).c_str());
+            if (fileExists(CompilerOptions::OutputLL))
+                system(("rm " + CompilerOptions::OutputLL).c_str());
         }
-        system(("rm " + CompilerOptions::OutputS).c_str());
+        if (fileExists(CompilerOptions::OutputS))
+            system(("rm " + CompilerOptions::OutputS).c_str());
     }
 
     NumberExprAST::NumberExprAST(double Val) : Val(Val)
