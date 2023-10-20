@@ -112,7 +112,7 @@ namespace AST
 
     Value *StringExprAST::codegen()
     {
-        return MasterAST::Builder->CreateGlobalString(Val);
+        return MasterAST::Builder->CreateGlobalString(Val + "\n");
     }
 
     VariableExprAST::VariableExprAST(const std::string &Name)
@@ -255,6 +255,153 @@ namespace AST
         // Error reading body, remove function.
         TheFunction->eraseFromParent();
         return nullptr;
+    }
+
+    IfExprAST::IfExprAST(ExprAST* Cond, ExprAST* Then, ExprAST* Else)
+        : Cond(std::move(Cond)), Then(std::move(Then)), Else(std::move(Else))
+    {
+
+    }
+
+    Value* IfExprAST::codegen() 
+    {
+        Value* CondV = Cond->codegen();
+        if (!CondV)
+            return nullptr;
+
+        // Convert condition to a bool by comparing non-equal to 0.0.
+        CondV = MasterAST::Builder->CreateFCmpONE(
+            CondV, ConstantFP::get(*MasterAST::TheContext, APFloat(0.0)), "ifcond");
+
+        Function* TheFunction = MasterAST::Builder->GetInsertBlock()->getParent();
+
+        // Create blocks for the then and else cases.  Insert the 'then' block at the
+        // end of the function.
+        BasicBlock* ThenBB = BasicBlock::Create(*MasterAST::TheContext, "then", TheFunction);
+        BasicBlock* ElseBB = BasicBlock::Create(*MasterAST::TheContext, "else");
+        BasicBlock* MergeBB = BasicBlock::Create(*MasterAST::TheContext, "ifcont");
+
+        MasterAST::Builder->CreateCondBr(CondV, ThenBB, ElseBB);
+
+        // Emit then value.
+        MasterAST::Builder->SetInsertPoint(ThenBB);
+
+        Value* ThenV = Then->codegen();
+        if (!ThenV)
+            return nullptr;
+
+        MasterAST::Builder->CreateBr(MergeBB);
+        // Codegen of 'Then' can change the current block, update ThenBB for the PHI.
+        ThenBB = MasterAST::Builder->GetInsertBlock();
+
+        // Emit else block.
+        TheFunction->insert(TheFunction->end(), ElseBB);
+        MasterAST::Builder->SetInsertPoint(ElseBB);
+
+        Value* ElseV = Else->codegen();
+        if (!ElseV)
+            return nullptr;
+
+        MasterAST::Builder->CreateBr(MergeBB);
+        // Codegen of 'Else' can change the current block, update ElseBB for the PHI.
+        ElseBB = MasterAST::Builder->GetInsertBlock();
+
+        // Emit merge block.
+        TheFunction->insert(TheFunction->end(), MergeBB);
+        MasterAST::Builder->SetInsertPoint(MergeBB);
+        PHINode* PN = MasterAST::Builder->CreatePHI(Type::getDoubleTy(*MasterAST::TheContext), 2, "iftmp");
+
+        PN->addIncoming(ThenV, ThenBB);
+        PN->addIncoming(ElseV, ElseBB);
+        return PN;
+    }
+
+    ForExprAST::ForExprAST(const std::string& VarName, ExprAST* Start, ExprAST* End, ExprAST* Step, ExprAST* Body)
+        : VarName(VarName), Start(std::move(Start)), End(std::move(End)),
+        Step(std::move(Step)), Body(std::move(Body)) 
+    {
+    }
+
+    Value* ForExprAST::codegen() 
+    {
+        // Emit the start code first, without 'variable' in scope.
+        Value* StartVal = Start->codegen();
+        if (!StartVal)
+            return nullptr;
+
+        // Make the new basic block for the loop header, inserting after current
+        // block.
+        Function* TheFunction = MasterAST::Builder->GetInsertBlock()->getParent();
+        BasicBlock* PreheaderBB = MasterAST::Builder->GetInsertBlock();
+        BasicBlock* LoopBB = BasicBlock::Create(*MasterAST::TheContext, "loop", TheFunction);
+
+        // Insert an explicit fall through from the current block to the LoopBB.
+        MasterAST::Builder->CreateBr(LoopBB);
+
+        // Start insertion in LoopBB.
+        MasterAST::Builder->SetInsertPoint(LoopBB);
+
+        // Start the PHI node with an entry for Start.
+        PHINode* Variable =
+            MasterAST::Builder->CreatePHI(Type::getDoubleTy(*MasterAST::TheContext), 2, VarName);
+        Variable->addIncoming(StartVal, PreheaderBB);
+
+        // Within the loop, the variable is defined equal to the PHI node.  If it
+        // shadows an existing variable, we have to restore it, so save it now.
+        Value* OldVal = MasterAST::NamedValues[VarName];
+        MasterAST::NamedValues[VarName] = Variable;
+
+        // Emit the body of the loop.  This, like any other expr, can change the
+        // current BB.  Note that we ignore the value computed by the body, but don't
+        // allow an error.
+        if (!Body->codegen())
+            return nullptr;
+
+        // Emit the step value.
+        Value* StepVal = nullptr;
+        if (Step) {
+            StepVal = Step->codegen();
+            if (!StepVal)
+                return nullptr;
+        }
+        else {
+            // If not specified, use 1.0.
+            StepVal = ConstantFP::get(*MasterAST::TheContext, APFloat(1.0));
+        }
+
+        Value* NextVar = MasterAST::Builder->CreateFAdd(Variable, StepVal, "nextvar");
+
+        // Compute the end condition.
+        Value* EndCond = End->codegen();
+        if (!EndCond)
+            return nullptr;
+
+        // Convert condition to a bool by comparing non-equal to 0.0.
+        EndCond = MasterAST::Builder->CreateFCmpONE(
+            EndCond, ConstantFP::get(*MasterAST::TheContext, APFloat(0.0)), "loopcond");
+
+        // Create the "after loop" block and insert it.
+        BasicBlock* LoopEndBB = MasterAST::Builder->GetInsertBlock();
+        BasicBlock* AfterBB =
+            BasicBlock::Create(*MasterAST::TheContext, "afterloop", TheFunction);
+
+        // Insert the conditional branch into the end of LoopEndBB.
+        MasterAST::Builder->CreateCondBr(EndCond, LoopBB, AfterBB);
+
+        // Any new code will be inserted in AfterBB.
+        MasterAST::Builder->SetInsertPoint(AfterBB);
+
+        // Add a new entry to the PHI node for the backedge.
+        Variable->addIncoming(NextVar, LoopEndBB);
+
+        // Restore the unshadowed variable.
+        if (OldVal)
+            MasterAST::NamedValues[VarName] = OldVal;
+        else
+            MasterAST::NamedValues.erase(VarName);
+
+        // for expr always returns 0.0.
+        return Constant::getNullValue(Type::getDoubleTy(*MasterAST::TheContext));
     }
 
     void createExternalFunctions()

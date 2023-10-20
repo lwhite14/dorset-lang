@@ -24,6 +24,8 @@ private:
     AST::ExprAST *parseStringExpr();
     AST::ExprAST *parseParenExpr();
     AST::ExprAST *parseIdentifierExpr();
+    AST::ExprAST *parseIfExpr();
+    AST::ExprAST *parseForExpr();
     AST::ExprAST *parsePrimary();
     AST::ExprAST *parseBinOpRHS(int ExprPrec, AST::ExprAST *LHS);
     int getTokPrecedence();

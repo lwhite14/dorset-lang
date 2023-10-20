@@ -1,4 +1,10 @@
+fn printstar(n)
+{
+	for i = 1, i < n, 1.0 
+		in printf("*", 0);
+}
+
 fn main()
 {
-    printf("%f", 25);
+	printstar(15);
 }

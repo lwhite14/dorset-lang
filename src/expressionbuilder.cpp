@@ -112,6 +112,102 @@ AST::ExprAST *ExpressionBuilder::parseIdentifierExpr()
     return new AST::CallExprAST(IdName, Args);
 }
 
+AST::ExprAST* ExpressionBuilder::parseIfExpr()
+{
+    advanceToken();  // eat the if.
+
+    // condition.
+    auto Cond = buildExpression();
+    if (!Cond)
+        return nullptr;
+
+    if (currentToken().getType() != THEN)
+    {
+        ErrorHandler::error("expected then");
+        return nullptr;
+    }
+    advanceToken();  // eat the then
+
+    auto Then = buildExpression();
+    if (!Then)
+        return nullptr;
+
+    if (currentToken().getType() != ELSE)
+    {
+        ErrorHandler::error("expected else");
+        return nullptr;
+    }
+
+    advanceToken();
+
+    auto Else = buildExpression();
+    if (!Else)
+        return nullptr;
+
+    return new AST::IfExprAST(std::move(Cond), std::move(Then),
+        std::move(Else));
+}
+
+AST::ExprAST* ExpressionBuilder::parseForExpr()
+{
+    advanceToken();  // eat the for.
+
+    if (currentToken().getType() != IDENTIFIER) 
+    {
+        ErrorHandler::error("expected identifier after for");
+        return nullptr;
+    }
+
+    std::string IdName = currentToken().getLexeme();
+    advanceToken();  // eat identifier.
+
+    if (currentToken().getLexeme() != "=") 
+    {
+        ErrorHandler::error("expected '=' after for");
+        return nullptr;
+    }
+    advanceToken();  // eat '='.
+
+     
+    auto Start = buildExpression();
+    if (!Start) {
+        return nullptr;
+    }
+
+    if (currentToken().getLexeme() != ",") {
+        ErrorHandler::error("expected ',' after for start value");
+        return nullptr;
+    }
+    advanceToken();
+
+    auto End = buildExpression();
+    if (!End)
+        return nullptr;
+
+    // The step value is optional.
+    AST::ExprAST* Step;
+    if (currentToken().getLexeme() == ",") {
+        advanceToken();
+        Step = buildExpression();
+        if (!Step)
+            return nullptr;
+    }
+
+    if (currentToken().getType() != IN) {
+        ErrorHandler::error("expected 'in' after for");
+        return nullptr;
+    }
+    advanceToken();  // eat 'in'.
+
+    auto Body = buildExpression();
+    if (!Body)
+        return nullptr;
+
+    return new AST::ForExprAST(IdName, std::move(Start),
+        std::move(End), std::move(Step),
+        std::move(Body));
+}
+
 AST::ExprAST *ExpressionBuilder::parsePrimary()
 {
     if (currentToken().getType() == IDENTIFIER)
@@ -132,6 +228,16 @@ AST::ExprAST *ExpressionBuilder::parsePrimary()
     else if (currentToken().getType() == LEFT_PAREN)
     {
         auto Expr = parseParenExpr();
+        return Expr;
+    }
+    else if (currentToken().getType() == IF)
+    {
+        auto Expr = parseIfExpr();
+        return Expr;
+    }
+    else if (currentToken().getType() == FOR)
+    {
+        auto Expr = parseForExpr();
         return Expr;
     }
     else

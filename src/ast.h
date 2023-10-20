@@ -136,5 +136,31 @@ namespace AST
         Function *codegen();
     };
 
+    /// IfExprAST - Expression class for if/then/else.
+    class IfExprAST : public ExprAST {
+        ExprAST* Cond;
+        ExprAST* Then;
+        ExprAST* Else;
+
+    public:
+        IfExprAST(ExprAST* Cond, ExprAST* Then, ExprAST* Else);
+
+        Value* codegen() override;
+    };
+
+    /// ForExprAST - Expression class for for/in.
+    class ForExprAST : public ExprAST {
+        std::string VarName;
+        ExprAST* Start; 
+        ExprAST* End; 
+        ExprAST* Step; 
+        ExprAST* Body;
+
+    public:
+        ForExprAST(const std::string& VarName, ExprAST* Start, ExprAST* End, ExprAST* Step, ExprAST* Body);
+
+        Value* codegen() override;
+    };
+
     void createExternalFunctions();
 }
