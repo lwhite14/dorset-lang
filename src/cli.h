@@ -12,6 +12,8 @@
 #include "outpututils.h"
 #include "astbuilder.h"
 
+static bool fileExists(std::string fileName);
+
 class CompilerOptions
 {
 private:
@@ -33,7 +35,6 @@ private:
     void error(std::string message);
 
     std::string removeFileExtension(std::string fileName);
-    bool fileExists(std::string fileName);
 
     void processFlag();
     void processFile();
@@ -71,6 +72,9 @@ private:
     std::string getSourceContents(std::string fileName);
     std::vector<Token> lex(std::string contents);
     void buildAST(std::vector<Token> tokens);
+
+    void outputBinaries();
+    void removeBinaries();
 
 public:
     Compiler(CompilerOptions options);

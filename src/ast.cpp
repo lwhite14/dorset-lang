@@ -14,19 +14,6 @@ namespace AST
         return nullptr;
     }
 
-    bool fileExists(std::string fileName)
-    {
-        if (FILE* file = fopen(fileName.c_str(), "r"))
-        {
-            fclose(file);
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
     void MasterAST::initializeModule()
     {
         TheContext = new LLVMContext;
@@ -47,54 +34,6 @@ namespace AST
 
         // Create a new builder for the module.
         Builder = new IRBuilder<>(*TheContext);
-    }
-
-    void  MasterAST::outputModule()
-    {
-        std::string ir;
-        raw_string_ostream ostream(ir);
-        ostream << *TheModule;
-        ostream.flush();
-
-        std::ofstream irFile;
-        irFile.open(CompilerOptions::OutputLL);
-        irFile << ir;
-        irFile.close();
-
-        if (system(("llc " + CompilerOptions::OutputLL + " -o " + CompilerOptions::OutputS).c_str()) != 0)
-        {
-            std::cout << "Error compiling LLVM IR." << std::endl;
-            return;
-        }
-        if (system(("clang -c " + CompilerOptions::OutputS + " -o " + CompilerOptions::OutputO).c_str()) != 0)
-        {
-            std::cout << "Error compiling assembly." << std::endl;
-            return;
-        }
-        if (!CompilerOptions::IsLibrary)
-        {
-            if (system(("clang " + CompilerOptions::OutputO + " -o " + CompilerOptions::OutputFinal + " -no-pie").c_str()) != 0)
-            {
-                std::cout << "Error compiling object file." << std::endl;
-                return;
-            }
-        }
-    }
-
-    void  MasterAST::removeBuildFiles()
-    {
-        if (!CompilerOptions::IsLibrary)
-        {
-            if (fileExists(CompilerOptions::OutputO))
-                system(("rm " + CompilerOptions::OutputO).c_str());
-        }
-        if (!CompilerOptions::GenerateLLVMIR)
-        {
-            if (fileExists(CompilerOptions::OutputLL))
-                system(("rm " + CompilerOptions::OutputLL).c_str());
-        }
-        if (fileExists(CompilerOptions::OutputS))
-            system(("rm " + CompilerOptions::OutputS).c_str());
     }
 
     NumberExprAST::NumberExprAST(double Val) : Val(Val)

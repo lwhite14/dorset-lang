@@ -4,21 +4,21 @@
 /// Private Functions ///
 /////////////////////////
 
-void ErrorHandler::report(std::string where, std::string message)
+void ErrorHandler::report(std::string message)
 {
-    std::cout << "[unknown] Error" << where << ": " << message << std::endl;
+    std::cout << "[unknown] Error: " << message << std::endl;
     HadError = true;
 }
 
-void ErrorHandler::report(std::string where, std::string message, int line)
+void ErrorHandler::report(std::string message, int line)
 {
-    std::cout << "[line " << line << "] Error" << where << ": " << message << std::endl;
+    std::cout << "[line " << line << "] Error: " << message << std::endl;
     HadError = true;
 }
 
-void ErrorHandler::report(std::string where, std::string message, int line, int character)
+void ErrorHandler::report(std::string message, int line, int character)
 {
-    std::cout << "[line " << line << ", char " << character << "] Error" << where << ": " << message << std::endl;
+    std::cout << "[line " << line << ", char " << character << "] Error: " << message << std::endl;
     HadError = true;
 }
 
@@ -28,15 +28,15 @@ void ErrorHandler::report(std::string where, std::string message, int line, int 
 
 void ErrorHandler::error(std::string message)
 {
-    report("", message);
+    report(message);
 }
 
 void ErrorHandler::error(std::string message, int line)
 {
-    report("", message, line);
+    report(message, line);
 }
 
 void ErrorHandler::error(std::string message, int line, int character)
 {
-    report("", message, line, character);
+    report(message, line, character);
 }

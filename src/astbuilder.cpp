@@ -31,11 +31,6 @@ void ASTBuilder::parseTokenList()
         switch (currentToken().getType())
         {
         case _EOF:
-            if (!ErrorHandler::HadError)
-            {
-                AST::MasterAST::outputModule();
-                AST::MasterAST::removeBuildFiles();
-            }
             return;
         case FUNCTION:
             handleDefinition();

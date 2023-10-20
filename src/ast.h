@@ -29,8 +29,7 @@ using namespace llvm;
 namespace AST
 {
     Value *logError(std::string message);
-    bool fileExists(std::string fileName);
-
+    
     class MasterAST
     {
     public:
@@ -41,8 +40,6 @@ namespace AST
         static inline legacy::FunctionPassManager *TheFPM;
 
         static void initializeModule();
-        static void outputModule();
-        static void removeBuildFiles();
     };
 
     /// ExprAST - Base class for all expression nodes.
