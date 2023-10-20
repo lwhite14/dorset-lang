@@ -73,7 +73,7 @@ namespace AST
         }
         if (!CompilerOptions::IsLibrary)
         {
-            if (system(("clang " + CompilerOptions::OutputO + " -o " + CompilerOptions::OutputFinal).c_str()) != 0)
+            if (system(("clang " + CompilerOptions::OutputO + " -o " + CompilerOptions::OutputFinal + " -no-pie").c_str()) != 0)
             {
                 std::cout << "Error compiling object file." << std::endl;
                 return;

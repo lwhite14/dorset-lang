@@ -1,10 +1,15 @@
-fn printstar(n)
+fn forLoop(n)
 {
 	for i = 1, i < n, 1.0 
-		in printf("*", 0);
+		in printf("%f", i);
+}
+
+fn ifStatement(x)
+{
+	if 5 < x then printf("X is more than 5!", 0) else printf("X is less than 5!", 0);
 }
 
 fn main()
 {
-	printstar(15);
+	ifStatement(15);
 }
