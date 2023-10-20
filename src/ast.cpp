@@ -130,7 +130,7 @@ namespace AST
     }
 
     BinaryExprAST::BinaryExprAST(char Op, ExprAST *LHS, ExprAST *RHS)
-        : Op(Op), LHS(LHS), RHS(RHS)
+        : Op(Op), LHS(std::move(LHS)), RHS(std::move(RHS))
     {
     }
 
@@ -215,7 +215,7 @@ namespace AST
     }
 
     FunctionAST::FunctionAST(PrototypeAST *Proto, ExprAST *Body)
-        : Proto(Proto), Body(Body)
+        : Proto(std::move(Proto)), Body(std::move(Body))
     {
     }
 

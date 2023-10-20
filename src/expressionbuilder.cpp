@@ -31,7 +31,7 @@ AST::ExprAST *ExpressionBuilder::buildExpression()
         return nullptr;
     }
 
-    return parseBinOpRHS(0, LHS);
+    return parseBinOpRHS(0, std::move(LHS));
 }
 
 
@@ -39,14 +39,14 @@ AST::ExprAST *ExpressionBuilder::parseNumberExpr()
 {
     AST::NumberExprAST *output = new AST::NumberExprAST(std::stod(currentToken().getLiteral()));
     advanceToken();
-    return output;
+    return std::move(output);
 }
 
 AST::ExprAST *ExpressionBuilder::parseStringExpr()
 {
     AST::StringExprAST *output = new AST::StringExprAST(currentToken().getLiteral());
     advanceToken();
-    return output;
+    return std::move(output);
 }
 
 AST::ExprAST *ExpressionBuilder::parseParenExpr()
@@ -85,7 +85,7 @@ AST::ExprAST *ExpressionBuilder::parseIdentifierExpr()
         {
             if (AST::ExprAST *Arg = buildExpression())
             {
-                Args.push_back(Arg);
+                Args.push_back(std::move(Arg));
             }
             else
             {
@@ -109,7 +109,7 @@ AST::ExprAST *ExpressionBuilder::parseIdentifierExpr()
     // Eat the ')'.
     advanceToken();
 
-    return new AST::CallExprAST(IdName, Args);
+    return new AST::CallExprAST(IdName, std::move(Args));
 }
 
 AST::ExprAST* ExpressionBuilder::parseIfExpr()
@@ -285,7 +285,7 @@ AST::ExprAST *ExpressionBuilder::parseBinOpRHS(int ExprPrec, AST::ExprAST *LHS)
         }
 
         // Merge LHS/RHS.
-        LHS = new AST::BinaryExprAST(BinOp, LHS, RHS);
+        LHS = new AST::BinaryExprAST(BinOp, std::move(LHS), std::move(RHS));
     }
 }
 

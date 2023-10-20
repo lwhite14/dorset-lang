@@ -100,7 +100,7 @@ AST::PrototypeAST *ASTBuilder::parsePrototype()
     // success.
     advanceToken(); // eat ')'.
 
-    return new AST::PrototypeAST(FnName, ArgNames);
+    return new AST::PrototypeAST(FnName, std::move(ArgNames));
 }
 
 AST::FunctionAST *ASTBuilder::parseDefinition()
@@ -131,7 +131,7 @@ AST::FunctionAST *ASTBuilder::parseDefinition()
     advanceToken();
 
     if (E)
-        return new AST::FunctionAST(Proto, E);
+        return new AST::FunctionAST(std::move(Proto), std::move(E));
 
     return nullptr;
 }
