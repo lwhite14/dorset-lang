@@ -67,16 +67,16 @@ void CompilerOptions::processFlag()
     else if (currentArgument() == "-o")
     {
         advanceArgument();
-        OutputFinal = currentArgument();
+        outputFinal = currentArgument();
         hasOutputName = true;
     }
     else if (currentArgument() == "-l" || currentArgument() == "--library")
     {
-        IsLibrary = true;
+        isLibrary = true;
     }
     else if (currentArgument() == "-r" || currentArgument() == "--llvmir")
     {
-        GenerateLLVMIR = true;
+        generateLLVMIR = true;
     }
     else
     {
@@ -92,8 +92,8 @@ void CompilerOptions::processFile()
         return;
     }
 
-    SourceFile = removeFileExtension(currentArgument());
-    SourceFileLocation = std::filesystem::absolute(currentArgument()).generic_string();
+    sourceFile = removeFileExtension(currentArgument());
+    sourceFileLocation = std::filesystem::absolute(currentArgument()).generic_string();
     hasSourceFile = true;
 }
 
@@ -101,17 +101,17 @@ void CompilerOptions::constructOutputBinaryNames()
 {
     if (hasOutputName)
     {
-        std::string name = removeFileExtension(OutputFinal);
-        OutputLL = name + ".ll";
-        OutputO = name + ".o";
-        OutputS = name + ".s";
+        std::string name = removeFileExtension(outputFinal);
+        outputLL = name + ".ll";
+        outputO = name + ".o";
+        outputS = name + ".s";
     }
     else
     {
-        OutputFinal = SourceFile + ".out";
-        OutputLL = SourceFile + ".ll";
-        OutputO = SourceFile + ".o";
-        OutputS = SourceFile + ".s";
+        outputFinal = sourceFile + ".out";
+        outputLL = sourceFile + ".ll";
+        outputO = sourceFile + ".o";
+        outputS = sourceFile + ".s";
     }
 }
 
@@ -150,41 +150,6 @@ CompilerOptions::CompilerOptions(int argc, char *argv[])
     }
 }
 
-bool CompilerOptions::getIsHelp()
-{
-    return isHelp;
-}
-
-bool CompilerOptions::getIsVersion()
-{
-    return isVersion;
-}
-
-bool CompilerOptions::getIsTokens()
-{
-    return isTokens;
-}
-
-bool CompilerOptions::getHasSourceFile()
-{
-    return hasSourceFile;
-}
-
-bool CompilerOptions::getHadError()
-{
-    return hadError;
-}
-
-bool CompilerOptions::getHasOutputName()
-{
-    return hasOutputName;
-}
-
-bool CompilerOptions::getIsLibrary()
-{
-    return IsLibrary;
-}
-
 /////////////////////////
 /////// Compiler ////////
 /////////////////////////
@@ -219,27 +184,29 @@ Compiler::Compiler(CompilerOptions options) : options{options}
 
 int Compiler::compile()
 {
-    if (options.getHadError())
+    if (options.hadError)
     {
         printUsage();
         return 0;
     }
 
-    if (options.getIsHelp())
+    if (options.isHelp)
     {
         printUsage();
     }
-    else if (options.getIsVersion())
+    else if (options.isVersion)
     {
         printVersion();
     }
-    else if (options.getHasSourceFile())
+    else if (options.hasSourceFile)
     {
-        std::vector<Token> tokens = lex(getSourceContents(CompilerOptions::SourceFileLocation));
-        if (options.getIsTokens())
+        std::vector<Token> tokens = lex(getSourceContents(options.sourceFileLocation));
+        if (options.isTokens)
         {
             printTokens(tokens);
         }
+        AST::MasterAST::initializeModule(options.sourceFileLocation.c_str());
+        AST::createExternalFunctions();
         buildAST(tokens);
 
         if (!ErrorHandler::HadError)
@@ -264,23 +231,23 @@ void Compiler::outputBinaries()
     ostream.flush();
 
     std::ofstream irFile;
-    irFile.open(CompilerOptions::OutputLL);
+    irFile.open(options.outputLL);
     irFile << ir;
     irFile.close();
 
-    if (system(("llc " + CompilerOptions::OutputLL + " -o " + CompilerOptions::OutputS).c_str()) != 0)
+    if (system(("llc " + options.outputLL + " -o " + options.outputS).c_str()) != 0)
     {
         ErrorHandler::error("error compiling LLVM IR");
         return;
     }
-    if (system(("clang -c " + CompilerOptions::OutputS + " -o " + CompilerOptions::OutputO).c_str()) != 0)
+    if (system(("clang -c " + options.outputS + " -o " + options.outputO).c_str()) != 0)
     {
         ErrorHandler::error("error compiling assembly");
         return;
     }
-    if (!CompilerOptions::IsLibrary)
+    if (!options.isLibrary)
     {
-        if (system(("clang " + CompilerOptions::OutputO + " -o " + CompilerOptions::OutputFinal + " -no-pie").c_str()) != 0)
+        if (system(("clang " + options.outputS + " -o " + options.outputFinal + " -no-pie").c_str()) != 0)
         {
             ErrorHandler::error("error compiling object file");
             return;
@@ -290,22 +257,22 @@ void Compiler::outputBinaries()
 
 void Compiler::removeBinaries()
 {
-    if (!CompilerOptions::IsLibrary || ErrorHandler::HadError)
+    if (!options.isLibrary || ErrorHandler::HadError)
     {
-        if (fileExists(CompilerOptions::OutputO))
+        if (fileExists(options.outputO))
         {
-            system(("rm " + CompilerOptions::OutputO).c_str());
+            system(("rm " + options.outputO).c_str());
         }
     }
-    if (!CompilerOptions::GenerateLLVMIR || ErrorHandler::HadError)
+    if (!options.generateLLVMIR || ErrorHandler::HadError)
     {
-        if (fileExists(CompilerOptions::OutputLL))
+        if (fileExists(options.outputLL))
         {
-            system(("rm " + CompilerOptions::OutputLL).c_str());
+            system(("rm " + options.outputLL).c_str());
         }
     }
-    if (fileExists(CompilerOptions::OutputS))
+    if (fileExists(options.outputS))
     {
-        system(("rm " + CompilerOptions::OutputS).c_str());
+        system(("rm " + options.outputS).c_str());
     }
 }

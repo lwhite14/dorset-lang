@@ -24,8 +24,6 @@ Token ASTBuilder::advanceToken()
 
 void ASTBuilder::parseTokenList()
 {
-    AST::MasterAST::initializeModule();
-    AST::createExternalFunctions();
     while (true)
     {
         switch (currentToken().getType())

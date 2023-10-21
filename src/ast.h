@@ -39,7 +39,7 @@ namespace AST
         static inline std::map<std::string, Value *> NamedValues;
         static inline legacy::FunctionPassManager *TheFPM;
 
-        static void initializeModule();
+        static void initializeModule(const char* moduleName);
     };
 
     /// ExprAST - Base class for all expression nodes.

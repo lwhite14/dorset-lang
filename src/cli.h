@@ -10,6 +10,7 @@
 #include "error.h"
 #include "lexer.h"
 #include "outpututils.h"
+#include "ast.h"
 #include "astbuilder.h"
 
 static bool fileExists(std::string fileName);
@@ -26,8 +27,18 @@ private:
     bool isTokens = false;
     bool hasSourceFile = false;
     bool hasOutputName = false;
+    bool isLibrary = false;
+    bool generateLLVMIR = false;
 
     bool hadError = false;
+
+    std::string sourceFile;
+    std::string sourceFileLocation;
+
+    std::string outputLL;
+    std::string outputS;
+    std::string outputO;
+    std::string outputFinal;
 
     void advanceArgument();
     std::string currentArgument();
@@ -42,26 +53,9 @@ private:
     void constructOutputBinaryNames();
 
 public:
-    static inline std::string SourceFile;
-    static inline std::string SourceFileLocation;
-
-    static inline std::string OutputLL;
-    static inline std::string OutputS;
-    static inline std::string OutputO;
-    static inline std::string OutputFinal;
-
-    static inline bool IsLibrary = false;
-    static inline bool GenerateLLVMIR = false;
-
     CompilerOptions(int argc, char *argv[]);
 
-    bool getIsHelp();
-    bool getIsVersion();
-    bool getIsTokens();
-    bool getHasSourceFile();
-    bool getHadError();
-    bool getHasOutputName();
-    bool getIsLibrary();
+    friend class Compiler;
 };
 
 class Compiler
@@ -80,5 +74,4 @@ public:
     Compiler(CompilerOptions options);
 
     int compile();
-
 };

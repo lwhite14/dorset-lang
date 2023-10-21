@@ -14,10 +14,10 @@ namespace AST
         return nullptr;
     }
 
-    void MasterAST::initializeModule()
+    void MasterAST::initializeModule(const char* moduleName)
     {
         TheContext = new LLVMContext;
-        TheModule = new Module(CompilerOptions::SourceFileLocation, *TheContext);
+        TheModule = new Module(moduleName, *TheContext);
 
         TheFPM = new legacy::FunctionPassManager(TheModule);
 
