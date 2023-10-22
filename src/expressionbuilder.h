@@ -8,12 +8,6 @@
 class ExpressionBuilder
 {
 private:
-    std::map<char, int> binopPrecedence = {
-        {'<', 10},
-        {'+', 20},
-        {'-', 30},
-        {'*', 40}};
-
     std::vector<Token> tokens;
     int currentTokenIndex;
 
@@ -28,6 +22,7 @@ private:
     AST::ExprAST *parseForExpr();
     AST::ExprAST *parsePrimary();
     AST::ExprAST *parseBinOpRHS(int ExprPrec, AST::ExprAST *LHS);
+    AST::ExprAST* parseUnary();
     int getTokPrecedence();
 
 public:

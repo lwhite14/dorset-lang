@@ -25,7 +25,7 @@ Token ExpressionBuilder::advanceToken()
 
 AST::ExprAST *ExpressionBuilder::buildExpression()
 {
-    auto LHS = parsePrimary();
+    auto LHS = parseUnary();
     if (!LHS)
     {
         return nullptr;
@@ -52,6 +52,7 @@ AST::ExprAST *ExpressionBuilder::parseStringExpr()
 AST::ExprAST *ExpressionBuilder::parseParenExpr()
 {
     advanceToken(); // eat (.
+
     AST::ExprAST *V = buildExpression();
     if (!V)
     {
@@ -99,7 +100,7 @@ AST::ExprAST *ExpressionBuilder::parseIdentifierExpr()
 
             if (currentToken().getType() != COMMA)
             {
-                ErrorHandler::error("Expected ')' or ',' in argument list", currentToken().getLine(), currentToken().getCharacter());
+                ErrorHandler::error("expected ')' or ',' in argument list", currentToken().getLine(), currentToken().getCharacter());
                 return nullptr;
             }
             advanceToken();
@@ -242,7 +243,7 @@ AST::ExprAST *ExpressionBuilder::parsePrimary()
     }
     else
     {
-        ErrorHandler::error("unknown token when expecting an expression", currentToken().getLine(), currentToken().getCharacter());
+        ErrorHandler::error("unknown token when expecting an expression: " + currentToken().getLexeme(), currentToken().getLine(), currentToken().getCharacter());
         return nullptr;
     }
 }
@@ -250,43 +251,52 @@ AST::ExprAST *ExpressionBuilder::parsePrimary()
 AST::ExprAST *ExpressionBuilder::parseBinOpRHS(int ExprPrec, AST::ExprAST *LHS)
 {
     // If this is a binop, find its precedence.
-    while (true)
+    while (true) 
     {
         int TokPrec = getTokPrecedence();
 
         // If this is a binop that binds at least as tightly as the current binop,
         // consume it, otherwise we are done.
         if (TokPrec < ExprPrec)
-        {
             return LHS;
-        }
 
         // Okay, we know this is a binop.
         int BinOp = currentToken().getLexeme()[0];
         advanceToken(); // eat binop
 
-        // Parse the primary expression after the binary operator.
-        auto RHS = parsePrimary();
+        // Parse the unary expression after the binary operator.
+        auto RHS = parseUnary();
         if (!RHS)
-        {
             return nullptr;
-        }
 
         // If BinOp binds less tightly with RHS than the operator after RHS, let
         // the pending operator take RHS as its LHS.
         int NextPrec = getTokPrecedence();
-        if (TokPrec < NextPrec)
-        {
+        if (TokPrec < NextPrec) {
             RHS = parseBinOpRHS(TokPrec + 1, std::move(RHS));
             if (!RHS)
-            {
                 return nullptr;
-            }
         }
 
         // Merge LHS/RHS.
         LHS = new AST::BinaryExprAST(BinOp, std::move(LHS), std::move(RHS));
     }
+}
+
+AST::ExprAST* ExpressionBuilder::parseUnary()
+{
+    // If the current token is not an operator, it must be a primary expr.
+    if (!isOperator(currentToken().getLexeme()[0]) || currentToken().getType() == LEFT_PAREN || currentToken().getType() == COMMA)
+    {
+        return parsePrimary();
+    }
+
+    // If this is a unary operator, read it.
+    int Opc = currentToken().getLexeme()[0];
+    advanceToken();
+    if (auto Operand = parseUnary())
+        return new AST::UnaryExprAST(Opc, std::move(Operand));
+    return nullptr;
 }
 
 int ExpressionBuilder::getTokPrecedence()
@@ -302,7 +312,7 @@ int ExpressionBuilder::getTokPrecedence()
     }
 
     // Make sure it's a declared binop.
-    int TokPrec = binopPrecedence[currentToken().getLexeme()[0]];
+    int TokPrec = AST::MasterAST::BinopPrecedence[currentToken().getLexeme()[0]];
     if (TokPrec <= 0)
     {
         return -1;

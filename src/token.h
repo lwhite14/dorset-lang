@@ -24,7 +24,10 @@ enum TokenType
     THEN, IN,
 
     // Special
-    _EOF, TERMINATING
+    _EOF, TERMINATING,
+
+    // Operator Related
+    BINARY, UNARY, VERTICAL_BAR, AMPERSAND, COLON
 };
 
 static std::map<std::string, TokenType> keywords = {
@@ -46,7 +49,9 @@ static std::map<std::string, TokenType> keywords = {
     {"while",  WHILE},
     {"extern", EXTERN},
     {"then",   THEN},
-    {"in",     IN}
+    {"in",     IN},
+    {"binary", BINARY},
+    {"unary",  UNARY}
 };
 
 class Token 
@@ -68,3 +73,21 @@ public:
     int getLine();
     int getCharacter();
 };
+
+static bool isOperator(char c) 
+{
+    if (c == '+') { return true; }
+    if (c == '-') { return true; }
+    if (c == '*') { return true; }
+    if (c == '/') { return true; }
+    if (c == '|') { return true; }
+    if (c == ':') { return true; }
+    if (c == '=') { return true; }
+    if (c == '&') { return true; }
+    if (c == '^') { return true; }
+    if (c == '%') { return true; }
+    if (c == '!') { return true; }
+    if (c == '<') { return true; }
+    if (c == '>') { return true; }
+    return false;
+}

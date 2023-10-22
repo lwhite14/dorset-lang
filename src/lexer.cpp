@@ -64,6 +64,18 @@ void Lexer::scanToken()
     {
         addToken(STAR);
     }
+    else if (c == '|')
+    {
+        addToken(VERTICAL_BAR);
+    }
+    else if (c == '&')
+    {
+        addToken(AMPERSAND);
+    }
+    else if (c == ':')
+    {
+        addToken(COLON);
+    }
     else if (c == '!')
     {
         addToken(match('=') ? BANG_EQUAL : BANG);
@@ -122,8 +134,7 @@ void Lexer::scanToken()
         }
         else
         {
-            std::cout << c << std::endl;
-            ErrorHandler::error("unexpected character", line, current);
+            ErrorHandler::error("unexpected character: " + c, line, current);
         }
     }
 }

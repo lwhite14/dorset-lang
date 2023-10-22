@@ -14,6 +14,22 @@ namespace AST
         return nullptr;
     }
 
+    Function* getFunction(std::string Name) 
+    {
+        // First, see if the function has already been added to the current module.
+        if (auto* F = MasterAST::TheModule->getFunction(Name))
+            return F;
+
+        // If not, check whether we can codegen the declaration from some existing
+        // prototype.
+        auto FI = MasterAST::FunctionProtos.find(Name);
+        if (FI != MasterAST::FunctionProtos.end())
+            return FI->second->codegen();
+
+        // If no existing prototype exists, return null.
+        return nullptr;
+    }
+
     void MasterAST::initializeModule(const char* moduleName)
     {
         TheContext = new LLVMContext;
@@ -64,7 +80,7 @@ namespace AST
         // Look this variable up in the function.
         Value *V = MasterAST::NamedValues[Name];
         if (!V)
-            logError("Unknown variable: '" + Name + "'");
+            logError("unknown variable: '" + Name + "'");
         return V;
     }
 
@@ -75,13 +91,12 @@ namespace AST
 
     Value *BinaryExprAST::codegen()
     {
-        Value *L = LHS->codegen();
-        Value *R = RHS->codegen();
+        Value* L = LHS->codegen();
+        Value* R = RHS->codegen();
         if (!L || !R)
             return nullptr;
 
-        switch (Op)
-        {
+        switch (Op) {
         case '+':
             return MasterAST::Builder->CreateFAdd(L, R, "addtmp");
         case '-':
@@ -93,8 +108,16 @@ namespace AST
             // Convert bool 0/1 to double 0.0 or 1.0
             return MasterAST::Builder->CreateUIToFP(L, Type::getDoubleTy(*MasterAST::TheContext), "booltmp");
         default:
-            return logError("invalid binary operator");
+            break;
         }
+
+        // If it wasn't a builtin binary operator, it must be a user defined one. Emit
+        // a call to it.
+        Function* F = getFunction(std::string("binary") + Op);
+        assert(F && "binary operator not found!");
+
+        Value* Ops[] = { L, R };
+        return MasterAST::Builder->CreateCall(F, Ops, "binop");
     }
 
     CallExprAST::CallExprAST(const std::string &Callee, std::vector<ExprAST *> Args)
@@ -105,13 +128,13 @@ namespace AST
     Value *CallExprAST::codegen()
     {
         // Look up the name in the global module table.
-        Function *CalleeF = MasterAST::TheModule->getFunction(Callee);
+        Function* CalleeF = getFunction(Callee);
         if (!CalleeF)
-            return logError("Unknown function referenced");
+            return logError("unknown function referenced");
 
         // If argument mismatch error.
         if (CalleeF->arg_size() != Args.size())
-            return logError("Incorrect # arguments passed");
+            return logError("incorrect # arguments passed");
 
         std::vector<Value *> ArgsV;
         for (unsigned i = 0, e = Args.size(); i != e; ++i)
@@ -124,9 +147,10 @@ namespace AST
         return MasterAST::Builder->CreateCall(CalleeF, ArgsV, "calltmp");
     }
 
-    PrototypeAST::PrototypeAST(const std::string &Name, std::vector<std::string> Args)
-        : Name(Name), Args(std::move(Args))
+    PrototypeAST::PrototypeAST(const std::string& Name, std::vector<std::string> Args, bool IsOperator, unsigned Prec)
+        : Name(Name), Args(std::move(Args)), IsOperator(IsOperator), Precedence(Prec) 
     {
+    
     }
 
     const std::string &PrototypeAST::getName() const
@@ -153,6 +177,27 @@ namespace AST
         return F;
     }
 
+    bool PrototypeAST::isUnaryOp() const
+    {
+        return IsOperator && Args.size() == 1; 
+    }
+
+    bool PrototypeAST::isBinaryOp() const
+    {
+        return IsOperator && Args.size() == 2; 
+    }
+
+    char PrototypeAST::getOperatorName() const
+    {
+        assert(isUnaryOp() || isBinaryOp());
+        return Name[Name.size() - 1];
+    }
+
+    unsigned PrototypeAST::getBinaryPrecedence() const
+    {
+        return Precedence; 
+    }
+
     FunctionAST::FunctionAST(PrototypeAST *Proto, ExprAST *Body)
         : Proto(std::move(Proto)), Body(std::move(Body))
     {
@@ -160,39 +205,42 @@ namespace AST
 
     Function *FunctionAST::codegen()
     {
-        // First, check for an existing function from a previous 'extern' declaration.
-        Function *TheFunction = MasterAST::TheModule->getFunction(Proto->getName());
-
-        if (!TheFunction)
-            TheFunction = Proto->codegen();
-
+        // Transfer ownership of the prototype to the FunctionProtos map, but keep a
+        // reference to it for use below.
+        auto& P = *Proto;
+        MasterAST::FunctionProtos[Proto->getName()] = std::move(Proto);
+        Function* TheFunction = getFunction(P.getName());
         if (!TheFunction)
             return nullptr;
 
+        // If this is an operator, install it.
+        if (P.isBinaryOp())
+            MasterAST::BinopPrecedence[P.getOperatorName()] = P.getBinaryPrecedence();
+
         // Create a new basic block to start insertion into.
-        BasicBlock *BB = BasicBlock::Create(*MasterAST::TheContext, "entry", TheFunction);
+        BasicBlock* BB = BasicBlock::Create(*MasterAST::TheContext, "entry", TheFunction);
         MasterAST::Builder->SetInsertPoint(BB);
 
         // Record the function arguments in the NamedValues map.
         MasterAST::NamedValues.clear();
-        for (auto &Arg : TheFunction->args())
+        for (auto& Arg : TheFunction->args())
             MasterAST::NamedValues[std::string(Arg.getName())] = &Arg;
 
-        if (Value *RetVal = Body->codegen())
-        {
+        if (Value* RetVal = Body->codegen()) {
             // Finish off the function.
             MasterAST::Builder->CreateRet(RetVal);
 
             // Validate the generated code, checking for consistency.
             verifyFunction(*TheFunction);
 
-            MasterAST::TheFPM->run(*TheFunction);
-
             return TheFunction;
         }
 
         // Error reading body, remove function.
         TheFunction->eraseFromParent();
+
+        if (P.isBinaryOp())
+            MasterAST::BinopPrecedence.erase(P.getOperatorName());
         return nullptr;
     }
 
@@ -341,6 +389,25 @@ namespace AST
 
         // for expr always returns 0.0.
         return Constant::getNullValue(Type::getDoubleTy(*MasterAST::TheContext));
+    }
+
+    UnaryExprAST::UnaryExprAST(char Opcode, ExprAST* Operand)
+        : Opcode(Opcode), Operand(std::move(Operand))
+    {
+
+    }
+
+    Value* UnaryExprAST::codegen() 
+    {
+        Value* OperandV = Operand->codegen();
+        if (!OperandV)
+            return nullptr;
+
+        Function* F = getFunction(std::string("unary") + Opcode);
+        if (!F)
+            return logError("unknown unary operator");
+
+        return MasterAST::Builder->CreateCall(F, OperandV, "unop");
     }
 
     void createExternalFunctions()

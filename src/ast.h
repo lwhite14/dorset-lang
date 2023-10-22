@@ -29,18 +29,8 @@ using namespace llvm;
 namespace AST
 {
     Value *logError(std::string message);
-    
-    class MasterAST
-    {
-    public:
-        static inline LLVMContext *TheContext;
-        static inline Module *TheModule;
-        static inline IRBuilder<> *Builder;
-        static inline std::map<std::string, Value *> NamedValues;
-        static inline legacy::FunctionPassManager *TheFPM;
-
-        static void initializeModule(const char* moduleName);
-    };
+    Function* getFunction(std::string Name);
+   
 
     /// ExprAST - Base class for all expression nodes.
     class ExprAST
@@ -108,18 +98,25 @@ namespace AST
     };
 
     /// PrototypeAST - This class represents the "prototype" for a function,
-    /// which captures its name, and its argument names (thus implicitly the number
-    /// of arguments the function takes).
-    class PrototypeAST
-    {
+    /// which captures its argument names as well as if it is an operator.
+    class PrototypeAST {
         std::string Name;
         std::vector<std::string> Args;
+        bool IsOperator;
+        unsigned Precedence;
 
     public:
-        PrototypeAST(const std::string &Name, std::vector<std::string> Args);
+        PrototypeAST(const std::string& Name, std::vector<std::string> Args, bool IsOperator = false, unsigned Prec = 0);
 
-        const std::string &getName() const;
-        Function *codegen();
+        Function* codegen();
+        const std::string& getName() const;
+
+        bool isUnaryOp() const;
+        bool isBinaryOp() const;
+
+        char getOperatorName() const;
+
+        unsigned getBinaryPrecedence() const;
     };
 
     /// FunctionAST - This class represents a function definition itself.
@@ -157,6 +154,37 @@ namespace AST
         ForExprAST(const std::string& VarName, ExprAST* Start, ExprAST* End, ExprAST* Step, ExprAST* Body);
 
         Value* codegen() override;
+    };
+
+    /// UnaryExprAST - Expression class for a unary operator.
+    class UnaryExprAST : public ExprAST {
+        char Opcode;
+        ExprAST* Operand;
+
+    public:
+        UnaryExprAST(char Opcode, ExprAST* Operand);
+
+        Value* codegen() override;
+    };
+
+    class MasterAST
+    {
+    public:
+        static inline LLVMContext* TheContext;
+        static inline Module* TheModule;
+        static inline IRBuilder<>* Builder;
+        static inline std::map<std::string, Value*> NamedValues;
+        static inline legacy::FunctionPassManager* TheFPM;
+        static inline std::map<std::string, PrototypeAST*> FunctionProtos;
+        static inline std::map<char, int> BinopPrecedence =
+        {
+            {'<', 10},
+            {'+', 20},
+            {'-', 30},
+            {'*', 40}
+        };
+
+        static void initializeModule(const char* moduleName);
     };
 
     void createExternalFunctions();
