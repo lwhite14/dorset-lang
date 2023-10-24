@@ -57,13 +57,37 @@ fn printdensity(d)
         printf("*", 0);
 }
 
+fn mandelconverger(real imag iters creal cimag)
+{
+    if iters > 255 | (real*real + imag*imag > 4) then
+        iters
+    else
+        mandelconverger(real*real - imag*imag + creal,
+                        2*real*imag + cimag,
+                        iters+1, creal, cimag);
+}
+
+
+fn mandelconverge(real imag)
+{
+    mandelconverger(real, imag, 0, real, imag);
+}
+
+fn mandelhelp(xmin xmax xstep   ymin ymax ystep){
+    for y = ymin, y < ymax, ystep in (
+        (for x = xmin, x < xmax, xstep in
+            printdensity(mandelconverge(x,y)))
+            : printf("\n", 0)
+        );
+}
+
+fn mandel(realstart imagstart realmag imagmag)
+{
+    mandelhelp(realstart, realstart+realmag*78, realmag,
+                imagstart, imagstart+imagmag*40, imagmag);
+}
+
 fn main()
 {
-    printdensity(1): 
-    printdensity(2): 
-    printdensity(3):
-    printdensity(4): 
-    printdensity(5): 
-    printdensity(9):
-    printf("%f", 10);
+    mandel(-3, -2, 0.1, 0.14);
 }

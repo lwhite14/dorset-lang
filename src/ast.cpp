@@ -67,7 +67,13 @@ namespace AST
 
     Value *StringExprAST::codegen()
     {
-        return MasterAST::Builder->CreateGlobalString(Val + "\n");
+        if (Val == "\\n") 
+        {
+            std::string val = "";
+            return MasterAST::Builder->CreateGlobalString(val + "\n");
+        }
+
+        return MasterAST::Builder->CreateGlobalString(Val);
     }
 
     VariableExprAST::VariableExprAST(const std::string &Name)
@@ -130,7 +136,7 @@ namespace AST
         // Look up the name in the global module table.
         Function* CalleeF = getFunction(Callee);
         if (!CalleeF)
-            return logError("unknown function referenced");
+            return logError("unknown function referenced: " + Callee);
 
         // If argument mismatch error.
         if (CalleeF->arg_size() != Args.size())
