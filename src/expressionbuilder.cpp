@@ -186,7 +186,7 @@ AST::ExprAST* ExpressionBuilder::parseForExpr()
         return nullptr;
 
     // The step value is optional.
-    AST::ExprAST* Step;
+    AST::ExprAST* Step = nullptr;
     if (currentToken().getLexeme() == ",") {
         advanceToken();
         Step = buildExpression();
@@ -204,9 +204,60 @@ AST::ExprAST* ExpressionBuilder::parseForExpr()
     if (!Body)
         return nullptr;
 
-    return new AST::ForExprAST(IdName, std::move(Start),
-        std::move(End), std::move(Step),
-        std::move(Body));
+    return new AST::ForExprAST(IdName, std::move(Start), std::move(End), std::move(Step), std::move(Body));
+}
+
+AST::ExprAST *ExpressionBuilder::parseVarExpr() 
+{
+    advanceToken(); // eat the var.
+
+    std::vector<std::pair<std::string, AST::ExprAST*>> VarNames;
+
+    // At least one variable name is required.
+    if (currentToken().getType() != IDENTIFIER) {
+        ErrorHandler::error("expected identifier after var", currentToken().getLine(), currentToken().getCharacter());
+        return nullptr;
+    }
+
+    while (true) {
+        std::string Name = currentToken().getLexeme();
+        advanceToken(); // eat identifier.
+
+        // Read the optional initializer.
+        AST::ExprAST* Init = nullptr;
+        if (currentToken().getLexeme()[0] == '=') {
+            advanceToken(); // eat the '='.
+
+            Init = buildExpression();
+            if (!Init)
+                return nullptr;
+        }
+
+        VarNames.push_back(std::make_pair(Name, std::move(Init)));
+
+        // End of var list, exit loop.
+        if (currentToken().getLexeme()[0] != ',')
+            break;
+        advanceToken(); // eat the ','.
+
+        if (currentToken().getType() != IDENTIFIER) {
+            ErrorHandler::error("expected identifier list after var", currentToken().getLine(), currentToken().getCharacter());
+            return nullptr;
+        }
+    }
+
+    // At this point, we have to have 'in'.
+    if (currentToken().getType() != IN) {
+        ErrorHandler::error("expected 'in' keyword after 'var'", currentToken().getLine(), currentToken().getCharacter());
+        return nullptr;
+    }
+    advanceToken(); // eat 'in'.
+
+    auto Body = buildExpression();
+    if (!Body)
+        return nullptr;
+
+    return new AST::VarExprAST(std::move(VarNames), std::move(Body));
 }
 
 AST::ExprAST *ExpressionBuilder::parsePrimary()
@@ -239,6 +290,11 @@ AST::ExprAST *ExpressionBuilder::parsePrimary()
     else if (currentToken().getType() == FOR)
     {
         auto Expr = parseForExpr();
+        return Expr;
+    }
+    else if (currentToken().getType() == VAR) 
+    {
+        auto Expr = parseVarExpr();
         return Expr;
     }
     else

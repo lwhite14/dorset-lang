@@ -30,6 +30,7 @@ namespace AST
 {
     Value *logError(std::string message);
     Function* getFunction(std::string Name);
+    AllocaInst* CreateEntryBlockAlloca(Function* TheFunction, const std::string& VarName);
    
 
     /// ExprAST - Base class for all expression nodes.
@@ -70,6 +71,19 @@ namespace AST
     public:
         VariableExprAST(const std::string &Name);
         Value *codegen() override;
+        const std::string& getName();
+    };
+
+    /// VarExprAST - Expression class for var/in
+    class VarExprAST : public ExprAST 
+    {
+        std::vector<std::pair<std::string, ExprAST*>> VarNames;
+        ExprAST* Body;
+
+    public:
+        VarExprAST(std::vector<std::pair<std::string, ExprAST*>> VarNames, ExprAST* Body);
+
+        Value* codegen() override;
     };
 
     /// BinaryExprAST - Expression class for a binary operator.
@@ -173,11 +187,12 @@ namespace AST
         static inline LLVMContext* TheContext;
         static inline Module* TheModule;
         static inline IRBuilder<>* Builder;
-        static inline std::map<std::string, Value*> NamedValues;
+        static inline std::map<std::string, AllocaInst*> NamedValues;
         static inline legacy::FunctionPassManager* TheFPM;
         static inline std::map<std::string, PrototypeAST*> FunctionProtos;
         static inline std::map<char, int> BinopPrecedence =
         {
+            {'=' , 2},
             {'<', 10},
             {'+', 20},
             {'-', 30},

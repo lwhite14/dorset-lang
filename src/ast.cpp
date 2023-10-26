@@ -30,6 +30,12 @@ namespace AST
         return nullptr;
     }
 
+    AllocaInst* CreateEntryBlockAlloca(Function* TheFunction, const std::string& VarName) 
+    {
+        IRBuilder<> TmpB(&TheFunction->getEntryBlock(), TheFunction->getEntryBlock().begin());
+        return TmpB.CreateAlloca(Type::getDoubleTy(*MasterAST::TheContext), nullptr, VarName);
+    }
+
     void MasterAST::initializeModule(const char* moduleName)
     {
         TheContext = new LLVMContext;
@@ -84,10 +90,73 @@ namespace AST
     Value *VariableExprAST::codegen()
     {
         // Look this variable up in the function.
-        Value *V = MasterAST::NamedValues[Name];
-        if (!V)
-            logError("unknown variable: '" + Name + "'");
-        return V;
+        AllocaInst* A = MasterAST::NamedValues[Name];
+        if (!A)
+            return logError("Unknown variable name");
+
+        // Load the value.
+        return MasterAST::Builder->CreateLoad(A->getAllocatedType(), A, Name.c_str());
+    }
+
+    const std::string& VariableExprAST::getName() 
+    {
+        return Name;
+    }
+
+    VarExprAST::VarExprAST(std::vector<std::pair<std::string, ExprAST*>> VarNames, ExprAST* Body)
+        : VarNames(std::move(VarNames)), Body(std::move(Body)) 
+    {
+    
+    }
+
+    Value* VarExprAST::codegen() 
+    {
+        std::vector<AllocaInst*> OldBindings;
+
+        Function* TheFunction = MasterAST::Builder->GetInsertBlock()->getParent();
+
+        // Register all variables and emit their initializer.
+        for (unsigned i = 0, e = VarNames.size(); i != e; ++i) {
+            const std::string& VarName = VarNames[i].first;
+            ExprAST* Init = VarNames[i].second;
+
+            // Emit the initializer before adding the variable to scope, this prevents
+            // the initializer from referencing the variable itself, and permits stuff
+            // like this:
+            //  var a = 1 in
+            //    var a = a in ...   # refers to outer 'a'.
+            Value* InitVal;
+            if (Init) {
+                InitVal = Init->codegen();
+                if (!InitVal)
+                    return nullptr;
+            }
+            else { // If not specified, use 0.0.
+                InitVal = ConstantFP::get(*MasterAST::TheContext, APFloat(0.0));
+            }
+
+            AllocaInst* Alloca = CreateEntryBlockAlloca(TheFunction, VarName);
+            MasterAST::Builder->CreateStore(InitVal, Alloca);
+
+            // Remember the old variable binding so that we can restore the binding when
+            // we unrecurse.
+            OldBindings.push_back(MasterAST::NamedValues[VarName]);
+
+            // Remember this binding.
+            MasterAST::NamedValues[VarName] = Alloca;
+        }
+
+        // Codegen the body, now that all vars are in scope.
+        Value* BodyVal = Body->codegen();
+        if (!BodyVal)
+            return nullptr;
+
+        // Pop all our variables from scope.
+        for (unsigned i = 0, e = VarNames.size(); i != e; ++i)
+            MasterAST::NamedValues[VarNames[i].first] = OldBindings[i];
+
+        // Return the body computation.
+        return BodyVal;
     }
 
     BinaryExprAST::BinaryExprAST(char Op, ExprAST *LHS, ExprAST *RHS)
@@ -97,6 +166,25 @@ namespace AST
 
     Value *BinaryExprAST::codegen()
     {
+        if (Op == '=') 
+        {
+            VariableExprAST* LHSE = static_cast<VariableExprAST*>(LHS);
+            if (!LHSE)
+                return logError("destination of '=' must be a variable");
+            // Codegen the RHS.
+            Value* Val = RHS->codegen();
+            if (!Val)
+                return nullptr;
+
+            // Look up the name.
+            Value* Variable = MasterAST::NamedValues[LHSE->getName()];
+            if (!Variable)
+                return logError("Unknown variable name");
+
+            MasterAST::Builder->CreateStore(Val, Variable);
+            return Val;
+        }
+
         Value* L = LHS->codegen();
         Value* R = RHS->codegen();
         if (!L || !R)
@@ -229,8 +317,16 @@ namespace AST
 
         // Record the function arguments in the NamedValues map.
         MasterAST::NamedValues.clear();
-        for (auto& Arg : TheFunction->args())
-            MasterAST::NamedValues[std::string(Arg.getName())] = &Arg;
+        for (auto& Arg : TheFunction->args()) {
+            // Create an alloca for this variable.
+            AllocaInst* Alloca = CreateEntryBlockAlloca(TheFunction, Arg.getName().str());
+
+            // Store the initial value into the alloca.
+            MasterAST::Builder->CreateStore(&Arg, Alloca);
+
+            // Add arguments to variable symbol table.
+            MasterAST::NamedValues[std::string(Arg.getName())] = Alloca;
+        }
 
         if (Value* RetVal = Body->codegen()) {
             // Finish off the function.
@@ -317,15 +413,21 @@ namespace AST
 
     Value* ForExprAST::codegen() 
     {
+        Function* TheFunction = MasterAST::Builder->GetInsertBlock()->getParent();
+
+        // Create an alloca for the variable in the entry block.
+        AllocaInst* Alloca = CreateEntryBlockAlloca(TheFunction, VarName);
+
         // Emit the start code first, without 'variable' in scope.
         Value* StartVal = Start->codegen();
         if (!StartVal)
             return nullptr;
 
+        // Store the value into the alloca.
+        MasterAST::Builder->CreateStore(StartVal, Alloca);
+
         // Make the new basic block for the loop header, inserting after current
         // block.
-        Function* TheFunction = MasterAST::Builder->GetInsertBlock()->getParent();
-        BasicBlock* PreheaderBB = MasterAST::Builder->GetInsertBlock();
         BasicBlock* LoopBB = BasicBlock::Create(*MasterAST::TheContext, "loop", TheFunction);
 
         // Insert an explicit fall through from the current block to the LoopBB.
@@ -334,15 +436,10 @@ namespace AST
         // Start insertion in LoopBB.
         MasterAST::Builder->SetInsertPoint(LoopBB);
 
-        // Start the PHI node with an entry for Start.
-        PHINode* Variable =
-            MasterAST::Builder->CreatePHI(Type::getDoubleTy(*MasterAST::TheContext), 2, VarName);
-        Variable->addIncoming(StartVal, PreheaderBB);
-
         // Within the loop, the variable is defined equal to the PHI node.  If it
         // shadows an existing variable, we have to restore it, so save it now.
-        Value* OldVal = MasterAST::NamedValues[VarName];
-        MasterAST::NamedValues[VarName] = Variable;
+        AllocaInst* OldVal = MasterAST::NamedValues[VarName];
+        MasterAST::NamedValues[VarName] = Alloca;
 
         // Emit the body of the loop.  This, like any other expr, can change the
         // current BB.  Note that we ignore the value computed by the body, but don't
@@ -362,19 +459,23 @@ namespace AST
             StepVal = ConstantFP::get(*MasterAST::TheContext, APFloat(1.0));
         }
 
-        Value* NextVar = MasterAST::Builder->CreateFAdd(Variable, StepVal, "nextvar");
-
         // Compute the end condition.
         Value* EndCond = End->codegen();
         if (!EndCond)
             return nullptr;
+
+        // Reload, increment, and restore the alloca.  This handles the case where
+        // the body of the loop mutates the variable.
+        Value* CurVar =
+            MasterAST::Builder->CreateLoad(Alloca->getAllocatedType(), Alloca, VarName.c_str());
+        Value* NextVar = MasterAST::Builder->CreateFAdd(CurVar, StepVal, "nextvar");
+        MasterAST::Builder->CreateStore(NextVar, Alloca);
 
         // Convert condition to a bool by comparing non-equal to 0.0.
         EndCond = MasterAST::Builder->CreateFCmpONE(
             EndCond, ConstantFP::get(*MasterAST::TheContext, APFloat(0.0)), "loopcond");
 
         // Create the "after loop" block and insert it.
-        BasicBlock* LoopEndBB = MasterAST::Builder->GetInsertBlock();
         BasicBlock* AfterBB =
             BasicBlock::Create(*MasterAST::TheContext, "afterloop", TheFunction);
 
@@ -383,9 +484,6 @@ namespace AST
 
         // Any new code will be inserted in AfterBB.
         MasterAST::Builder->SetInsertPoint(AfterBB);
-
-        // Add a new entry to the PHI node for the backedge.
-        Variable->addIncoming(NextVar, LoopEndBB);
 
         // Restore the unshadowed variable.
         if (OldVal)
