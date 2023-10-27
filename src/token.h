@@ -7,16 +7,20 @@ enum TokenType
 {
     // Single-character tokens.
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
-    COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
+    COMMA, DOT, SEMICOLON,
 
     // One or two character tokens.
-    BANG, BANG_EQUAL,
-    EQUAL, EQUAL_EQUAL,
-    GREATER, GREATER_EQUAL,
-    LESS, LESS_EQUAL,
+                EXCLAMATION_EQUAL,
+    EQUAL,      EQUAL_EQUAL,
+                GREATER_EQUAL,
+                LESS_EQUAL,
 
     // Literals.
     IDENTIFIER, STRING, NUMBER,
+
+    // Operators
+    PLUS, SLASH, STAR, FORWARD_SLASH, BACK_SLASH, VERTICAL_BAR, 
+    COLON, AMPERSAND, CARET, EXCLAMATION, LESS, GREATER, 
 
     // Keywords.
     AND, CLASS, ELSE, FALSE, FUNCTION, FOR, IF, NIL, OR,
@@ -27,7 +31,7 @@ enum TokenType
     _EOF, TERMINATING,
 
     // Operator Related
-    BINARY, UNARY, VERTICAL_BAR, AMPERSAND, COLON
+    BINARY, UNARY
 };
 
 static std::map<std::string, TokenType> keywords = {
@@ -80,12 +84,11 @@ static bool isOperator(char c)
     if (c == '-') { return true; }
     if (c == '*') { return true; }
     if (c == '/') { return true; }
+    if (c == '\\') { return true; }
     if (c == '|') { return true; }
     if (c == ':') { return true; }
-    if (c == '=') { return true; }
     if (c == '&') { return true; }
     if (c == '^') { return true; }
-    if (c == '%') { return true; }
     if (c == '!') { return true; }
     if (c == '<') { return true; }
     if (c == '>') { return true; }

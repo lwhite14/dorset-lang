@@ -26,20 +26,22 @@ void ASTBuilder::parseTokenList()
 {
     while (true)
     {
-        switch (currentToken().getType())
+        if (currentToken().getType() == _EOF)
         {
-        case _EOF:
             return;
-        case FUNCTION:
+        }
+        else if (currentToken().getType() == FUNCTION)
+        {
             handleDefinition();
-            break;
-        case EXTERN:
+        }
+        else if (currentToken().getType() == EXTERN)
+        {
             handleExtern();
-            break;
-        default:
-            ErrorHandler::error("only functions allowed at the top level", currentToken().getLine(), currentToken().getCharacter());
-            advanceToken(); // ignore non function tokens
-            break;
+        }
+        else
+        {
+            ErrorHandler::error("a token of this type is not allowed at the top level", currentToken().getLine(), currentToken().getCharacter());
+            advanceToken(); // ignore this token
         }
     }
 }
@@ -70,17 +72,14 @@ AST::PrototypeAST *ASTBuilder::parsePrototype()
     unsigned Kind = 0; // 0 = identifier, 1 = unary, 2 = binary.
     unsigned BinaryPrecedence = 30;
 
-    switch (currentToken().getType())
+    if (currentToken().getType() == IDENTIFIER)
     {
-    default:
-        ErrorHandler::error("expected function name in prototype", currentToken().getLine(), currentToken().getCharacter());
-        return nullptr;
-    case IDENTIFIER:
         FnName = currentToken().getLexeme();
         Kind = 0;
         advanceToken();
-        break;
-    case UNARY:
+    }
+    else if (currentToken().getType() == UNARY)
+    {
         advanceToken();
         if (!isascii(currentToken().getLexeme()[0]))
         {
@@ -91,8 +90,9 @@ AST::PrototypeAST *ASTBuilder::parsePrototype()
         FnName += currentToken().getLexeme()[0];
         Kind = 1;
         advanceToken();
-        break;
-    case BINARY:
+    }
+    else if (currentToken().getType() == BINARY)
+    {
         advanceToken();
         if (!isascii(currentToken().getLexeme()[0]))
         {
@@ -115,7 +115,11 @@ AST::PrototypeAST *ASTBuilder::parsePrototype()
             BinaryPrecedence = (unsigned)std::stod(currentToken().getLiteral());
             advanceToken();
         }
-        break;
+    }
+    else
+    {
+        ErrorHandler::error("expected function name in prototype", currentToken().getLine(), currentToken().getCharacter());
+        return nullptr;
     }
 
     if (currentToken().getType() != LEFT_PAREN)
@@ -124,14 +128,21 @@ AST::PrototypeAST *ASTBuilder::parsePrototype()
         return nullptr;
     }
 
+    advanceToken(); // Move to first argument in argument list.
     std::vector<std::string> ArgNames;
-    while (advanceToken().getType() == IDENTIFIER)
+    while (currentToken().getType() == IDENTIFIER)
     {
         ArgNames.push_back(currentToken().getLexeme());
+        advanceToken(); // Move to comma or right parethesis
+        if (currentToken().getType() != COMMA)
+        {
+            break;
+        }
+        advanceToken();
     }
     if (currentToken().getType() != RIGHT_PAREN)
     {
-        ErrorHandler::error("expected ')' in prototype", currentToken().getLine(), currentToken().getCharacter());
+        ErrorHandler::error("expected ')' or ',' in prototype", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;
     }
 

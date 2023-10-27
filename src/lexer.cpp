@@ -72,13 +72,21 @@ void Lexer::scanToken()
     {
         addToken(AMPERSAND);
     }
+    else if (c == '^')
+    {
+        addToken(CARET);
+    }
     else if (c == ':')
     {
         addToken(COLON);
     }
+    else if (c == '\\')
+    {
+        addToken(BACK_SLASH);
+    }
     else if (c == '!')
     {
-        addToken(match('=') ? BANG_EQUAL : BANG);
+        addToken(match('=') ? EXCLAMATION_EQUAL : EXCLAMATION);
     }
     else if (c == '=')
     {
@@ -101,7 +109,7 @@ void Lexer::scanToken()
         }
         else
         {
-            addToken(SLASH);
+            addToken(FORWARD_SLASH);
         }
     }
     else if (c == ' ' || c == '\r' || c == '\t')

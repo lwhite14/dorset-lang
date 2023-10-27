@@ -1,6 +1,6 @@
-fn binary : 1 (x y) { y; }
+fn binary : 1 (x, y) { y; }
 
-extern externfunction(x y);
+extern externfunction(x, y);
 
 fn fibi(x)
 {
