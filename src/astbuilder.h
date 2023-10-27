@@ -32,8 +32,10 @@ private:
     AST::ExprAST *parseExpression();
     AST::PrototypeAST *parsePrototype(); 
     AST::FunctionAST *parseDefinition(); 
+    AST::PrototypeAST *parseExtern();
 
     void handleDefinition(); 
+    void handleExtern();
 
 public:
     ASTBuilder(std::vector<Token> tokens);

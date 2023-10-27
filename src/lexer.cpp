@@ -134,7 +134,9 @@ void Lexer::scanToken()
         }
         else
         {
-            ErrorHandler::error("unexpected character: " + c, line, current);
+            std::string errorMessage = "unexpected character: ";
+            errorMessage.push_back(c);
+            ErrorHandler::error(errorMessage.c_str(), line, current);
         }
     }
 }

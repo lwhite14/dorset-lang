@@ -1,12 +1,6 @@
 fn binary : 1 (x y) { y; }
 
-fn fib(x)
-{
-    if (x < 3) then
-        1
-    else
-        fib(x-1)+fib(x-2);
-}
+extern externfunction(x y);
 
 fn fibi(x)
 {
@@ -20,5 +14,6 @@ fn fibi(x)
 
 fn main() 
 { 
-    printf("%f", fibi(10));
+    printf("%f", fibi(10)) : 
+    printf("\n", 0);
 }

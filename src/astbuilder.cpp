@@ -33,6 +33,9 @@ void ASTBuilder::parseTokenList()
         case FUNCTION:
             handleDefinition();
             break;
+        case EXTERN:
+            handleExtern();
+            break;
         default:
             ErrorHandler::error("only functions allowed at the top level", currentToken().getLine(), currentToken().getCharacter());
             advanceToken(); // ignore non function tokens
@@ -40,7 +43,6 @@ void ASTBuilder::parseTokenList()
         }
     }
 }
-
 
 AST::ExprAST *ASTBuilder::parseExpression()
 {
@@ -65,10 +67,11 @@ AST::PrototypeAST *ASTBuilder::parsePrototype()
 {
     std::string FnName;
 
-    unsigned Kind = 0;  // 0 = identifier, 1 = unary, 2 = binary.
+    unsigned Kind = 0; // 0 = identifier, 1 = unary, 2 = binary.
     unsigned BinaryPrecedence = 30;
 
-    switch (currentToken().getType()) {
+    switch (currentToken().getType())
+    {
     default:
         ErrorHandler::error("expected function name in prototype", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;
@@ -102,7 +105,7 @@ AST::PrototypeAST *ASTBuilder::parsePrototype()
         advanceToken();
 
         // Read the precedence if present.
-        if (currentToken().getType() == NUMBER) 
+        if (currentToken().getType() == NUMBER)
         {
             if (std::stod(currentToken().getLiteral()) < 1 || std::stod(currentToken().getLiteral()) > 100)
             {
@@ -115,28 +118,28 @@ AST::PrototypeAST *ASTBuilder::parsePrototype()
         break;
     }
 
-    if (currentToken().getType() != LEFT_PAREN) 
+    if (currentToken().getType() != LEFT_PAREN)
     {
         ErrorHandler::error("expected '(' in prototype", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;
     }
 
     std::vector<std::string> ArgNames;
-    while (advanceToken().getType() == IDENTIFIER) 
+    while (advanceToken().getType() == IDENTIFIER)
     {
         ArgNames.push_back(currentToken().getLexeme());
     }
-    if (currentToken().getType() != RIGHT_PAREN) 
+    if (currentToken().getType() != RIGHT_PAREN)
     {
         ErrorHandler::error("expected ')' in prototype", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;
     }
 
     // success.
-    advanceToken();  // eat ')'.
+    advanceToken(); // eat ')'.
 
     // Verify right number of names for operator.
-    if (Kind && ArgNames.size() != Kind) 
+    if (Kind && ArgNames.size() != Kind)
     {
         ErrorHandler::error("invalid number of operands for operator", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;
@@ -144,7 +147,6 @@ AST::PrototypeAST *ASTBuilder::parsePrototype()
 
     return new AST::PrototypeAST(FnName, std::move(ArgNames), Kind != 0, BinaryPrecedence);
 }
-
 
 AST::FunctionAST *ASTBuilder::parseDefinition()
 {
@@ -179,13 +181,42 @@ AST::FunctionAST *ASTBuilder::parseDefinition()
     return nullptr;
 }
 
+AST::PrototypeAST *ASTBuilder::parseExtern()
+{
+    advanceToken(); // eat extern.
+    auto *Proto = parsePrototype();
+
+    if (currentToken().getType() != SEMICOLON)
+    {
+        ErrorHandler::error("no terminating semicolon", currentToken().getLine());
+        return nullptr;
+    }
+    advanceToken();
+
+    return Proto;
+}
+
 void ASTBuilder::handleDefinition()
 {
     if (auto FnAST = parseDefinition())
     {
         if (auto *FnIR = FnAST->codegen())
         {
+        }
+    }
+    else
+    {
+        // Skip token for error recovery.
+        advanceToken();
+    }
+}
 
+void ASTBuilder::handleExtern()
+{
+    if (auto ProtoAST = parseExtern())
+    {
+        if (auto *FnIR = ProtoAST->codegen())
+        {
         }
     }
     else
