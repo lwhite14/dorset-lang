@@ -26,12 +26,16 @@ void CompilerOptions::advanceArgument()
 
 std::string CompilerOptions::currentArgument()
 {
+    if (currentArgumentIndex >= arguments.size())
+    {
+        return "";
+    }
     return arguments[currentArgumentIndex];
 }
 
 bool CompilerOptions::isAtEnd()
 {
-    if (currentArgumentIndex == arguments.size())
+    if (currentArgumentIndex >= arguments.size())
     {
         return true;
     }
@@ -67,6 +71,11 @@ void CompilerOptions::processFlag()
     else if (currentArgument() == "-o")
     {
         advanceArgument();
+        if (currentArgument() == "")
+        {
+            error("No argument given to output flag.");
+            return;
+        }
         outputFinal = currentArgument();
         hasOutputName = true;
     }

@@ -15,7 +15,7 @@
 
 void printUsage()
 {
-    std::cout << "Usage: dorset [file] [options]                    " << std::endl;
+    std::cout << "Usage: dorset [file] <options, ...>               " << std::endl;
     std::cout << "                                                  " << std::endl;
     std::cout << "Options:                                          " << std::endl;
     std::cout << "    -t --tokens   = list all the tokens           " << std::endl;
