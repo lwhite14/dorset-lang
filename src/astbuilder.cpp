@@ -10,7 +10,7 @@ Token ASTBuilder::currentToken()
 {
     if (currentTokenIndex >= tokens.size())
     {
-        ErrorHandler::error("overshot token list length \n\t\t this can be caused by a miriad of errors");
+        ErrorHandler::error("overshot token list length \n\t\t this can be caused by a miriad of issues");
         exit(1);
     }
     return tokens[currentTokenIndex];
@@ -41,7 +41,15 @@ void ASTBuilder::parseTokenList()
         else
         {
             ErrorHandler::error("a token of this type is not allowed at the top level", currentToken().getLine(), currentToken().getCharacter());
-            advanceToken(); // ignore this token
+            bool cond = true;
+            while (cond)
+            {
+                advanceToken();
+                if (currentToken().getType() == _EOF || currentToken().getType() == FUNCTION || currentToken().getType() == EXTERN)
+                {
+                    cond = false;
+                }
+            }
         }
     }
 }
