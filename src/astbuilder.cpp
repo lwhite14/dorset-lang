@@ -10,7 +10,7 @@ Token ASTBuilder::currentToken()
 {
     if (currentTokenIndex >= tokens.size())
     {
-        ErrorHandler::error("overshot token list length \n\t\t this can be caused by a miriad of issues");
+        ErrorHandler::error("overshot token list length, this can be caused by a miriad of issues");
         exit(1);
     }
     return tokens[currentTokenIndex];
