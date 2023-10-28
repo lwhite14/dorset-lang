@@ -221,7 +221,7 @@ int Compiler::compile()
         if (!ErrorHandler::HadError)
         {
             outputBinaries();
-            removeBinaries();
+            // removeBinaries();
         }
     }
     else
@@ -234,38 +234,48 @@ int Compiler::compile()
 
 void Compiler::outputBinaries()
 {
-    std::string ir;
-    raw_string_ostream ostream(ir);
-    ostream << *AST::MasterAST::TheModule;
-    ostream.flush();
+    InitializeAllTargetInfos();
+    InitializeAllTargets();
+    InitializeAllTargetMCs();
+    InitializeAllAsmParsers();
+    InitializeAllAsmPrinters();
 
-    std::ofstream irFile;
-    irFile.open(options.outputLL);
-    irFile << ir;
-    irFile.close();
+    std::string TargetTriple = sys::getDefaultTargetTriple();
+    AST::MasterAST::TheModule->setTargetTriple(TargetTriple);
 
-    if (system(("llc " + options.outputLL + " -o " + options.outputS).c_str()) != 0)
+    std::string Error;
+    auto Target = TargetRegistry::lookupTarget(TargetTriple, Error);
+
+    if (!Target)
     {
-        ErrorHandler::error("error compiling LLVM IR");
-        return;
+        ErrorHandler::error("could not create target");
+        exit(1);
     }
-    if (system(("clang -c " + options.outputS + " -o " + options.outputO).c_str()) != 0)
+
+    auto TheTargetMachine = Target->createTargetMachine(TargetTriple, "generic", "", TargetOptions(), std::optional<Reloc::Model>());
+
+    AST::MasterAST::TheModule->setDataLayout(TheTargetMachine->createDataLayout());
+
+    StringRef fileName = options.outputO;
+    std::error_code EC;
+    raw_fd_ostream dest(fileName, EC, sys::fs::OF_None);
+
+    if (EC)
     {
-        ErrorHandler::error("error compiling assembly");
-        return;
+        ErrorHandler::error("could not open file: " + fileName.str());
+        exit(1);
     }
-    if (!options.isLibrary)
+
+    legacy::PassManager pass;
+
+    if (TheTargetMachine->addPassesToEmitFile(pass, dest, nullptr, CodeGenFileType::ObjectFile))
     {
-#if defined(_WIN64) || defined(_WIN32)
-        if (system(("clang -Wunused-command-line-argument " + options.outputS + " -o " + options.outputFinal).c_str()) != 0)
-#else
-        if (system(("clang -Wunused-command-line-argument " + options.outputS + " -o " + options.outputFinal + " -no-pie").c_str()) != 0)
-#endif
-        {
-            ErrorHandler::error("error compiling object file");
-            return;
-        }
+        ErrorHandler::error("can't emit a file of this type");
+        exit(1);
     }
+
+    pass.run(*AST::MasterAST::TheModule);
+    dest.flush();
 }
 
 void Compiler::removeBinaries()
