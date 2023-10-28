@@ -31,6 +31,13 @@ void printVersion()
 {
     std::cout << "dorset-lang " << Version.to_string() << std::endl;
     std::cout << "(" << GIT_COMMIT_HASH << ")" << std::endl;
+
+    std::string branch = GIT_BRANCH;
+    if (branch == "develop")
+    {
+        std::cout << "Built from the development branch, expect bugs.   " << std::endl;
+        std::cout << "\033[33mYou have been warned.\033[0m            " << std::endl;
+    }
 }
 
 void printTokens(std::vector<Token> tokens)
