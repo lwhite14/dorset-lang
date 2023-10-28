@@ -40,7 +40,7 @@ void ASTBuilder::parseTokenList()
         }
         else
         {
-            ErrorHandler::error("a token of this type is not allowed at the top level", currentToken().getLine(), currentToken().getCharacter());
+            ErrorHandler::error("unexpected token at 'top level'", currentToken().getLine(), currentToken().getCharacter());
             bool cond = true;
             while (cond)
             {

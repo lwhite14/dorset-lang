@@ -1,24 +1,35 @@
 #include "error.h"
 
+#include <iomanip>
+
 /////////////////////////
 /// Private Functions ///
 /////////////////////////
 
 void ErrorHandler::report(std::string message)
 {
-    std::cout << "[unknown] Error: " << message << std::endl;
+    std::string first = "\033[31m[unknown]";
+    std::string second = "Error: " + message + ".\033[0m";
+
+    std::cout << std::left << std::setw(24) << first << std::setw(4) << ' ' << std::setw(24) << second << std::endl;
     HadError = true;
 }
 
 void ErrorHandler::report(std::string message, int line)
 {
-    std::cout << "[line " << line << "] Error: " << message << std::endl;
+    std::string first = "\033[31m[line " + std::to_string(line) + "]";
+    std::string second = "Error: " + message + ".\033[0m";
+
+    std::cout << std::left  << std::setw(24) << first << std::setw(4) << ' ' << std::setw(24) << second << std::endl;
     HadError = true;
 }
 
 void ErrorHandler::report(std::string message, int line, int character)
 {
-    std::cout << "[line " << line << ", char " << character << "] Error: " << message << std::endl;
+    std::string first = "\033[31m[line " + std::to_string(line) + ", char " + std::to_string(character) + "]";
+    std::string second = "Error: " + message + ".\033[0m";
+
+    std::cout << std::left  << std::setw(24) << first << std::setw(4) << ' ' << std::setw(24) << second << std::endl;
     HadError = true;
 }
 

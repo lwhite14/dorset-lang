@@ -44,7 +44,7 @@ bool CompilerOptions::isAtEnd()
 
 void CompilerOptions::error(std::string message)
 {
-    std::cout << message << std::endl;
+    std::cout << "\033[31m" << message << "\033[0m" << std::endl;
     hadError = true;
 }
 
