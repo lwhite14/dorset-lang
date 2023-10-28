@@ -28,7 +28,8 @@ enum TokenType
     THEN, IN,
 
     // Special
-    _EOF, TERMINATING,
+    _EOF, // End of file
+    _EOE, // End of expression
 
     // Operator Related
     BINARY, UNARY

@@ -12,7 +12,8 @@ Token ExpressionBuilder::currentToken()
 {
     if (currentTokenIndex >= tokens.size())
     {
-        return Token(TERMINATING, "", "", tokens[tokens.size() - 1].getLine(), tokens[tokens.size() - 1].getCharacter());
+        ErrorHandler::error("overshot token list length, this can be caused by a miriad of issues", tokens[tokens.size() - 1].getLine());
+        exit(1);
     }
     return tokens[currentTokenIndex];
 }
