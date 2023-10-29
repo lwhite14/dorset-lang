@@ -68,7 +68,7 @@ AST::ExprAST *ASTBuilder::parseExpression()
         exprTokens.push_back(currentToken());
         advanceToken();
     }
-    exprTokens.push_back(Token(_EOE, currentToken().getLexeme(), currentToken().getLiteral(), currentToken().getLine(), currentToken().getCharacter()));
+    exprTokens.push_back(Token(_EOE, " ", "", currentToken().getLine(), currentToken().getCharacter()));
     advanceToken();
     ExpressionBuilder builder = ExpressionBuilder(exprTokens);
     return builder.buildExpression();

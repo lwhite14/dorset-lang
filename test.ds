@@ -1,19 +1,20 @@
 fn binary : 1 (x, y) { y; }
 
-extern externfunction(x, y);
-
-fn fibi(x)
+fn test(x)
 {
-    var a = 1, b = 1, c in
-    (for i = 3, i < x in
-        c = a + b :
-        a = b :
-        b = c) :
-    b;
+    x = 4:
+    printf("num in function %f", x):
+    printf("\n", 0);
 }
 
 fn main() 
 { 
-    printf("%f", fibi(10)) : 
+    var num in num = 3:
+    printf("num before %f", num):
+    printf("\n", 0):
+
+    test(num):
+
+    printf("num after %f", num):
     printf("\n", 0);
 }

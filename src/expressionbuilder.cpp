@@ -334,7 +334,7 @@ AST::ExprAST *ExpressionBuilder::parseBinOpRHS(int ExprPrec, AST::ExprAST *LHS)
             if (!RHS)
                 return nullptr;
         }
-
+        
         // Merge LHS/RHS.
         LHS = new AST::BinaryExprAST(BinOp, std::move(LHS), std::move(RHS));
     }
@@ -358,6 +358,11 @@ AST::ExprAST* ExpressionBuilder::parseUnary()
 
 int ExpressionBuilder::getTokPrecedence()
 {
+    if (currentToken().getType() == _EOE)
+    {
+        return -1;
+    }
+
     if (currentToken().getLexeme().length() != 1)
     {
         return -1;
