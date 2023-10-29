@@ -92,7 +92,7 @@ namespace AST
         // Look this variable up in the function.
         AllocaInst *A = MasterAST::NamedValues[Name];
         if (!A)
-            return logError("Unknown variable name");
+            return logError("unknown variable name: " + Name);
 
         // Load the value.
         return MasterAST::Builder->CreateLoad(A->getAllocatedType(), A, Name.c_str());
@@ -181,7 +181,7 @@ namespace AST
             // Look up the name.
             Value *Variable = MasterAST::NamedValues[LHSE->getName()];
             if (!Variable)
-                return logError("Unknown variable name");
+                return logError("unknown variable name: " + LHSE->getName());
 
             MasterAST::Builder->CreateStore(Val, Variable);
             return Val;

@@ -223,6 +223,10 @@ void ASTBuilder::handleDefinition()
         if (auto *FnIR = FnAST->codegen())
         {
         }
+        else
+        {
+            ErrorHandler::error("codegen failed", currentToken().getLine());
+        }
     }
     else
     {
@@ -237,6 +241,10 @@ void ASTBuilder::handleExtern()
     {
         if (auto *FnIR = ProtoAST->codegen())
         {
+        }
+        else
+        {
+            ErrorHandler::error("codegen failed", currentToken().getLine());
         }
     }
     else
