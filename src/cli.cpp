@@ -257,9 +257,9 @@ void Compiler::outputBinaries()
     if (!options.isLibrary)
     {
 #if defined(_WIN64) || defined(_WIN32)
-        if (system(("clang -Wunused-command-line-argument " + options.outputS + " -o " + options.outputFinal).c_str()) != 0)
+        if (system(("clang " + options.outputS + " -o " + options.outputFinal).c_str()) != 0)
 #else
-        if (system(("clang -Wunused-command-line-argument " + options.outputS + " -o " + options.outputFinal + " -no-pie").c_str()) != 0)
+        if (system(("clang " + options.outputS + " -o " + options.outputFinal + " -no-pie").c_str()) != 0)
 #endif
         {
             ErrorHandler::error("error compiling object file");
