@@ -2,19 +2,21 @@ fn binary : 1 (x, y) { y; }
 
 fn test(x)
 {
-    x = 4:
-    printf("num in function %f", x):
-    printf("\n", 0);
+    x = x + 12;
 }
 
 fn main() 
 { 
-    var num in num = 3:
-    printf("num before %f", num):
+    var num = 3:
+
+    printf("num: %f", num): // expecting 3
     printf("\n", 0):
 
-    test(num):
+    printf("num: %f", test(num)): // expecting 15
+    printf("\n", 0):
 
-    printf("num after %f", num):
+    num = num + 4:
+
+    printf("num: %f", num): // expecting 7
     printf("\n", 0);
 }

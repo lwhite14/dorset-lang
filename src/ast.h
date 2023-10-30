@@ -77,11 +77,11 @@ namespace AST
     /// VarExprAST - Expression class for var/in
     class VarExprAST : public ExprAST 
     {
-        std::vector<std::pair<std::string, ExprAST*>> VarNames;
-        ExprAST* Body;
+        std::string Name;
+        ExprAST* Init;
 
     public:
-        VarExprAST(std::vector<std::pair<std::string, ExprAST*>> VarNames, ExprAST* Body);
+        VarExprAST(std::string Name, ExprAST* Init);
 
         Value* codegen() override;
     };

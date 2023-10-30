@@ -103,62 +103,40 @@ namespace AST
         return Name;
     }
 
-    VarExprAST::VarExprAST(std::vector<std::pair<std::string, ExprAST *>> VarNames, ExprAST *Body)
-        : VarNames(std::move(VarNames)), Body(std::move(Body))
+    VarExprAST::VarExprAST(std::string Name, ExprAST* Init)
+        : Name(Name), Init(std::move(Init))
     {
     }
 
     Value *VarExprAST::codegen()
     {
-        std::vector<AllocaInst *> OldBindings;
-
         Function *TheFunction = MasterAST::Builder->GetInsertBlock()->getParent();
 
-        // Register all variables and emit their initializer.
-        for (unsigned i = 0, e = VarNames.size(); i != e; ++i)
+        Value *InitVal;
+        if (Init != nullptr)
         {
-            const std::string &VarName = VarNames[i].first;
-            ExprAST *Init = VarNames[i].second;
-
-            // Emit the initializer before adding the variable to scope, this prevents
-            // the initializer from referencing the variable itself, and permits stuff
-            // like this:
-            //  var a = 1 in
-            //    var a = a in ...   # refers to outer 'a'.
-            Value *InitVal;
-            if (Init)
-            {
-                InitVal = Init->codegen();
-                if (!InitVal)
-                    return nullptr;
-            }
-            else
-            { // If not specified, use 0.0.
-                InitVal = ConstantFP::get(*MasterAST::TheContext, APFloat(0.0));
+            InitVal = Init->codegen();
+            if (InitVal == nullptr)
+            { 
+                ErrorHandler::error("variable initialization has failed");
+                return nullptr;
             }
 
-            AllocaInst *Alloca = CreateEntryBlockAlloca(TheFunction, VarName);
-            MasterAST::Builder->CreateStore(InitVal, Alloca);
-
-            // Remember the old variable binding so that we can restore the binding when
-            // we unrecurse.
-            OldBindings.push_back(MasterAST::NamedValues[VarName]);
-
-            // Remember this binding.
-            MasterAST::NamedValues[VarName] = Alloca;
+        }
+        else
+        { // If not specified, use 0.0.
+            InitVal = ConstantFP::get(*MasterAST::TheContext, APFloat(0.0));
         }
 
-        // Codegen the body, now that all vars are in scope.
-        Value *BodyVal = Body->codegen();
-        if (!BodyVal)
-            return nullptr;
 
-        // Pop all our variables from scope.
-        for (unsigned i = 0, e = VarNames.size(); i != e; ++i)
-            MasterAST::NamedValues[VarNames[i].first] = OldBindings[i];
+        AllocaInst *Alloca = CreateEntryBlockAlloca(TheFunction, Name);
+        MasterAST::Builder->CreateStore(InitVal, Alloca);
+
+        // Remember this binding.
+        MasterAST::NamedValues[Name] = Alloca;
 
         // Return the body computation.
-        return BodyVal;
+        return InitVal;
     }
 
     BinaryExprAST::BinaryExprAST(char Op, ExprAST *LHS, ExprAST *RHS)
