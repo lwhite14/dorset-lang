@@ -137,10 +137,10 @@ namespace AST
     class FunctionAST
     {
         PrototypeAST *Proto;
-        ExprAST *Body;
+        std::vector<ExprAST *> Body;
 
     public:
-        FunctionAST(PrototypeAST *Proto, ExprAST *Body);
+        FunctionAST(PrototypeAST *Proto, std::vector<ExprAST *> Body);
         Function *codegen();
     };
 

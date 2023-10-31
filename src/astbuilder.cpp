@@ -10,7 +10,7 @@ Token ASTBuilder::currentToken()
 {
     if (currentTokenIndex >= tokens.size())
     {
-        ErrorHandler::error("overshot token list length, this can be caused by a miriad of issues");
+        ErrorHandler::error("overshot token list length in source root, this can be caused by a miriad of issues");
         exit(1);
     }
     return tokens[currentTokenIndex];
@@ -185,7 +185,10 @@ AST::FunctionAST *ASTBuilder::parseDefinition()
     }
     advanceToken();
 
-    auto E = parseExpression();
+    std::vector<AST::ExprAST*> expressions;
+
+    while (currentToken().getType() != RIGHT_BRACE)
+        expressions.push_back(parseExpression());
 
     // Eat '}'
     if (currentToken().getType() != RIGHT_BRACE)
@@ -193,11 +196,17 @@ AST::FunctionAST *ASTBuilder::parseDefinition()
         ErrorHandler::error("unknown token when expecting closing brace at the end of the function", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;
     }
-    advanceToken();
 
-    if (E)
-        return new AST::FunctionAST(std::move(Proto), std::move(E));
+    if (expressions.size() > 0)
+    {
+        // only advance past the right curly brace once we know the function hasn't
+        // failed, this way the error recovery in handleDefinition works correctly
+        advanceToken();
+        
+        return new AST::FunctionAST(std::move(Proto), expressions);
+    }
 
+    ErrorHandler::error("function cannot be empty, it needs a default return value", currentToken().getLine(), currentToken().getCharacter());
     return nullptr;
 }
 
@@ -231,7 +240,8 @@ void ASTBuilder::handleDefinition()
     else
     {
         // Skip token for error recovery.
-        advanceToken();
+        if (currentTokenIndex < tokens.size() - 1)
+            advanceToken();
     }
 }
 
@@ -250,6 +260,7 @@ void ASTBuilder::handleExtern()
     else
     {
         // Skip token for error recovery.
-        advanceToken();
+        if (currentTokenIndex < tokens.size() - 1)
+            advanceToken();
     }
 }

@@ -275,8 +275,8 @@ namespace AST
         return Precedence;
     }
 
-    FunctionAST::FunctionAST(PrototypeAST *Proto, ExprAST *Body)
-        : Proto(std::move(Proto)), Body(std::move(Body))
+    FunctionAST::FunctionAST(PrototypeAST *Proto, std::vector<ExprAST *> Body)
+        : Proto(std::move(Proto)), Body(Body)
     {
     }
 
@@ -312,15 +312,22 @@ namespace AST
             MasterAST::NamedValues[std::string(Arg.getName())] = Alloca;
         }
 
-        if (Value *RetVal = Body->codegen())
+        for (unsigned int i = 0; i < Body.size(); i++)
         {
-            // Finish off the function.
-            MasterAST::Builder->CreateRet(RetVal);
+            Body[i]->codegen();
+        
+            if (i == Body.size() - 1)
+            {
+                Value *RetVal = Body[i]->codegen();
 
-            // Validate the generated code, checking for consistency.
-            verifyFunction(*TheFunction);
+                // Finish off the function.
+                MasterAST::Builder->CreateRet(RetVal);
 
-            return TheFunction;
+                // Validate the generated code, checking for consistency.
+                verifyFunction(*TheFunction);
+
+                return TheFunction;
+            }
         }
 
         // Error reading body, remove function.
@@ -328,6 +335,7 @@ namespace AST
 
         if (P.isBinaryOp())
             MasterAST::BinopPrecedence.erase(P.getOperatorName());
+            
         return nullptr;
     }
 

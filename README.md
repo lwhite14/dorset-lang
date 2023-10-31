@@ -6,8 +6,6 @@ Very fragile, handle with care :worried:
 
 ### Syntax
 ```
-fn binary : 1 (x, y) { y; }
-
 fn test(x)
 {
     x = x + 12;
@@ -15,17 +13,17 @@ fn test(x)
 
 fn main() 
 { 
-    var num = 3:
+    var num = 3;
 
-    printf("num: %f", num): // expecting 3
-    printf("\n", 0):
+    printf("num = %f", num); // expecting 3
+    printf("\n", 0);
 
-    printf("num: %f", test(num)): // expecting 15
-    printf("\n", 0):
+    printf("num = %f", test(num)); // expecting 15
+    printf("\n", 0);
 
-    num = num + 4:
+    num = num + 4;
 
-    printf("num: %f", num): // expecting 7
+    printf("num = %f", num); // expecting 7
     printf("\n", 0);
 }
 ```
