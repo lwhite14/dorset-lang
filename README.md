@@ -8,19 +8,24 @@ Very fragile, handle with care :worried:
 ```
 fn binary : 1 (x, y) { y; }
 
-fn fibi(x)
+fn test(x)
 {
-    var a = 1, b = 1, c in
-    (for i = 3, i < x in
-        c = a + b :
-        a = b :
-        b = c) :
-    b;
+    x = x + 12;
 }
 
 fn main() 
 { 
-    printf("%f", fibi(10)) : 
+    var num = 3:
+
+    printf("num: %f", num): // expecting 3
+    printf("\n", 0):
+
+    printf("num: %f", test(num)): // expecting 15
+    printf("\n", 0):
+
+    num = num + 4:
+
+    printf("num: %f", num): // expecting 7
     printf("\n", 0);
 }
 ```
