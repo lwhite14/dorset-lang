@@ -226,7 +226,7 @@ AST::ExprAST *ExpressionBuilder::parseVarExpr()
     if (currentToken().getLexeme()[0] == '=') {
         advanceToken(); // eat the '='.
 
-        Init = parseUnary();
+        Init = buildExpression();
         if (!Init)
         {
             ErrorHandler::error("failed to build initializer value", currentToken().getLine(), currentToken().getCharacter());

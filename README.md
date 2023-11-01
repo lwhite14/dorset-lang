@@ -8,12 +8,12 @@ Very fragile, handle with care :worried:
 ```
 fn test(x)
 {
-    x = x + 12;
+    x + 12;
 }
 
 fn main() 
 { 
-    var num = 3;
+    var num = 1 + 2;
 
     printf("num = %f", num); // expecting 3
     printf("\n", 0);
