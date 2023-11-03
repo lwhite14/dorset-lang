@@ -190,6 +190,10 @@ AST::FunctionAST *ASTBuilder::parseDefinition()
         return nullptr;
     }
 
+    bool needsReturn = true;
+    if (Proto->getReturnType() == "void")
+        needsReturn = false;
+
     // Eat '{'
     if (currentToken().getType() != LEFT_BRACE)
     {
@@ -200,8 +204,21 @@ AST::FunctionAST *ASTBuilder::parseDefinition()
 
     std::vector<AST::ExprAST*> expressions;
 
-    while (currentToken().getType() != RIGHT_BRACE)
+    bool hasReturn = false;
+
+    while (currentToken().getType() != RIGHT_BRACE) 
+    {
+        if (currentToken().getType() == RETURN)
+            hasReturn = true;
+
         expressions.push_back(parseExpression());
+    }
+
+    if (needsReturn && !hasReturn) 
+    {
+        ErrorHandler::error("this function needs a return", currentToken().getLine(), currentToken().getCharacter());
+        return nullptr;
+    }
 
     // Eat '}'
     if (currentToken().getType() != RIGHT_BRACE)

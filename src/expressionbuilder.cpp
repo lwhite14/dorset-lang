@@ -237,6 +237,19 @@ AST::ExprAST *ExpressionBuilder::parseVarExpr()
     return new AST::VarExprAST(Name, std::move(Init));
 }
 
+AST::ExprAST* ExpressionBuilder::parseReturnExpr() 
+{
+    advanceToken(); // eat the return.
+
+    AST::ExprAST* RetVal;
+    if (currentToken().getType() != _EOE)
+        RetVal = buildExpression();
+    else
+        RetVal = nullptr;
+
+    return new AST::ReturnExprAST(RetVal);
+}
+
 AST::ExprAST *ExpressionBuilder::parsePrimary()
 {
     if (currentToken().getType() == IDENTIFIER)
@@ -272,6 +285,11 @@ AST::ExprAST *ExpressionBuilder::parsePrimary()
     else if (currentToken().getType() == VAR) 
     {
         auto Expr = parseVarExpr();
+        return Expr;
+    }
+    else if (currentToken().getType() == RETURN) 
+    {
+        auto Expr = parseReturnExpr();
         return Expr;
     }
     else

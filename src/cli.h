@@ -29,6 +29,7 @@ private:
     bool hasOutputName = false;
     bool isLibrary = false;
     bool generateLLVMIR = false;
+    bool deleteBinaries = true;
 
     bool hadError = false;
 

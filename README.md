@@ -8,7 +8,7 @@ Very fragile, handle with care :worried:
 ```
 fn test(x) double
 {
-    x + 12;
+    return x + 12;
 }
 
 fn main() void

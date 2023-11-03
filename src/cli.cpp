@@ -87,6 +87,10 @@ void CompilerOptions::processFlag()
     {
         generateLLVMIR = true;
     }
+    else if (currentArgument() == "-b" || currentArgument() == "--keepbin")
+    {
+        deleteBinaries = false;
+    }
     else
     {
         error("Flag not recognised.");
@@ -221,7 +225,10 @@ int Compiler::compile()
         if (!ErrorHandler::HadError)
         {
             outputBinaries();
-            removeBinaries();
+            if (options.deleteBinaries) 
+            {
+                removeBinaries();
+            }
         }
     }
     else

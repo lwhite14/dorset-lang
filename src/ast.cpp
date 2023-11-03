@@ -222,7 +222,10 @@ namespace AST
                 return nullptr;
         }
 
-        return MasterAST::Builder->CreateCall(CalleeF, ArgsV, "");
+        if (CalleeF->getReturnType() == Type::getVoidTy(*MasterAST::TheContext))
+            return MasterAST::Builder->CreateCall(CalleeF, ArgsV, "");
+        else 
+            return MasterAST::Builder->CreateCall(CalleeF, ArgsV, "calltmp");
     }
 
     PrototypeAST::PrototypeAST(const std::string& Name, std::vector<std::string> Args, std::string ReturnType, bool IsOperator, unsigned Prec)
@@ -333,36 +336,27 @@ namespace AST
 
         for (unsigned int i = 0; i < Body.size(); i++)
         {
-            Body[i]->codegen();
-        
-            if (i == Body.size() - 1)
+            if (!Body[i]->codegen()) 
             {
-                Value *RetVal = Body[i]->codegen();
+                // Error reading body, remove function.
+                TheFunction->eraseFromParent();
 
-                // Finish off the function.
-                if (P.getReturnType() == "void") 
-                {
-                    MasterAST::Builder->CreateRet(nullptr);
-                }
-                else 
-                {
-                    MasterAST::Builder->CreateRet(RetVal);
-                }
+                if (P.isBinaryOp())
+                    MasterAST::BinopPrecedence.erase(P.getOperatorName());
 
-                // Validate the generated code, checking for consistency.
-                verifyFunction(*TheFunction);
-
-                return TheFunction;
+                return nullptr;
             }
         }
 
-        // Error reading body, remove function.
-        TheFunction->eraseFromParent();
+        if (P.getReturnType() == "void") 
+        {
+            MasterAST::Builder->CreateRet(nullptr);
+        }
 
-        if (P.isBinaryOp())
-            MasterAST::BinopPrecedence.erase(P.getOperatorName());
-            
-        return nullptr;
+        // Validate the generated code, checking for consistency.
+        verifyFunction(*TheFunction);
+
+        return TheFunction;
     }
 
     IfExprAST::IfExprAST(ExprAST *Cond, ExprAST *Then, ExprAST *Else)
@@ -531,6 +525,28 @@ namespace AST
             return logError("unknown unary operator");
 
         return MasterAST::Builder->CreateCall(F, OperandV, "unop");
+    }
+
+    ReturnExprAST::ReturnExprAST(ExprAST* Expr)
+        : Expr(Expr)
+    {
+    
+    }
+
+    Value* ReturnExprAST::codegen()
+    {
+        Value* RetVal = nullptr;
+
+        if (Expr != nullptr) 
+        {
+            RetVal = Expr->codegen();
+            if (RetVal == nullptr)
+            {
+                logError("return value failed");
+            }
+        }
+
+        return MasterAST::Builder->CreateRet(RetVal);
     }
 
     void createExternalFunctions()

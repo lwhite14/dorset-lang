@@ -183,6 +183,16 @@ namespace AST
         Value* codegen() override;
     };
 
+    /// ReturnExprAST - Expression that represents the return value of a function.
+    class ReturnExprAST : public ExprAST {
+        ExprAST* Expr;
+
+    public:
+        ReturnExprAST(ExprAST* Expr);
+        
+        Value* codegen() override;
+    };
+
     class MasterAST
     {
     public:
