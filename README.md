@@ -6,12 +6,12 @@ Very fragile, handle with care :worried:
 
 ### Syntax
 ```
-fn test(x)
+fn test(x) double
 {
     x + 12;
 }
 
-fn main() 
+fn main() void
 { 
     var num = 1 + 2;
 

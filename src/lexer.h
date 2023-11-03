@@ -26,6 +26,7 @@ private:
     void number();
     char peekNext();
     void identifier();
+    bool type(std::string text);
     void nextLine();
 
 public:

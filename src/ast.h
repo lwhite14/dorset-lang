@@ -118,12 +118,14 @@ namespace AST
         std::vector<std::string> Args;
         bool IsOperator;
         unsigned Precedence;
+        std::string ReturnType;
 
     public:
-        PrototypeAST(const std::string& Name, std::vector<std::string> Args, bool IsOperator = false, unsigned Prec = 0);
+        PrototypeAST(const std::string& Name, std::vector<std::string> Args, std::string ReturnType, bool IsOperator = false, unsigned Prec = 0);
 
         Function* codegen();
         const std::string& getName() const;
+        const std::string& getReturnType() const;
 
         bool isUnaryOp() const;
         bool isBinaryOp() const;

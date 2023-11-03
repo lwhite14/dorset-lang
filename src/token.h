@@ -22,17 +22,20 @@ enum TokenType
     PLUS, SLASH, STAR, FORWARD_SLASH, BACK_SLASH, VERTICAL_BAR, 
     COLON, AMPERSAND, CARET, EXCLAMATION, LESS, GREATER, 
 
+    // Operator Related
+    BINARY, UNARY,
+
     // Keywords.
     AND, CLASS, ELSE, FALSE, FUNCTION, FOR, IF, NIL, OR,
     PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE, EXTERN,
     THEN, IN,
 
-    // Special
-    _EOF, // End of file
-    _EOE, // End of expression
+    // Types
+    TYPE_VOID, TYPE_DOUBLE,
 
-    // Operator Related
-    BINARY, UNARY
+    // Special
+    _EOE, // End of expression
+    _EOF // End of file
 };
 
 static std::map<std::string, TokenType> keywords = {
@@ -57,6 +60,11 @@ static std::map<std::string, TokenType> keywords = {
     {"in",     IN},
     {"binary", BINARY},
     {"unary",  UNARY}
+};
+
+static std::map<std::string, TokenType> types = {
+    {"void",    TYPE_VOID},
+    {"double",  TYPE_DOUBLE}
 };
 
 class Token 

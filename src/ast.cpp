@@ -222,11 +222,11 @@ namespace AST
                 return nullptr;
         }
 
-        return MasterAST::Builder->CreateCall(CalleeF, ArgsV, "calltmp");
+        return MasterAST::Builder->CreateCall(CalleeF, ArgsV, "");
     }
 
-    PrototypeAST::PrototypeAST(const std::string &Name, std::vector<std::string> Args, bool IsOperator, unsigned Prec)
-        : Name(Name), Args(std::move(Args)), IsOperator(IsOperator), Precedence(Prec)
+    PrototypeAST::PrototypeAST(const std::string& Name, std::vector<std::string> Args, std::string ReturnType, bool IsOperator, unsigned Prec)
+        : Name(Name), Args(std::move(Args)), IsOperator(IsOperator), Precedence(Prec), ReturnType(ReturnType)
     {
     }
 
@@ -235,14 +235,33 @@ namespace AST
         return Name;
     }
 
+    const std::string &PrototypeAST::getReturnType() const
+    {
+        return ReturnType;
+    }
+
     Function *PrototypeAST::codegen()
     {
         // Make the function type:  double(double,double) etc.
         std::vector<Type *> Doubles(Args.size(), Type::getDoubleTy(*MasterAST::TheContext));
 
-        FunctionType *FT = FunctionType::get(Type::getDoubleTy(*MasterAST::TheContext), Doubles, false);
+        llvm::Type* type;
 
-        Function *F = Function::Create(FT, Function::ExternalLinkage, Name, MasterAST::TheModule);
+        if (ReturnType == "void") 
+        {
+            type = Type::getVoidTy(*MasterAST::TheContext);
+        }
+        else if (ReturnType == "double")
+        {
+            type = Type::getDoubleTy(*MasterAST::TheContext);
+        }
+        else
+        {
+            type = Type::getVoidTy(*MasterAST::TheContext);
+        }
+
+        FunctionType* FT = FunctionType::get(type, Doubles, false);
+        Function* F = Function::Create(FT, Function::ExternalLinkage, Name, MasterAST::TheModule);
 
         // Set names for all arguments.
         unsigned Idx = 0;
@@ -321,7 +340,14 @@ namespace AST
                 Value *RetVal = Body[i]->codegen();
 
                 // Finish off the function.
-                MasterAST::Builder->CreateRet(RetVal);
+                if (P.getReturnType() == "void") 
+                {
+                    MasterAST::Builder->CreateRet(nullptr);
+                }
+                else 
+                {
+                    MasterAST::Builder->CreateRet(RetVal);
+                }
 
                 // Validate the generated code, checking for consistency.
                 verifyFunction(*TheFunction);

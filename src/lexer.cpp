@@ -254,17 +254,40 @@ void Lexer::identifier()
     }
 
     std::string text = source.substr(start, current - start);
-    TokenType type;
+    TokenType tokenType;
     std::map<std::string, TokenType>::const_iterator pos = keywords.find(text);
     if (pos == keywords.end())
     {
-        type = IDENTIFIER;
+        if (!type(text)) 
+        {
+            tokenType = IDENTIFIER;
+            addToken(tokenType);
+            return;
+        }
+        else { return; }
     }
     else
     {
-        type = pos->second;
+        tokenType = pos->second;
+        addToken(tokenType);
+        return;
     }
-    addToken(type);
+}
+
+bool Lexer::type(std::string text) 
+{
+    TokenType tokenType;
+    std::map<std::string, TokenType>::const_iterator pos = types.find(text);
+    if (pos == types.end())
+    {
+        return false;
+    }
+    else
+    {
+        tokenType = pos->second;
+        addToken(tokenType);
+        return true;
+    }
 }
 
 void Lexer::nextLine()

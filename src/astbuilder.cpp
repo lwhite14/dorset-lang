@@ -158,6 +158,19 @@ AST::PrototypeAST *ASTBuilder::parsePrototype()
     // success.
     advanceToken(); // eat ')'.
 
+    std::string returnType;
+    if (currentToken().getType() == TYPE_VOID || currentToken().getType() == TYPE_DOUBLE) 
+    {
+        returnType = currentToken().getLexeme();
+    }
+    else 
+    {
+        ErrorHandler::error("expect return type here", currentToken().getLine(), currentToken().getCharacter());
+        return nullptr;
+    }
+
+    advanceToken(); // eat type declaration.
+
     // Verify right number of names for operator.
     if (Kind && ArgNames.size() != Kind)
     {
@@ -165,7 +178,7 @@ AST::PrototypeAST *ASTBuilder::parsePrototype()
         return nullptr;
     }
 
-    return new AST::PrototypeAST(FnName, std::move(ArgNames), Kind != 0, BinaryPrecedence);
+    return new AST::PrototypeAST(FnName, std::move(ArgNames), returnType, Kind != 0, BinaryPrecedence);
 }
 
 AST::FunctionAST *ASTBuilder::parseDefinition()
