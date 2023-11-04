@@ -1,0 +1,267 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>dorset-lang</title>
+    <meta name="description" content="A simple HTML/CSS DocumentationTemplate">
+    <meta name="author" content="Carlos Yllobre">
+
+    <link rel="stylesheet" href="style.css?">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Open+Sans:ital,wght@0,400;0,700;1,600&display=swap" rel="stylesheet">
+
+    <link rel="icon" type="image/x-icon" href="../branding/icon.ico">
+
+    <script defer src="https://use.fontawesome.com/releases/v5.7.2/js/all.js" integrity="sha384-0pzryjIRos8mFBWMzSSZApWtPl/5++eIfzYmTgBBmXYdhvxPc+XcFEk+zJwDgWbP" crossorigin="anonymous"></script>
+
+
+</head>
+
+<body>
+
+    <div class="navbar clear nav-top">
+        <div class="row content">
+            <a href="#"><img class="logo" src="../branding/icon-bordered.png"></a>
+            <a class="right" style="text-decoration: underline;" href="#"><i class="fas fa-book"></i>&nbsp; Documentation</a>
+            <a class="right" href="https://github.com/lwhite14/dorset-lang" target="_blank"><i class="fas fa-link"></i>&nbsp; dorset-lang</a>
+        </div>
+    </div>
+
+    <div class="container clear">
+        <div class="row wrapper">
+
+            <div class="sidepanel">
+
+                <a class="title" href="#intro">Introduction</a>
+
+                <a class="section" href="#versions">Versions</a>
+                <a class="section" href="#tech">Technology</a>
+
+                <div class="divider left"></div>
+
+                <a class="title" href="#gettingstarted">Getting Started</a>
+
+                <a class="section" href="#install">Installing the App</a>
+                <a class="section" href="#usage">Usage</a>
+
+                <div class="divider left"></div>
+
+                <a class="title" href="#features">Features</a>
+
+                <a class="section" href="#feat-basics">Basic Rules and Features</a>
+                <a class="section" href="#feat-functions">Functions</a>
+                <a class="section" href="#feat-variables">Variables</a>
+                <a class="section" href="#feat-conditionals">Conditionals</a>
+                <a class="section" href="#feat-loops">Loops</a>
+                <a class="section" href="#feat-operators">Operator Overloading</a>
+
+                <div class="divider left"></div>
+
+                <a class="title" href="#moreinfo">More Info</a>
+
+                <div class="space double"></div>
+
+            </div>
+
+            <div class="right-col">
+
+
+
+                <h1 id="intro">Introduction</h1>
+
+                <p>
+                    Dorset lang is a language and compiler developed to be fast and strong.
+                </p>
+
+                <h2 id="versions">Versions</h2>
+
+                <p><b>Current stable version: 0.1.4-alpha.</b> Working towards version 1.0.0.</p>
+
+                <h2 id="tech">Technology</h2>
+
+                <p>
+                    Written with C++ (Clang) and LLVM.<br>
+                </p>
+
+                <div class="divider" style="width:24%; margin:30px 0;"></div>
+
+                <h1 id="gettingstarted">Getting Started</h1>
+
+                <h2 id="install">Installing</h2>
+
+                <h3>Dependancies:</h3>
+                <ol>
+                    <li>CMake.</li>
+                    <li>LLVM.</li>
+                    <li>C++ Compiler (Clang comes with LLVM).</li>
+                </ol>
+                <h3>Building</h3>
+                <p>
+                    You will need an install of LLVM to use the dorset compiler. You can find more information on building and installing LLVM and Clang <a href="https://llvm.org/docs/GettingStarted.html">here</a><br>
+                    First, clone the dorset-lang repository. It is advised to clone from a stable version:<br> <i>git clone --branch 0.1.3-alpha https://github.com/lwhite14/dorset-lang.git</i><br>
+                    Configure the CMake cache:<br> <i>cmake -B build -S . -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++</i><br>
+                    Build dorset-lang:<br> <i>cmake --build build --config Release</i><br>
+                    And install dorset-lang:<br> <i>sudo cmake --install build --prefix /usr/local</i><br>
+                </p>
+
+
+                <h2 id="usage">Usage</h2>
+                <p>
+                    Run <b>dorset --help</b> for usage details. <br>
+                    To compiler dorset-lang source code, run <b>dorset file.ds</b> to compile file.ds into an executable.
+                </p>
+
+                <div class="divider" style="width:24%; margin:30px 0;"></div>
+
+
+                <h1 id="features">Language Features</h1>
+
+                <h2 id="feat-basics">Basic Rules and Features</h2>
+                <p>
+                    Dorset-lang is semi-functional, no object oriented language, so every expression and statement must live within a function. Any top level code must be a function declaration. <br>
+                    Code like this is not allowed:
+                    <code><pre>
+fn test(x) double 
+{ 
+    return x + 2; 
+}
+
+printf("%f", test(3));
+                    </pre></code>
+                    The main entry point of your dorset-lang executable is the main function. So for the previous example, to make it work within the semi-functional framework you would write:
+                    <code><pre>
+fn test(x) double 
+{ 
+    return x + 2; 
+}
+
+fn main() void
+{
+    printf("%f", test(3));
+}
+                    </pre></code>
+                    The only types in dorset-lang 0.1.4 are doubles and voids. Any variables declared will automatically be a double to represent a number, however, you will have to specify whether a function returns a double or is void, returning nothing at all.
+                </p>
+
+                <h2 id="feat-functions">Functions</h2>
+                <p>
+                    Functions have five key components which are all necessary to compile.
+                    <ol>
+                        <li>A function keyword.</li>
+                        <li>The function indentifier, or function name.</li>
+                        <li>The parameter list.</li>
+                        <li>The return type.</li>
+                        <li>The function body.</li>
+                    </ol>
+                    A basic function may look like this: <br> 
+                    <code><pre>
+fn test(x) double 
+{ 
+    return x + 2; 
+}
+                    </pre></code>
+                    The <i>fn</i> tells the compiler that the following tokens represent a function definition. <br>
+                    <i>test</i> is the function identifier, this is what the programmer will use when they want to call this function.
+                    The <i>(x)</i> is the parameter list. This function only has one parameter, <i>x</i>. More parameters can be added by using commas.
+                    <code><pre>
+fn test(x, y, z, anotherParameter) double
+                    </pre></code>
+                    The last thing in the function prototype is the return type. This particular function will return a double value, representing a number. The other return type is void, which represents a function that doesn't return anything. <br>
+                    The last thing for the entire function is the function body, the code that is executed when the function is called. This will be zero or more lines of code surrounded by an open curly brace and a closed curly brace. 
+                </p>
+
+                <h2 id="feat-variables">Variables</h2>
+                <p>
+                    Declaring a double variable is very simple, use the var keyword and then give you variable a name, like so:
+                    <code><pre>
+var num;
+                    </pre></code>
+                    This variable does not have an initializer, so when used it will have a default value of 0, however you can initialize a variable with a value by using the <i>=</i> operator, like so: <br>
+                    <code><pre>
+var num = 43;
+                    </pre></code>
+                    You could use this variable in the previous <i>test</i> function call:<br>
+                    <code><pre>
+var num = 3;
+test(num);
+                    </pre></code>
+                </p>
+
+                <h2 id="feat-conditionals">Conditionals</h2>
+                <p>
+                    Conditionals consist of an if and then an else. Both are needed in a if block.
+                    <code><pre>
+if 3 < x then
+    printf("X is bigger than 3!", 0)
+else
+    printf("X is not bigger than 3!", 0);
+                    </pre></code>
+                    Firstly, declare your if and write your conditional that, when true, will execute the code inside the if block. <i>if 3 < x then </i>.<br> 
+                    After the condition, you will need the <i>then</i> token so the compiler knows when the following block begins.<br>
+                    After the if block, <i>else</i> controls the code that will execute if the condition fails: <i>else</i>.<br>
+                    It's important to note that the terminating semicolon only comes <b>at the end</b> of the entire statiement.
+                </p>
+
+                <h2 id="feat-loops">Loops</h2>
+                <p>
+                    Loops are implementing using the following syntax: 
+                    <code><pre>
+for i = 1, i < x, 1.0 in
+        printf("*", 0);
+                    </pre></code>
+                    Firstly, start the for loop with the <i>for</i> keyword. You will then need a start, an end, and a step for the loop. <br>
+                    In dorset-lang 0.1.4, you can only initialize new variables, but you can use any expression to initialize it, for example:
+                    <code><pre>
+for i = add(3, 4), i < 45, 3.0 in
+                    </pre></code>
+                </p>
+
+                <h2 id="feat-operators">Operator Overloading</h2>
+                <p>
+                    In dorset-lang, you can define your own operators. There are two types of operator overloading, unary operators and binary operator. <br>
+                    Unary operators take one argument and perform some operation on that parameter before returning the result. Binary operators take two parameters and do the same, perform some operation and return. Here's an example of both:
+                    <code><pre>
+fn unary!(v) double
+{
+    if v then
+        return 0
+    else
+        return 1;
+}
+
+fn binary> 10 (LHS RHS) double
+{
+    return RHS < LHS;
+}
+                    </pre></code>
+                    The <i>!</i> unary operator takes an argument, v, and returns the opposite of the argument with an if statement. The binary operator <i>></i> takes two arguments and returns essentially the opposite of the <i><</i> operator, returning true if the left side is larger and false if it is not. <br>
+                    You can use this operator overloading functionality to essentially define your own functions for a predefined set of operators. The operators you can use are: +, -, *, /, \, |, :, &, ^, !, <, and >.
+                </p>
+
+                <div class="divider" style="width:24%; margin:30px 0;"></div>
+
+                <h1 id="moreinfo">More Info</h1>
+
+                <p>
+                    The dorset compiler is very fragile, handle with care. <br>
+                    Visit the <a href="https://github.com/lwhite14/dorset-lang">github repository</a> for more information or to submit an issue.
+                </p>
+
+                <div class="doublespace"></div>
+                <div class="divider" style="width:24%; margin:30px 0;"></div>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+</body>
+
+</html>

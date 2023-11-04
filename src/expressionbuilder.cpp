@@ -125,7 +125,7 @@ AST::ExprAST* ExpressionBuilder::parseIfExpr()
 
     if (currentToken().getType() != THEN)
     {
-        ErrorHandler::error("expected then");
+        ErrorHandler::error("expected then", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;
     }
     advanceToken();  // eat the then
@@ -136,7 +136,7 @@ AST::ExprAST* ExpressionBuilder::parseIfExpr()
 
     if (currentToken().getType() != ELSE)
     {
-        ErrorHandler::error("expected else");
+        ErrorHandler::error("expected else", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;
     }
 
@@ -156,7 +156,7 @@ AST::ExprAST* ExpressionBuilder::parseForExpr()
 
     if (currentToken().getType() != IDENTIFIER) 
     {
-        ErrorHandler::error("expected identifier after for");
+        ErrorHandler::error("expected identifier after for", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;
     }
 
@@ -165,7 +165,7 @@ AST::ExprAST* ExpressionBuilder::parseForExpr()
 
     if (currentToken().getLexeme() != "=") 
     {
-        ErrorHandler::error("expected '=' after for");
+        ErrorHandler::error("expected '=' after for", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;
     }
     advanceToken();  // eat '='.
@@ -177,7 +177,7 @@ AST::ExprAST* ExpressionBuilder::parseForExpr()
     }
 
     if (currentToken().getLexeme() != ",") {
-        ErrorHandler::error("expected ',' after for start value");
+        ErrorHandler::error("expected ',' after for start value", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;
     }
     advanceToken();
@@ -196,7 +196,7 @@ AST::ExprAST* ExpressionBuilder::parseForExpr()
     }
 
     if (currentToken().getType() != IN) {
-        ErrorHandler::error("expected 'in' after for");
+        ErrorHandler::error("expected 'in' after for", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;
     }
     advanceToken();  // eat 'in'.
