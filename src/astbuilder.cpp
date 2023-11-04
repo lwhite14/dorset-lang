@@ -65,6 +65,11 @@ AST::ExprAST *ASTBuilder::parseExpression()
             return nullptr;
         }
 
+        if (currentToken().getType() == RETURN) 
+        {
+            hasReturnToken = true;
+        }
+
         exprTokens.push_back(currentToken());
         advanceToken();
     }
@@ -204,17 +209,13 @@ AST::FunctionAST *ASTBuilder::parseDefinition()
 
     std::vector<AST::ExprAST*> expressions;
 
-    bool hasReturn = false;
-
+    hasReturnToken = false;
     while (currentToken().getType() != RIGHT_BRACE) 
     {
-        if (currentToken().getType() == RETURN)
-            hasReturn = true;
-
         expressions.push_back(parseExpression());
     }
 
-    if (needsReturn && !hasReturn) 
+    if (needsReturn && !hasReturnToken) 
     {
         ErrorHandler::error("this function needs a return", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;

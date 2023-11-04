@@ -25,6 +25,7 @@ class ASTBuilder
 private:
     std::vector<Token> tokens;
     int currentTokenIndex;
+    bool hasReturnToken = false;
 
     Token currentToken();
     Token advanceToken();
