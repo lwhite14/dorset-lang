@@ -10,6 +10,7 @@ class ExpressionBuilder
 private:
     std::vector<Token> tokens;
     int currentTokenIndex;
+    bool needsReturnToken;
 
     Token currentToken();
     Token advanceToken();
@@ -28,7 +29,7 @@ private:
     int getTokPrecedence();
 
 public:
-    ExpressionBuilder(std::vector<Token> tokens);
+    ExpressionBuilder(std::vector<Token> tokens, bool needsReturnToken);
 
     AST::ExprAST *buildExpression();
 };

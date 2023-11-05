@@ -75,7 +75,7 @@ AST::ExprAST *ASTBuilder::parseExpression()
     }
     exprTokens.push_back(Token(_EOE, " ", "", currentToken().getLine(), currentToken().getCharacter()));
     advanceToken();
-    ExpressionBuilder builder = ExpressionBuilder(exprTokens);
+    ExpressionBuilder builder = ExpressionBuilder(exprTokens, needsReturnToken);
     return builder.buildExpression();
 }
 
@@ -195,9 +195,9 @@ AST::FunctionAST *ASTBuilder::parseDefinition()
         return nullptr;
     }
 
-    bool needsReturn = true;
+    needsReturnToken = true;
     if (Proto->getReturnType() == "void")
-        needsReturn = false;
+        needsReturnToken = false;
 
     // Eat '{'
     if (currentToken().getType() != LEFT_BRACE)
@@ -212,10 +212,14 @@ AST::FunctionAST *ASTBuilder::parseDefinition()
     hasReturnToken = false;
     while (currentToken().getType() != RIGHT_BRACE) 
     {
-        expressions.push_back(parseExpression());
+        auto* Expr = parseExpression();
+        if (Expr == nullptr)
+            return nullptr;
+
+        expressions.push_back(Expr);
     }
 
-    if (needsReturn && !hasReturnToken) 
+    if (needsReturnToken && !hasReturnToken)
     {
         ErrorHandler::error("this function needs a return", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;

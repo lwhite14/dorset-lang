@@ -1,29 +1,14 @@
-fn test(x) double
+fn testOne(x) double
 {
-    return x + 12;
+    return 0;
 }
 
-fn blank() void
+fn blankTwo() void
 {
-    return;
+    return 2;
 }
 
 fn main() void
 { 
-    var num = 1 + 2;
-
-    printf("num = %f", num); // expecting 3
-    printf("\n", 0);
-
-    blank();
-
-    printf("num = %f", test(num)); // expecting 15
-    printf("\n", 0);
-
-    num = num + 4;
-
-    return;
-
-    printf("num = %f", num); // expecting 7
-    printf("\n", 0);
+    blankTwo();
 }

@@ -2,10 +2,11 @@
 
 #include "error.h"
 
-ExpressionBuilder::ExpressionBuilder(std::vector<Token> tokens)
+ExpressionBuilder::ExpressionBuilder(std::vector<Token> tokens, bool needsReturnToken) 
 {
     this->tokens = tokens;
     this->currentTokenIndex = 0;
+    this->needsReturnToken = needsReturnToken;
 }
 
 Token ExpressionBuilder::currentToken()
@@ -243,9 +244,21 @@ AST::ExprAST* ExpressionBuilder::parseReturnExpr()
 
     AST::ExprAST* RetVal;
     if (currentToken().getType() != _EOE)
-        RetVal = buildExpression();
-    else
+    {
+        if (needsReturnToken) 
+        {
+            RetVal = buildExpression();
+        }
+        else 
+        {
+            ErrorHandler::error("you cannot return a value in a void function", currentToken().getLine(), currentToken().getCharacter());
+            return nullptr;
+        }
+    }
+    else 
+    {
         RetVal = nullptr;
+    }
 
     return new AST::ReturnExprAST(RetVal);
 }

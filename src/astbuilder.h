@@ -26,6 +26,7 @@ private:
     std::vector<Token> tokens;
     int currentTokenIndex;
     bool hasReturnToken = false;
+    bool needsReturnToken = false;
 
     Token currentToken();
     Token advanceToken();
