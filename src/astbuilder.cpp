@@ -57,11 +57,23 @@ void ASTBuilder::parseTokenList()
 AST::ExprAST *ASTBuilder::parseExpression()
 {
     std::vector<Token> exprTokens;
-    while (currentToken().getType() != SEMICOLON)
+    bool cond = true;
+    int blockCounter = 1;
+
+    while (cond)
     {
-        if (currentToken().getType() == _EOF || currentToken().getType() == RIGHT_BRACE)
+        if (currentToken().getType() == RIGHT_BRACE) 
         {
-            ErrorHandler::error("no terminating semicolon", currentToken().getLine());
+            blockCounter--;
+        }
+        if (currentToken().getType() == LEFT_BRACE)
+        {
+            blockCounter++;
+        }
+
+        if (currentToken().getType() == _EOF || blockCounter == 0)
+        {
+            ErrorHandler::error("a block hasn't been terminated");
             return nullptr;
         }
 
@@ -70,8 +82,15 @@ AST::ExprAST *ASTBuilder::parseExpression()
             hasReturnToken = true;
         }
 
-        exprTokens.push_back(currentToken());
-        advanceToken();
+        if (currentToken().getType() == SEMICOLON && blockCounter == 1) 
+        {
+            cond = false;
+        }
+        else 
+        {
+            exprTokens.push_back(currentToken());
+            advanceToken();
+        }
     }
     exprTokens.push_back(Token(_EOE, " ", "", currentToken().getLine(), currentToken().getCharacter()));
     advanceToken();

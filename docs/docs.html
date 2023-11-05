@@ -143,7 +143,8 @@ fn main() void
     printf("%f", test(3));
 }
                     </pre></code>
-                    The only types in dorset-lang 0.1.4 are doubles and voids. Any variables declared will automatically be a double to represent a number, however, you will have to specify whether a function returns a double or is void, returning nothing at all.
+                    The only types in dorset-lang 0.1.4 are doubles and voids. Any variables declared will automatically be a double to represent a number, however, you will have to specify whether a function returns a double or is void, returning nothing at all. <br>
+                    Another rule in dorset-lang is that every function needs a least one expression in its body.
                 </p>
 
                 <h2 id="feat-functions">Functions</h2>
@@ -194,15 +195,20 @@ test(num);
                 <p>
                     Conditionals consist of an if and then an else. Both are needed in a if block.
                     <code><pre>
-if 3 < x then
+if 3 < x
+{
     printf("X is bigger than 3!", 0)
+}
 else
-    printf("X is not bigger than 3!", 0);
+{
+    printf("X is not bigger than 3!", 0)
+};
                     </pre></code>
                     Firstly, declare your if and write your conditional that, when true, will execute the code inside the if block. <i>if 3 < x then </i>.<br> 
-                    After the condition, you will need the <i>then</i> token so the compiler knows when the following block begins.<br>
+                    After the condition, you will need the <i>{</i> and <i>}</i> tokens so the compiler knows when the following block begins and ends.<br>
                     After the if block, <i>else</i> controls the code that will execute if the condition fails: <i>else</i>.<br>
-                    It's important to note that the terminating semicolon only comes <b>at the end</b> of the entire statiement.
+                    It's important to note that the terminating semicolon only comes <b>at the end</b> of the entire statement. <br>
+                    Note that you don't need semicolons for the expressions within the if else blocks. This is because in 0.1.4 you can only execute one expression within these blocks. You can define your own operators to get over this limitation, but there is no native semicolon solution.
                 </p>
 
                 <h2 id="feat-loops">Loops</h2>

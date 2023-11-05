@@ -1,14 +1,16 @@
-fn testOne(x) double
+fn test(x) void
 {
-    return 0;
-}
-
-fn blankTwo() void
-{
-    return 2;
+    if 3 < x
+    {
+        printf("X is bigger than 3!", 0)
+    }
+    else
+    {
+        printf("X is not bigger than 3!", 0)
+    };
 }
 
 fn main() void
 { 
-    blankTwo();
+    test(1);
 }
