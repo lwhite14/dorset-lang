@@ -1,16 +1,12 @@
 fn test(x) void
 {
-    if 3 < x
+    for (i = 1, i < x, 1.0)
     {
-        printf("X is bigger than 3!", 0)
-    }
-    else
-    {
-        printf("X is not bigger than 3!", 0)
-    };
+        printf("*", 0)
+    };                 
 }
 
 fn main() void
 { 
-    test(1);
+    test(5);
 }

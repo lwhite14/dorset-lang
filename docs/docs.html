@@ -215,14 +215,17 @@ else
                 <p>
                     Loops are implementing using the following syntax: 
                     <code><pre>
-for i = 1, i < x, 1.0 in
-        printf("*", 0);
+for (i = 1, i < x, 1.0)
+{
+    printf("*", 0)
+};     
                     </pre></code>
                     Firstly, start the for loop with the <i>for</i> keyword. You will then need a start, an end, and a step for the loop. <br>
                     In dorset-lang 0.1.4, you can only initialize new variables, but you can use any expression to initialize it, for example:
                     <code><pre>
-for i = add(3, 4), i < 45, 3.0 in
+for (i = add(3, 4), i < 45, 3.0)
                     </pre></code>
+                    The first part represents the new variables used in the loop. The middle part is the condition which needs to be satisfied to continue looping. Once this condition is false, the loop ends. The last part is the step, and it is entirely optional. If you leave out the step, the loop will use a default step value of 1. The step is the number which is added to the newly declared variable every loop. So for the previous example, the variable <i>i</i> will have 3 added to it for each loop.
                 </p>
 
                 <h2 id="feat-operators">Operator Overloading</h2>

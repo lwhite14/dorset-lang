@@ -175,6 +175,13 @@ AST::ExprAST* ExpressionBuilder::parseForExpr()
 {
     advanceToken();  // eat the for.
 
+    if (currentToken().getType() != LEFT_PAREN)
+    {
+        ErrorHandler::error("expected open parentheses", currentToken().getLine(), currentToken().getCharacter());
+        return nullptr;
+    }
+    advanceToken(); // eat '('
+
     if (currentToken().getType() != IDENTIFIER) 
     {
         ErrorHandler::error("expected identifier after for", currentToken().getLine(), currentToken().getCharacter());
@@ -197,7 +204,8 @@ AST::ExprAST* ExpressionBuilder::parseForExpr()
         return nullptr;
     }
 
-    if (currentToken().getLexeme() != ",") {
+    if (currentToken().getLexeme() != ",") 
+    {
         ErrorHandler::error("expected ',' after for start value", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;
     }
@@ -216,15 +224,30 @@ AST::ExprAST* ExpressionBuilder::parseForExpr()
             return nullptr;
     }
 
-    if (currentToken().getType() != IN) {
-        ErrorHandler::error("expected 'in' after for", currentToken().getLine(), currentToken().getCharacter());
+    if (currentToken().getType() != RIGHT_PAREN)
+    {
+        ErrorHandler::error("expected close parentheses", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;
     }
-    advanceToken();  // eat 'in'.
+    advanceToken(); // eat ')'
+
+    if (currentToken().getType() != LEFT_BRACE)
+    {
+        ErrorHandler::error("unknown token when expecting opening brace at the start of the block", currentToken().getLine(), currentToken().getCharacter());
+        return nullptr;
+    }
+    advanceToken();  // eat the '{'
 
     auto Body = buildExpression();
     if (!Body)
         return nullptr;
+
+    if (currentToken().getType() != RIGHT_BRACE)
+    {
+        ErrorHandler::error("unknown token when expecting opening brace at the start of the block", currentToken().getLine(), currentToken().getCharacter());
+        return nullptr;
+    }
+    advanceToken();  // eat the '}'
 
     return new AST::ForExprAST(IdName, std::move(Start), std::move(End), std::move(Step), std::move(Body));
 }
