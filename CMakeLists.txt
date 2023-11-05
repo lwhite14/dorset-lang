@@ -25,17 +25,32 @@ execute_process(
     OUTPUT_VARIABLE GIT_COMMIT_HASH
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-add_executable(dorset 
-    src/main.cpp
-    src/error.cpp
-    src/lexer.cpp
-    src/token.cpp
-    src/ast.cpp
-    src/astbuilder.cpp
-    src/outpututils.cpp
-    src/expressionbuilder.cpp
-    src/cli.cpp
-)
+if (WIN32)
+    add_executable(dorset 
+        src/main.cpp
+        src/error.cpp
+        src/lexer.cpp
+        src/token.cpp
+        src/ast.cpp
+        src/astbuilder.cpp
+        src/outpututils.cpp
+        src/expressionbuilder.cpp
+        src/cli.cpp
+        branding/icon.o
+    )
+else()
+    add_executable(dorset 
+        src/main.cpp
+        src/error.cpp
+        src/lexer.cpp
+        src/token.cpp
+        src/ast.cpp
+        src/astbuilder.cpp
+        src/outpututils.cpp
+        src/expressionbuilder.cpp
+        src/cli.cpp
+    )
+endif()
 
 
 llvm_map_components_to_libnames(llvm_libs support core irreader orcjit native)
