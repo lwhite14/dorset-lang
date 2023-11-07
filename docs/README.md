@@ -164,13 +164,18 @@ Unary operators take one argument and perform some operation on that parameter b
 ```
 fn unary!(v) double
 {
-    if v then
-        return 0
+    return
+    if v 
+    {
+        0
+    }
     else
-        return 1;
+    {
+        1
+    };
 }
 
-fn binary> 10 (LHS RHS) double
+fn binary> 10 (LHS, RHS) double
 {
     return RHS < LHS;
 }

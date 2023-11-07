@@ -6,6 +6,28 @@ All notable changes to this project will be documented in this file. The format 
 
 Unreleased is the develop branch which includes every unmerged change from the last release version. These changes will be untested and may be potentially unstable, build this version at your own risk.
 
+## [0.1.4-alpha] - 2023-11-07
+
+### Added
+ - This here changelog!
+ - Development build warning.
+ - Error messaging colours.
+ - Error message if code generation fails.
+ - Multi line functions.
+ - Basic return types (void and double).
+ - Documentation page.
+ - Executable icon for windows binary.
+
+### Fixed
+ - Unescapable loop when code gets stuck returning the 'end of expression' token.
+
+### Changed
+ - Improved error messaging formatting.
+ - Improved token output formatting.
+ - Made the variable declaration a lot simpler: 'var i = 3;'
+ - If statements now use curly braces.
+ - For loops now use curly braces.
+
 ## [0.1.3-alpha] - 2023-10-28
 
 ### Added
@@ -88,7 +110,8 @@ Unreleased is the develop branch which includes every unmerged change from the l
         - -v: printing the version.
 
 
-[unreleased]: https://github.com/lwhite14/dorset-lang/compare/0.1.3-alpha...develop
+[unreleased]: https://github.com/lwhite14/dorset-lang/compare/0.1.4-alpha...develop
+[0.1.4-alpha]: https://github.com/lwhite14/dorset-lang/releases/tag/0.1.4-alpha
 [0.1.3-alpha]: https://github.com/lwhite14/dorset-lang/releases/tag/0.1.3-alpha
 [0.1.2-alpha]: https://github.com/lwhite14/dorset-lang/releases/tag/0.1.2-alpha
 [0.1.1-alpha]: https://github.com/lwhite14/dorset-lang/releases/tag/0.1.1-alpha

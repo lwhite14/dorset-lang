@@ -2,4 +2,4 @@
 
 #include "../deps/semver.hpp"
 
-semver::version Version = semver::version{0, 1, 3, semver::prerelease::alpha, 11};
+semver::version Version = semver::version{0, 1, 4, semver::prerelease::alpha, 0};
