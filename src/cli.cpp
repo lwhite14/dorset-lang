@@ -91,6 +91,12 @@ void CompilerOptions::processFlag()
     {
         deleteBinaries = false;
     }
+    else if (currentArgument() == "-rs")
+    {
+        hasRawCode = true;
+        advanceArgument();
+        rawCode = currentArgument();
+    }
     else
     {
         error("Flag not recognised.");
@@ -99,15 +105,18 @@ void CompilerOptions::processFlag()
 
 void CompilerOptions::processFile()
 {
-    if (!fileExists(currentArgument()))
+    if (!hasSourceFile && !hasRawCode) // only read the first source file (only one source supported 0.1.4)
     {
-        error("File does not exist.");
-        return;
-    }
+        if (!fileExists(currentArgument()))
+        {
+            error("File does not exist.");
+            return;
+        }
 
-    sourceFile = removeFileExtension(currentArgument());
-    sourceFileLocation = std::filesystem::absolute(currentArgument()).generic_string();
-    hasSourceFile = true;
+        sourceFile = removeFileExtension(currentArgument());
+        sourceFileLocation = std::filesystem::absolute(currentArgument()).generic_string();
+        hasSourceFile = true;
+    }
 }
 
 void CompilerOptions::constructOutputBinaryNames()
@@ -151,7 +160,7 @@ CompilerOptions::CompilerOptions(int argc, char *argv[])
         {
             processFile();
         }
-
+        
         advanceArgument();
     }
 
@@ -211,9 +220,19 @@ int Compiler::compile()
     {
         printVersion();
     }
-    else if (options.hasSourceFile)
+    else if (options.hasSourceFile || options.hasRawCode)
     {
-        std::vector<Token> tokens = lex(getSourceContents(options.sourceFileLocation));
+        std::vector<Token> tokens;
+        if (options.hasRawCode) 
+        {
+            tokens = lex(options.rawCode);
+        }
+        else 
+        {
+            tokens = lex(getSourceContents(options.sourceFileLocation));
+        }
+
+
         if (options.isTokens)
         {
             printTokens(tokens);

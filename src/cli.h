@@ -22,10 +22,12 @@ private:
 
     int currentArgumentIndex = 0;
 
+    bool hasSourceFile = false;
+    bool hasRawCode = false;
+
     bool isHelp = false;
     bool isVersion = false;
     bool isTokens = false;
-    bool hasSourceFile = false;
     bool hasOutputName = false;
     bool isLibrary = false;
     bool generateLLVMIR = false;
@@ -33,13 +35,15 @@ private:
 
     bool hadError = false;
 
-    std::string sourceFile;
-    std::string sourceFileLocation;
+    std::string sourceFile = "output";
+    std::string sourceFileLocation = "output";
 
     std::string outputLL;
     std::string outputS;
     std::string outputO;
     std::string outputFinal;
+
+    std::string rawCode = "";
 
     void advanceArgument();
     std::string currentArgument();
