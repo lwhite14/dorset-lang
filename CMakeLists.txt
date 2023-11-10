@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(dorset)
+project(dorset VERSION 0.1.4 DESCRIPTION "Dorset compiler for the Dorset programming language.")
 
 find_package(LLVM REQUIRED CONFIG)
 
@@ -25,48 +25,7 @@ execute_process(
     OUTPUT_VARIABLE GIT_COMMIT_HASH
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-if (WIN32)
-    add_executable(dorset 
-        src/main.cpp
-        src/error.cpp
-        src/lexer.cpp
-        src/token.cpp
-        src/ast.cpp
-        src/astbuilder.cpp
-        src/outpututils.cpp
-        src/expressionbuilder.cpp
-        src/cli.cpp
-        branding/icon.o
-    )
-else()
-    add_executable(dorset 
-        src/main.cpp
-        src/error.cpp
-        src/lexer.cpp
-        src/token.cpp
-        src/ast.cpp
-        src/astbuilder.cpp
-        src/outpututils.cpp
-        src/expressionbuilder.cpp
-        src/cli.cpp
-    )
-endif()
-
-llvm_map_components_to_libnames(llvm_libs support core irreader orcjit native)
-
-target_link_libraries(dorset ${llvm_libs})
-
-target_compile_definitions(${PROJECT_NAME} PRIVATE
-    "-DGIT_COMMIT_HASH=\"${GIT_COMMIT_HASH}\"")
-
-target_compile_definitions(${PROJECT_NAME} PRIVATE
-    "-DGIT_BRANCH=\"${GIT_BRANCH}\"")
-
-install(TARGETS dorset PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dorset-lang)
-
-# Testing
-add_executable(compilationTests 
-    tests/tests.cpp        
+add_library(dorsetDriver STATIC
     src/error.cpp
     src/lexer.cpp
     src/token.cpp
@@ -76,7 +35,38 @@ add_executable(compilationTests
     src/expressionbuilder.cpp
     src/cli.cpp
 )
-target_link_libraries(compilationTests ${llvm_libs})
+
+if (WIN32)
+    add_executable(${PROJECT_NAME} 
+        src/main.cpp
+        branding/icon.o
+    )
+else()
+    add_executable(${PROJECT_NAME} 
+        src/main.cpp
+    )
+endif()
+
+llvm_map_components_to_libnames(llvm_libs support core irreader orcjit native)
+
+target_link_libraries(dorsetDriver ${llvm_libs})
+
+target_link_libraries(${PROJECT_NAME} dorsetDriver)
+
+target_compile_definitions(dorsetDriver PRIVATE
+    "-DGIT_COMMIT_HASH=\"${GIT_COMMIT_HASH}\"")
+
+target_compile_definitions(dorsetDriver PRIVATE
+    "-DGIT_BRANCH=\"${GIT_BRANCH}\"")
+
+install(TARGETS ${PROJECT_NAME} PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dorset-lang)
+install(TARGETS dorsetDriver PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dorset-lang)
+
+# Testing
+add_executable(compilationTests 
+    tests/tests.cpp        
+)
+target_link_libraries(compilationTests dorsetDriver)
 enable_testing()
 add_test(NAME compilationTests COMMAND $<TARGET_FILE:compilationTests>)
 
