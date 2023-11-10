@@ -44,3 +44,14 @@ build/dorset --help
 cmake --build build --config Release
 sudo cmake --install build --prefix /usr/local
 ```
+
+### Testing
+Firstly, configure and build the project, the above sections detail this process. Then, run the following commands.
+```
+cd build
+ctest -C Debug --verbose
+```
+> **Note**
+> Replace <i>-C Debug</i> with Release if that is the configuration that you used.
+
+
