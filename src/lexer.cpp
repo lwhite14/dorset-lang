@@ -159,12 +159,12 @@ char Lexer::advance()
     return source[current++];
 }
 
-void Lexer::addToken(TokenType type)
+void Lexer::addToken(enum TokenType type)
 {
     addToken(type, "");
 }
 
-void Lexer::addToken(TokenType type, std::string literal)
+void Lexer::addToken(enum TokenType type, std::string literal)
 {
     std::string text = source.substr(start, current - start);
     tokens.push_back(Token(type, text, literal, line, start - charactersAtLineStart));

@@ -26,9 +26,9 @@ enum TokenType
     BINARY, UNARY,
 
     // Keywords.
-    AND, CLASS, ELSE, FALSE, FUNCTION, FOR, IF, NIL, OR,
-    PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE, EXTERN,
-    THEN, IN,
+    AND, CLASS, ELSE, _FALSE, FUNCTION, FOR, IF, NIL, OR,
+    PRINT, RETURN, SUPER, THIS, _TRUE, VAR, WHILE, EXTERN,
+    THEN, _IN,
 
     // Types
     TYPE_VOID, TYPE_DOUBLE,
@@ -38,11 +38,11 @@ enum TokenType
     _EOF // End of file
 };
 
-static std::map<std::string, TokenType> keywords = {
+static std::map<std::string, enum TokenType> keywords = {
     {"and",    AND},
     {"class",  CLASS},
     {"else",   ELSE},
-    {"false",  FALSE},
+    {"false",  _FALSE},
     {"for",    FOR},
     {"fn",     FUNCTION},
     {"if",     IF},
@@ -52,17 +52,17 @@ static std::map<std::string, TokenType> keywords = {
     {"return", RETURN},
     {"super",  SUPER},
     {"this",   THIS},
-    {"true",   TRUE},
+    {"true",   _TRUE},
     {"var",    VAR},
     {"while",  WHILE},
     {"extern", EXTERN},
     {"then",   THEN},
-    {"in",     IN},
+    {"in",     _IN},
     {"binary", BINARY},
     {"unary",  UNARY}
 };
 
-static std::map<std::string, TokenType> types = {
+static std::map<std::string, enum TokenType> types = {
     {"void",    TYPE_VOID},
     {"double",  TYPE_DOUBLE}
 };
@@ -70,16 +70,16 @@ static std::map<std::string, TokenType> types = {
 class Token 
 {
 private:
-    TokenType type;
+    enum TokenType type;
     std::string lexeme;
     std::string literal;
     int line; 
     int character;
 
 public:
-    Token(TokenType type, std::string lexeme, std::string literal, int line, int character);
+    Token(enum TokenType type, std::string lexeme, std::string literal, int line, int character);
 
-    TokenType getType();
+    enum TokenType getType();
     std::string getTypeStr();
     std::string getLexeme();
     std::string getLiteral();

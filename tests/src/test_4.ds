@@ -1,6 +1,6 @@
 fn main() void 
 {
-    var x = 3;
+    var x = 5;
     if x < 3 
     {
         printf("X is smaller than 3!", 0)
