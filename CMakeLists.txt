@@ -52,7 +52,6 @@ else()
     )
 endif()
 
-
 llvm_map_components_to_libnames(llvm_libs support core irreader orcjit native)
 
 target_link_libraries(dorset ${llvm_libs})
@@ -64,3 +63,21 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     "-DGIT_BRANCH=\"${GIT_BRANCH}\"")
 
 install(TARGETS dorset PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dorset-lang)
+
+# Testing
+add_executable(compilationTests 
+    tests/tests.cpp        
+    src/error.cpp
+    src/lexer.cpp
+    src/token.cpp
+    src/ast.cpp
+    src/astbuilder.cpp
+    src/outpututils.cpp
+    src/expressionbuilder.cpp
+    src/cli.cpp
+)
+target_link_libraries(compilationTests ${llvm_libs})
+enable_testing()
+add_test(NAME compilationTests COMMAND $<TARGET_FILE:compilationTests>)
+
+file(COPY tests/src DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

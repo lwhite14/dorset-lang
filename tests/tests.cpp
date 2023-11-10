@@ -1,0 +1,70 @@
+#define CATCH_CONFIG_MAIN
+#include "../deps/catch.hpp"
+
+#include "../src/cli.h"
+
+void resetGlobals()
+{
+	ErrorHandler::HadError = false;
+}
+
+
+TEST_CASE("Basic Hello World", "[Compile]") 
+{
+	// Pre Work
+	resetGlobals();
+
+	CompilerOptions options = CompilerOptions({"src/test_1.ds"});
+
+	REQUIRE(options.getHadError() == false);
+
+	Compiler compiler = Compiler(options);
+	int i = compiler.compile();
+
+	REQUIRE(i == 0);
+}
+
+TEST_CASE("Externs", "[Compile]") 
+{
+	// Pre Work
+	resetGlobals();
+
+	CompilerOptions options = CompilerOptions({"src/test_2.ds", "-l"});
+
+	REQUIRE(options.getHadError() == false);
+
+	Compiler compiler = Compiler(options);
+	int i = compiler.compile();
+
+	REQUIRE(i == 0);
+}
+
+TEST_CASE("Returns", "[Compile]") 
+{
+	// Pre Work
+	resetGlobals();
+
+	CompilerOptions options = CompilerOptions({"src/test_3.ds"});
+
+	REQUIRE(options.getHadError() == false);
+
+	Compiler compiler = Compiler(options);
+	int i = compiler.compile();
+
+	REQUIRE(i == 0);
+}
+
+TEST_CASE("Variable and If Statement", "[Compile]") 
+{
+	// Pre Work
+	resetGlobals();
+
+	CompilerOptions options = CompilerOptions({"src/test_4.ds"});
+
+	REQUIRE(options.getHadError() == false);
+
+	Compiler compiler = Compiler(options);
+	int i = compiler.compile();
+
+	REQUIRE(i == 0);
+}

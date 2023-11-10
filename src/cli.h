@@ -59,6 +59,9 @@ private:
 
 public:
     CompilerOptions(int argc, char *argv[]);
+    CompilerOptions(std::vector<std::string> args); // For testing purproses
+
+    bool getHadError();
 
     friend class Compiler;
 };

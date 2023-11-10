@@ -1,0 +1,3 @@
+extern someFunction() double;
+
+extern someOtherFunction(x, y) double;

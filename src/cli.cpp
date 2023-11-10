@@ -137,6 +137,41 @@ void CompilerOptions::constructOutputBinaryNames()
     }
 }
 
+CompilerOptions::CompilerOptions(std::vector<std::string> args) // For testing purproses
+{
+    for (unsigned int i = 0; i < args.size(); i++)
+    {
+        arguments.push_back(args[i]);
+    }
+
+    if (arguments.size() == 0)
+    {
+        error("No arguments.");
+        return;
+    }
+
+    while (!isAtEnd())
+    {
+        if (currentArgument()[0] == '-')
+        {
+            processFlag();
+        }
+        else
+        {
+            processFile();
+        }
+
+        advanceArgument();
+    }
+
+    constructOutputBinaryNames();
+
+    if (isTokens && !hasSourceFile)
+    {
+        error("Cannot display tokens without an input source file.");
+    }
+}
+
 CompilerOptions::CompilerOptions(int argc, char *argv[])
 {
     for (unsigned int i = 1; i < argc; i++)
@@ -170,6 +205,11 @@ CompilerOptions::CompilerOptions(int argc, char *argv[])
     {
         error("Cannot display tokens without an input source file.");
     }
+}
+
+bool CompilerOptions::getHadError() 
+{
+    return hadError;
 }
 
 /////////////////////////
@@ -209,7 +249,7 @@ int Compiler::compile()
     if (options.hadError)
     {
         printUsage();
-        return 0;
+        return 1;
     }
 
     if (options.isHelp)
@@ -254,6 +294,9 @@ int Compiler::compile()
     {
         printUsage();
     }
+
+    if (ErrorHandler::HadError)
+        return 1;
 
     return 0;
 }
