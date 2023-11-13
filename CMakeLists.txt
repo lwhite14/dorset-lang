@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(dorset VERSION 0.1.4 DESCRIPTION "Dorset compiler for the Dorset programming language.")
+project(dorsetc VERSION 0.1.5 DESCRIPTION "Dorset compiler for the Dorset programming language.")
 
 find_package(LLVM REQUIRED CONFIG)
 
@@ -59,8 +59,8 @@ target_compile_definitions(dorsetDriver PRIVATE
 target_compile_definitions(dorsetDriver PRIVATE
     "-DGIT_BRANCH=\"${GIT_BRANCH}\"")
 
-install(TARGETS ${PROJECT_NAME} PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dorset-lang)
-install(TARGETS dorsetDriver PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dorset-lang)
+install(TARGETS ${PROJECT_NAME} PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(TARGETS dorsetDriver PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # Testing
 add_executable(compileTests tests/CompileTests.cpp)

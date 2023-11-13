@@ -57,8 +57,8 @@ sudo cmake --install build --prefix /usr/local
 ```
 
 ### Usage
-Run <em>dorset --help</em> for usage details.
-To compiler dorset-lang source code, run <em>dorset file.ds</em> to compile file.ds into an executable.
+Run <em>dorsetc --help</em> for usage details.
+To compiler dorset-lang source code, run <em>dorsetc file.ds</em> to compile file.ds into an executable.
 
 ## Features
 
