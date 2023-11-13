@@ -77,18 +77,18 @@ void CompilerOptions::processFlag()
         outputFinal = currentArgument();
         hasOutputName = true;
     }
-    else if (currentArgument() == "-l" || currentArgument() == "--library")
-    {
-        isLibrary = true;
-    }
-    else if (currentArgument() == "-r" || currentArgument() == "--llvmir")
-    {
-        generateLLVMIR = true;
-    }
-    else if (currentArgument() == "-b" || currentArgument() == "--keepbin")
-    {
-        deleteBinaries = false;
-    }
+    // else if (currentArgument() == "-l" || currentArgument() == "--library")
+    // {
+    //     isLibrary = true;
+    // }
+    // else if (currentArgument() == "-r" || currentArgument() == "--llvmir")
+    // {
+    //     generateLLVMIR = true;
+    // }
+    // else if (currentArgument() == "-b" || currentArgument() == "--keepbin")
+    // {
+    //     deleteBinaries = false;
+    // }
     else if (currentArgument() == "-rs")
     {
         hasRawCode = true;
@@ -282,10 +282,10 @@ int Compiler::compile()
         if (!ErrorHandler::HadError)
         {
             outputBinaries();
-            if (options.deleteBinaries) 
-            {
-                removeBinaries();
-            }
+            // if (options.deleteBinaries) 
+            // {
+            //     removeBinaries();
+            // }
         }
     }
     else
@@ -311,28 +311,28 @@ void Compiler::outputBinaries()
     irFile << ir;
     irFile.close();
 
-    if (system(("llc " + options.outputLL + " -o " + options.outputS).c_str()) != 0)
-    {
-        ErrorHandler::error("error compiling LLVM IR");
-        return;
-    }
-    if (system(("clang -c " + options.outputS + " -o " + options.outputO).c_str()) != 0)
-    {
-        ErrorHandler::error("error compiling assembly");
-        return;
-    }
-    if (!options.isLibrary)
-    {
-#if defined(_WIN64) || defined(_WIN32)
-        if (system(("clang " + options.outputS + " -o " + options.outputFinal).c_str()) != 0)
-#else
-        if (system(("clang " + options.outputS + " -o " + options.outputFinal + " -no-pie").c_str()) != 0)
-#endif
-        {
-            ErrorHandler::error("error compiling object file");
-            return;
-        }
-    }
+//     if (system(("llc " + options.outputLL + " -o " + options.outputS).c_str()) != 0)
+//     {
+//         ErrorHandler::error("error compiling LLVM IR");
+//         return;
+//     }
+//     if (system(("clang -c " + options.outputS + " -o " + options.outputO).c_str()) != 0)
+//     {
+//         ErrorHandler::error("error compiling assembly");
+//         return;
+//     }
+//     if (!options.isLibrary)
+//     {
+// #if defined(_WIN64) || defined(_WIN32)
+//         if (system(("clang " + options.outputS + " -o " + options.outputFinal).c_str()) != 0)
+// #else
+//         if (system(("clang " + options.outputS + " -o " + options.outputFinal + " -no-pie").c_str()) != 0)
+// #endif
+//         {
+//             ErrorHandler::error("error compiling object file");
+//             return;
+//         }
+//     }
 }
 
 void Compiler::removeBinaries()

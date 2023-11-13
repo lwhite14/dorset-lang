@@ -22,9 +22,9 @@ void printUsage()
     std::cout << "    -h  --help     = print the usage            " << std::endl;
     std::cout << "    -v  --version  = print the version          " << std::endl;
     std::cout << "    -o  <filename> = specify the output name    " << std::endl;
-    std::cout << "    -l  --library  = generate a library file    " << std::endl;
-    std::cout << "    -r  --llvmir   = output LLVM IR file        " << std::endl;
-    std::cout << "    -b  --keepbin  = retain the build binaries  " << std::endl;
+    // std::cout << "    -l  --library  = generate a library file    " << std::endl;
+    // std::cout << "    -r  --llvmir   = output LLVM IR file        " << std::endl;
+    // std::cout << "    -b  --keepbin  = retain the build binaries  " << std::endl;
     std::cout << "    -rs <code>     = input the raw source       " << std::endl;
     std::cout << "                                                " << std::endl;
 }
