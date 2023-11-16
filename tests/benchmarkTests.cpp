@@ -6,7 +6,6 @@ using std::chrono::high_resolution_clock;
 using std::chrono::duration_cast;
 using std::chrono::duration;
 using std::chrono::milliseconds;
-using std::chrono::_V2::system_clock;
 
 void resetGlobals()
 {
@@ -25,7 +24,11 @@ void compileTest1()
 
 void runTest1()
 {
+#if defined(_WIN64) || defined(_WIN32)
+    system("\"src\\benchmarkTest_1.out\"");
+#else
     system("src/benchmarkTest_1.out");
+#endif
 }
 
 void compileTest2()
@@ -40,7 +43,11 @@ void compileTest2()
 
 void runTest2()
 {
+#if defined(_WIN64) || defined(_WIN32)
+    system("\"src\\benchmarkTest_2.out\"");
+#else
     system("src/benchmarkTest_2.out");
+#endif
 }
 
 void compileTest3()
@@ -55,7 +62,11 @@ void compileTest3()
 
 void runTest3()
 {
+#if defined(_WIN64) || defined(_WIN32)
+    system("\"src\\benchmarkTest_3.out\"");
+#else
     system("src/benchmarkTest_3.out");
+#endif
 }
 
 void compileTest4()
@@ -70,19 +81,20 @@ void compileTest4()
 
 void runTest4()
 {
+#if defined(_WIN64) || defined(_WIN32)
+    system("\"src\\benchmarkTest_4.out\"");
+#else
     system("src/benchmarkTest_4.out");
+#endif
 }
 
 void timeBenchmark1()
 {
     std::cout << "Source File 1" << std::endl;
 
-    system_clock::time_point t1;
-    system_clock::time_point t2;
-
-    t1 = high_resolution_clock::now();
+    auto t1 = high_resolution_clock::now();
     compileTest1();
-    t2 = high_resolution_clock::now();
+    auto t2 = high_resolution_clock::now();
     auto durationCompile = duration_cast<milliseconds>(t2 - t1);
     std::cout << "Compilation Time: " << durationCompile.count() << "ms" << std::endl;
 
@@ -98,12 +110,9 @@ void timeBenchmark2()
 {
     std::cout << "Source File 2" << std::endl;
 
-    system_clock::time_point t1;
-    system_clock::time_point t2;
-
-    t1 = high_resolution_clock::now();
+    auto t1 = high_resolution_clock::now();
     compileTest2();
-    t2 = high_resolution_clock::now();
+    auto t2 = high_resolution_clock::now();
     auto durationCompile = duration_cast<milliseconds>(t2 - t1);
     std::cout << "Compilation Time: " << durationCompile.count() << "ms" << std::endl;
 
@@ -119,12 +128,9 @@ void timeBenchmark3()
 {
     std::cout << "Source File 3" << std::endl;
 
-    system_clock::time_point t1;
-    system_clock::time_point t2;
-
-    t1 = high_resolution_clock::now();
+    auto t1 = high_resolution_clock::now();
     compileTest3();
-    t2 = high_resolution_clock::now();
+    auto t2 = high_resolution_clock::now();
     auto durationCompile = duration_cast<milliseconds>(t2 - t1);
     std::cout << "Compilation Time: " << durationCompile.count() << "ms" << std::endl;
 
@@ -138,14 +144,11 @@ void timeBenchmark3()
 
 void timeBenchmark4()
 {
-    std::cout << "Source File 4" << std::endl;
+    std::cout << "Source File 4" << std::endl; 
 
-    system_clock::time_point t1;
-    system_clock::time_point t2;
-
-    t1 = high_resolution_clock::now();
+    auto t1 = high_resolution_clock::now();
     compileTest4();
-    t2 = high_resolution_clock::now();
+    auto t2 = high_resolution_clock::now();
     auto durationCompile = duration_cast<milliseconds>(t2 - t1);
     std::cout << "Compilation Time: " << durationCompile.count() << "ms" << std::endl;
 
