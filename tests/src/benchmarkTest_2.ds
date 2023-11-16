@@ -1,0 +1,15 @@
+fn calc(x, y, z) double
+{
+    var num = x * y;
+    num = (num + z) / 2;
+    num = num + 12;
+    return num;
+}
+
+fn main() double
+{
+    var x = 2;
+    var y = 3;
+    var z = 4;
+    return calc(x, y, z);
+}

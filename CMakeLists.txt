@@ -63,11 +63,13 @@ install(TARGETS ${PROJECT_NAME} PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUD
 install(TARGETS dorsetDriver PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dorset-lang)
 
 # Testing
-add_executable(compilationTests 
-    tests/tests.cpp        
-)
-target_link_libraries(compilationTests dorsetDriver)
-enable_testing()
-add_test(NAME compilationTests COMMAND $<TARGET_FILE:compilationTests>)
+add_executable(compileTests tests/compileTests.cpp)
+add_executable(benchmarkTests tests/benchmarkTests.cpp)
 
+target_link_libraries(compileTests dorsetDriver)
+target_link_libraries(benchmarkTests dorsetDriver)
+
+enable_testing()
+add_test(NAME compileTests COMMAND $<TARGET_FILE:compileTests>)
+add_test(NAME benchmarkTests COMMAND $<TARGET_FILE:benchmarkTests>)
 file(COPY tests/src DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

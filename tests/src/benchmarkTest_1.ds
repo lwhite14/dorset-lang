@@ -1,0 +1,11 @@
+fn calc(number) double
+{
+    return number * 3 + 4;
+}
+
+fn main() double
+{
+    var x = 3;
+    var y = calc(x);
+    return y;
+}

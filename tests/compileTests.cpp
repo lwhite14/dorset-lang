@@ -14,7 +14,7 @@ TEST_CASE("Basic Hello World", "[Compile]")
 	// Pre Work
 	resetGlobals();
 
-	CompilerOptions options = CompilerOptions({"src/test_1.ds"});
+	CompilerOptions options = CompilerOptions({"src/compileTest_1.ds"});
 
 	REQUIRE(options.getHadError() == false);
 
@@ -29,7 +29,7 @@ TEST_CASE("Externs", "[Compile]")
 	// Pre Work
 	resetGlobals();
 
-	CompilerOptions options = CompilerOptions({"src/test_2.ds", "-l"});
+	CompilerOptions options = CompilerOptions({"src/compileTest_2.ds", "-l"});
 
 	REQUIRE(options.getHadError() == false);
 
@@ -44,7 +44,7 @@ TEST_CASE("Returns", "[Compile]")
 	// Pre Work
 	resetGlobals();
 
-	CompilerOptions options = CompilerOptions({"src/test_3.ds"});
+	CompilerOptions options = CompilerOptions({"src/compileTest_3.ds"});
 
 	REQUIRE(options.getHadError() == false);
 
@@ -59,7 +59,7 @@ TEST_CASE("Variable and If Statement", "[Compile]")
 	// Pre Work
 	resetGlobals();
 
-	CompilerOptions options = CompilerOptions({"src/test_4.ds"});
+	CompilerOptions options = CompilerOptions({"src/compileTest_4.ds"});
 
 	REQUIRE(options.getHadError() == false);
 
