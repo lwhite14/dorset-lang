@@ -1,0 +1,32 @@
+name: Build dorsetc
+
+on:
+  push
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure Build
+        run: cmake -B build -S . -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+
+      - name: Build dorsetc
+        run: cmake --build build --config Release
+
+      - name: Test
+        working-directory: build
+        run: ctest --build-config Release --verbose
+
+      - name: Emit Version
+        run: build/dorset --version
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dorset-lang-build
+          path: |
+            build/dorset
+            build/libdorsetDriver.a
