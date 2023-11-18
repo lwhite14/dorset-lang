@@ -118,8 +118,7 @@ namespace AST
             InitVal = Init->codegen();
             if (InitVal == nullptr)
             { 
-                ErrorHandler::error("variable initialization has failed");
-                return nullptr;
+                logError("variable initialization has failed");
             }
 
         }
@@ -297,7 +296,7 @@ namespace AST
         return Precedence;
     }
 
-    FunctionAST::FunctionAST(PrototypeAST *Proto, std::vector<ExprAST *> Body)
+    FunctionAST::FunctionAST(PrototypeAST *Proto, BlockAST *Body)
         : Proto(std::move(Proto)), Body(Body)
     {
     }
@@ -334,19 +333,7 @@ namespace AST
             MasterAST::NamedValues[std::string(Arg.getName())] = Alloca;
         }
 
-        for (unsigned int i = 0; i < Body.size(); i++)
-        {
-            if (!Body[i]->codegen()) 
-            {
-                // Error reading body, remove function.
-                TheFunction->eraseFromParent();
-
-                if (P.isBinaryOp())
-                    MasterAST::BinopPrecedence.erase(P.getOperatorName());
-
-                return nullptr;
-            }
-        }
+        Body->codegen();
 
         if (P.getReturnType() == "void") 
         {
@@ -542,11 +529,27 @@ namespace AST
             RetVal = Expr->codegen();
             if (RetVal == nullptr)
             {
-                logError("return value failed");
+                return logError("return value failed");
             }
         }
 
         return MasterAST::Builder->CreateRet(RetVal);
+    }
+
+    BlockAST::BlockAST(std::vector<ExprAST*> Exprs) 
+        : Exprs(Exprs)
+    {
+    }
+
+    void BlockAST::codegen()
+    {
+        for (unsigned int i = 0; i < Exprs.size(); i++)
+        {
+            if (!Exprs[i]->codegen())
+            {
+                logError("expression in block failed");
+            }
+        }
     }
 
     void createExternalFunctions()

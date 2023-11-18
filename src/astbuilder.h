@@ -34,6 +34,7 @@ private:
     AST::ExprAST *parseExpression();
     AST::PrototypeAST *parsePrototype(); 
     AST::FunctionAST *parseDefinition(); 
+    AST::BlockAST *parseBlock();
     AST::PrototypeAST *parseExtern();
 
     void handleDefinition(); 

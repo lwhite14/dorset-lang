@@ -111,6 +111,16 @@ namespace AST
         Value *codegen() override;
     };
 
+    /// BlockAST - Represents a block, '{ }'.
+    class BlockAST  { 
+        std::vector<ExprAST*> Exprs;
+
+    public:
+        BlockAST(std::vector<ExprAST*> Exprs);
+
+        void codegen();
+    };
+
     /// PrototypeAST - This class represents the "prototype" for a function,
     /// which captures its argument names as well as if it is an operator.
     class PrototypeAST {
@@ -139,10 +149,10 @@ namespace AST
     class FunctionAST
     {
         PrototypeAST *Proto;
-        std::vector<ExprAST *> Body;
+        BlockAST* Body;
 
     public:
-        FunctionAST(PrototypeAST *Proto, std::vector<ExprAST *> Body);
+        FunctionAST(PrototypeAST *Proto, BlockAST *Body);
         Function *codegen();
     };
 

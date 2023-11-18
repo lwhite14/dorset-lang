@@ -226,17 +226,7 @@ AST::FunctionAST *ASTBuilder::parseDefinition()
     }
     advanceToken();
 
-    std::vector<AST::ExprAST*> expressions;
-
-    hasReturnToken = false;
-    while (currentToken().getType() != RIGHT_BRACE) 
-    {
-        auto* Expr = parseExpression();
-        if (Expr == nullptr)
-            return nullptr;
-
-        expressions.push_back(Expr);
-    }
+    AST::BlockAST* block = parseBlock();
 
     if (needsReturnToken && !hasReturnToken)
     {
@@ -251,17 +241,31 @@ AST::FunctionAST *ASTBuilder::parseDefinition()
         return nullptr;
     }
 
-    if (expressions.size() > 0)
+    advanceToken();
+    
+    return new AST::FunctionAST(std::move(Proto), block);
+}
+
+AST::BlockAST *ASTBuilder::parseBlock()
+{
+    std::vector<AST::ExprAST*> expressions;
+    hasReturnToken = false;
+    while (currentToken().getType() != RIGHT_BRACE) 
     {
-        // only advance past the right curly brace once we know the function hasn't
-        // failed, this way the error recovery in handleDefinition works correctly
-        advanceToken();
-        
-        return new AST::FunctionAST(std::move(Proto), expressions);
+        auto* Expr = parseExpression();
+        if (Expr == nullptr)
+            return nullptr;
+
+        expressions.push_back(Expr);
     }
 
-    ErrorHandler::error("function cannot be empty, it needs a default return value", currentToken().getLine(), currentToken().getCharacter());
-    return nullptr;
+    if (expressions.size() == 0)
+    {
+        ErrorHandler::error("block cannot be empty, it needs at least one expression", currentToken().getLine(), currentToken().getCharacter());
+        return nullptr;
+    }
+
+    return new AST::BlockAST(expressions);
 }
 
 AST::PrototypeAST *ASTBuilder::parseExtern()
