@@ -131,6 +131,11 @@ AST::ExprAST* ExpressionBuilder::parseIfExpr()
     }
     advanceToken();  // eat the '{'
 
+    bool thenReturns = false;
+    if (currentToken().getType() == RETURN)
+    {
+        thenReturns = true;
+    }
     auto Then = buildExpression();
     if (!Then)
         return nullptr;
@@ -157,6 +162,11 @@ AST::ExprAST* ExpressionBuilder::parseIfExpr()
     }
     advanceToken();  // eat the '{'
 
+    bool elseReturns = false;
+    if (currentToken().getType() == RETURN)
+    {
+        elseReturns = true;
+    }
     auto Else = buildExpression();
     if (!Else)
         return nullptr;
@@ -168,7 +178,7 @@ AST::ExprAST* ExpressionBuilder::parseIfExpr()
     }
     advanceToken();  // eat the '}'
 
-    return new AST::IfExprAST(std::move(Cond), std::move(Then), std::move(Else));
+    return new AST::IfExprAST(std::move(Cond), std::move(Then), std::move(Else), thenReturns, elseReturns);
 }
 
 AST::ExprAST* ExpressionBuilder::parseForExpr()

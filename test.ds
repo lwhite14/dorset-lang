@@ -1,12 +1,28 @@
-fn test(x) void
-{
-    for (i = 1, i < x, 1.0)
+fn testOne(x) double {
+    var someVar = 0;
+    if x < 5 
     {
-        printf("*", 0)
-    };                 
+        someVar = 0
+    }   
+    else
+    {
+        someVar = 1
+    };      
+    return someVar;
 }
 
-fn main() void
-{ 
-    test(5);
+fn testTwo(x) double {
+    if x < 5 
+    {
+        return 0
+    }   
+    else
+    {
+        return 1
+    };      
+}
+
+fn main() void { 
+    testOne(2);
+    testTwo(2);
 }

@@ -68,3 +68,18 @@ TEST_CASE("Variable and If Statement", "[Compile]")
 
 	REQUIRE(i == 0);
 }
+
+TEST_CASE("Return from Inside an If Block", "[Compile]") 
+{
+	// Pre Work
+	resetGlobals();
+
+	CompilerOptions options = CompilerOptions({"src/compileTest_5.ds"});
+
+	REQUIRE(options.getHadError() == false);
+
+	Compiler compiler = Compiler(options);
+	int i = compiler.compile();
+
+	REQUIRE(i == 0);
+}

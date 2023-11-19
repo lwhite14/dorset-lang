@@ -162,8 +162,11 @@ namespace AST
         ExprAST* Then;
         ExprAST* Else;
 
+        bool ThenReturns = false;
+        bool ElseReturns = false;
+
     public:
-        IfExprAST(ExprAST* Cond, ExprAST* Then, ExprAST* Else);
+        IfExprAST(ExprAST* Cond, ExprAST* Then, ExprAST* Else, bool ThenReturns, bool ElseReturns);
 
         Value* codegen() override;
     };

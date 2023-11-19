@@ -1,0 +1,13 @@
+fn main() void 
+{
+    var x = 5;
+    if x < 3 
+    {
+        printf("X is smaller than 3!", 0)
+    }
+    else
+    {
+        printf("X is bigger than 3!", 0)
+    };
+
+}

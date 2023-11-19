@@ -49,9 +49,9 @@ sudo cmake --install build --prefix /usr/local
 Firstly, configure and build the project, the above sections detail this process. Then, run the following commands.
 ```
 cd build
-ctest -C Debug --verbose
+ctest --build-config Debug --verbose
 ```
 > **Note**
-> Replace <i>-C Debug</i> with Release if that is the configuration that you used.
+> Replace <i>--build-config Debug</i> with <i>--build-config Release</i> if Release is the configuration that you used.
 
 

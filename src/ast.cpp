@@ -346,13 +346,19 @@ namespace AST
         return TheFunction;
     }
 
-    IfExprAST::IfExprAST(ExprAST *Cond, ExprAST *Then, ExprAST *Else)
-        : Cond(std::move(Cond)), Then(std::move(Then)), Else(std::move(Else))
+    IfExprAST::IfExprAST(ExprAST *Cond, ExprAST *Then, ExprAST *Else, bool ThenReturns, bool ElseReturns)
+        : Cond(std::move(Cond)), Then(std::move(Then)), Else(std::move(Else)), ThenReturns(ThenReturns), ElseReturns(ElseReturns)
     {
     }
 
     Value *IfExprAST::codegen()
     {
+        bool NeedsIfCont = true;
+        if (ThenReturns && ElseReturns)
+        {
+            NeedsIfCont = false;
+        }
+
         Value *CondV = Cond->codegen();
         if (!CondV)
             return nullptr;
@@ -378,7 +384,10 @@ namespace AST
         if (!ThenV)
             return nullptr;
 
-        MasterAST::Builder->CreateBr(MergeBB);
+        if (!ThenReturns)
+        {
+            MasterAST::Builder->CreateBr(MergeBB);
+        }
         // Codegen of 'Then' can change the current block, update ThenBB for the PHI.
         ThenBB = MasterAST::Builder->GetInsertBlock();
 
@@ -390,18 +399,22 @@ namespace AST
         if (!ElseV)
             return nullptr;
 
-        MasterAST::Builder->CreateBr(MergeBB);
+        if (!ElseReturns)
+        {
+            MasterAST::Builder->CreateBr(MergeBB);
+        }
         // Codegen of 'Else' can change the current block, update ElseBB for the PHI.
         ElseBB = MasterAST::Builder->GetInsertBlock();
 
         // Emit merge block.
-        TheFunction->insert(TheFunction->end(), MergeBB);
-        MasterAST::Builder->SetInsertPoint(MergeBB);
-        PHINode *PN = MasterAST::Builder->CreatePHI(Type::getDoubleTy(*MasterAST::TheContext), 2, "iftmp");
+        if (NeedsIfCont)
+        {
+            TheFunction->insert(TheFunction->end(), MergeBB);
+            MasterAST::Builder->SetInsertPoint(MergeBB);
+        }
 
-        PN->addIncoming(ThenV, ThenBB);
-        PN->addIncoming(ElseV, ElseBB);
-        return PN;
+        // if expr always returns 0.0.
+        return Constant::getNullValue(Type::getDoubleTy(*MasterAST::TheContext));
     }
 
     ForExprAST::ForExprAST(const std::string &VarName, ExprAST *Start, ExprAST *End, ExprAST *Step, ExprAST *Body)
@@ -533,7 +546,8 @@ namespace AST
             }
         }
 
-        return MasterAST::Builder->CreateRet(RetVal);
+        MasterAST::Builder->CreateRet(RetVal);
+        return RetVal;
     }
 
     BlockAST::BlockAST(std::vector<ExprAST*> Exprs) 
