@@ -112,13 +112,13 @@ namespace AST
     };
 
     /// BlockAST - Represents a block, '{ }'.
-    class BlockAST  { 
+    class BlockAST : public ExprAST { 
         std::vector<ExprAST*> Exprs;
 
     public:
         BlockAST(std::vector<ExprAST*> Exprs);
 
-        void codegen();
+        Value *codegen() override;
     };
 
     /// PrototypeAST - This class represents the "prototype" for a function,

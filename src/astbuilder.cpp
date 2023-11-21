@@ -57,21 +57,10 @@ void ASTBuilder::parseTokenList()
 AST::ExprAST *ASTBuilder::parseExpression()
 {
     std::vector<Token> exprTokens;
-    bool cond = true;
-    int blockCounter = 1;
 
-    while (cond)
+    while (currentToken().getType() != SEMICOLON)
     {
-        if (currentToken().getType() == RIGHT_BRACE) 
-        {
-            blockCounter--;
-        }
-        if (currentToken().getType() == LEFT_BRACE)
-        {
-            blockCounter++;
-        }
-
-        if (currentToken().getType() == _EOF || blockCounter == 0)
+        if (currentToken().getType() == _EOF)
         {
             ErrorHandler::error("a block hasn't been terminated");
             return nullptr;
@@ -82,18 +71,11 @@ AST::ExprAST *ASTBuilder::parseExpression()
             hasReturnToken = true;
         }
 
-        if (currentToken().getType() == SEMICOLON && blockCounter == 1) 
-        {
-            cond = false;
-        }
-        else 
-        {
-            exprTokens.push_back(currentToken());
-            advanceToken();
-        }
+        exprTokens.push_back(currentToken());
+        advanceToken();
     }
     exprTokens.push_back(Token(_EOE, " ", "", currentToken().getLine(), currentToken().getCharacter()));
-    advanceToken();
+    advanceToken(); // Eat semicolon
     ExpressionBuilder builder = ExpressionBuilder(exprTokens, needsReturnToken);
     return builder.buildExpression();
 }
@@ -218,14 +200,6 @@ AST::FunctionAST *ASTBuilder::parseDefinition()
     if (Proto->getReturnType() == "void")
         needsReturnToken = false;
 
-    // Eat '{'
-    if (currentToken().getType() != LEFT_BRACE)
-    {
-        ErrorHandler::error("unknown token when expecting opening brace at the start of the function", currentToken().getLine(), currentToken().getCharacter());
-        return nullptr;
-    }
-    advanceToken();
-
     AST::BlockAST* block = parseBlock();
 
     if (needsReturnToken && !hasReturnToken)
@@ -233,39 +207,37 @@ AST::FunctionAST *ASTBuilder::parseDefinition()
         ErrorHandler::error("this function needs a return", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;
     }
-
-    // Eat '}'
-    if (currentToken().getType() != RIGHT_BRACE)
-    {
-        ErrorHandler::error("unknown token when expecting closing brace at the end of the function", currentToken().getLine(), currentToken().getCharacter());
-        return nullptr;
-    }
-
-    advanceToken();
     
     return new AST::FunctionAST(std::move(Proto), block);
 }
 
 AST::BlockAST *ASTBuilder::parseBlock()
-{
-    std::vector<AST::ExprAST*> expressions;
-    hasReturnToken = false;
-    while (currentToken().getType() != RIGHT_BRACE) 
+{   
+    if (currentToken().getType() != LEFT_BRACE)
     {
-        auto* Expr = parseExpression();
-        if (Expr == nullptr)
-            return nullptr;
-
-        expressions.push_back(Expr);
-    }
-
-    if (expressions.size() == 0)
-    {
-        ErrorHandler::error("block cannot be empty, it needs at least one expression", currentToken().getLine(), currentToken().getCharacter());
+        ErrorHandler::error("unknown token when expecting opening brace at the start of the function", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;
     }
+    advanceToken(); // Eat '{'
 
-    return new AST::BlockAST(expressions);
+    std::vector<AST::ExprAST*> Exprs;
+
+    while (currentToken().getType() != RIGHT_BRACE)
+    {
+        if (currentToken().getType() == LEFT_BRACE)
+        {
+            AST::BlockAST* block = parseBlock();
+        }
+        else
+        {
+            AST::ExprAST* expr = parseExpression();
+            Exprs.push_back(expr);
+        }
+    }
+
+    advanceToken(); // Eat '}'
+
+    return new AST::BlockAST(Exprs);
 }
 
 AST::PrototypeAST *ASTBuilder::parseExtern()

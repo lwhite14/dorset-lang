@@ -555,7 +555,7 @@ namespace AST
     {
     }
 
-    void BlockAST::codegen()
+    Value *BlockAST::codegen()
     {
         for (unsigned int i = 0; i < Exprs.size(); i++)
         {
@@ -564,6 +564,8 @@ namespace AST
                 logError("expression in block failed");
             }
         }
+
+        return Constant::getNullValue(Type::getDoubleTy(*MasterAST::TheContext));
     }
 
     void createExternalFunctions()

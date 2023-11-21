@@ -1,28 +1,14 @@
-fn testOne(x) double {
-    var someVar = 0;
-    if x < 5 
-    {
-        someVar = 0
-    }   
-    else
-    {
-        someVar = 1
-    };      
-    return someVar;
+fn newLine() void {
+    printf("\n", 0);
 }
 
-fn testTwo(x) double {
-    if x < 5 
-    {
-        return 0
-    }   
-    else
-    {
-        return 1
-    };      
-}
-
-fn main() void { 
-    testOne(2);
-    testTwo(2);
+fn main() void {
+    var x = 5;
+    if x < 3 {
+        printf("X is smaller than 3!", 0)
+    }
+    else {
+        printf("X is bigger than 3!", 0)
+    };
+    newLine();
 }
