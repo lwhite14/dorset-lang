@@ -227,6 +227,7 @@ AST::BlockAST *ASTBuilder::parseBlock()
         if (currentToken().getType() == LEFT_BRACE)
         {
             AST::BlockAST* block = parseBlock();
+            Exprs.push_back(block);
         }
         else
         {

@@ -1,0 +1,14 @@
+fn newLine() void {
+    printf("\n", 0);
+}
+
+fn main() void {
+
+    {
+        printf("Hello World", 0);
+        newLine();
+        printf("And hello again...", 0);
+    }
+
+    newLine();
+}
