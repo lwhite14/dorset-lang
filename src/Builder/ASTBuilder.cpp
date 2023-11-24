@@ -1,4 +1,4 @@
-#include "astbuilder.h"
+#include "ASTBuilder.h"
 
 ASTBuilder::ASTBuilder(std::vector<Token> tokens)
 {

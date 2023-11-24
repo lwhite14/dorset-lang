@@ -3,7 +3,8 @@
 #include <string>
 #include <vector>
 
-#include "token.h"
+#include "Token.h"
+#include "../Utils/Error.h"
 
 class Lexer
 {

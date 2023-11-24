@@ -3,10 +3,10 @@
 #include <string>
 #include <vector>
 
-#include "token.h"
-#include "ast.h"
-#include "error.h"
-#include "expressionbuilder.h"
+#include "../LexicalAnalysis/Token.h"
+#include "../AST/AST.h"
+#include "../Utils/Error.h"
+#include "../Builder/ExpressionBuilder.h"
 
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"

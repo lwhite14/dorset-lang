@@ -1,6 +1,6 @@
-#include "token.h"
+#include "Token.h"
 
-#include "../deps/magic_enum.hpp"
+#include "../../deps/magic_enum.hpp"
 
 Token::Token(TokenType type, std::string lexeme, std::string literal, int line, int character) 
 {

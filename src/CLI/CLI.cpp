@@ -1,6 +1,4 @@
-#include "cli.h"
-
-#include "outpututils.h"
+#include "CLI.h"
 
 bool fileExists(std::string fileName)
 {

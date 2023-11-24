@@ -1,8 +1,6 @@
-#include "lexer.h"
+#include "Lexer.h"
 
 #include <ctype.h>
-
-#include "error.h"
 
 Lexer::Lexer(std::string source)
 {

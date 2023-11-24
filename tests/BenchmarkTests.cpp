@@ -1,6 +1,6 @@
 #include <chrono>
 
-#include "../src/cli.h"
+#include "../src/CLI/CLI.h"
 
 using std::chrono::high_resolution_clock;
 using std::chrono::duration_cast;

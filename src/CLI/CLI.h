@@ -7,11 +7,11 @@
 #include <memory>
 #include <filesystem>
 
-#include "error.h"
-#include "lexer.h"
-#include "outpututils.h"
-#include "ast.h"
-#include "astbuilder.h"
+#include "../LexicalAnalysis/Lexer.h"
+#include "../Utils/Error.h"
+#include "../Utils/OutputUtils.h"
+#include "../AST/AST.h"
+#include "../Builder/ASTBuilder.h"
 
 static bool fileExists(std::string fileName);
 

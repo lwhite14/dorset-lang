@@ -6,6 +6,8 @@
 #include <iostream>
 #include <map>
 
+#include "../Utils/Error.h"
+
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/IR/BasicBlock.h"

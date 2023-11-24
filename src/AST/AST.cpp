@@ -1,10 +1,7 @@
-#include "ast.h"
+#include "AST.h"
 
 #include <fstream>
 #include <ostream>
-
-#include "error.h"
-#include "cli.h"
 
 namespace AST
 {

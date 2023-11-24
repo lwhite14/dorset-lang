@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include "../deps/catch.hpp"
 
-#include "../src/cli.h"
+#include "../src/CLI/CLI.h"
 
 void resetGlobals()
 {

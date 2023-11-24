@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "token.h"
-#include "ast.h"
+#include "../LexicalAnalysis/Token.h"
+#include "../AST/AST.h"
 
 class ExpressionBuilder
 {

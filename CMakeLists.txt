@@ -26,24 +26,24 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 add_library(dorsetDriver STATIC
-    src/error.cpp
-    src/lexer.cpp
-    src/token.cpp
-    src/ast.cpp
-    src/astbuilder.cpp
-    src/outpututils.cpp
-    src/expressionbuilder.cpp
-    src/cli.cpp
+    src/Utils/Error.cpp
+    src/Utils/OutputUtils.cpp
+    src/LexicalAnalysis/Lexer.cpp
+    src/LexicalAnalysis/Token.cpp
+    src/Builder/ASTBuilder.cpp
+    src/Builder/ExpressionBuilder.cpp
+    src/AST/AST.cpp
+    src/CLI/CLI.cpp
 )
 
 if (WIN32)
     add_executable(${PROJECT_NAME} 
-        src/main.cpp
+        src/AppEntry.cpp
         branding/icon.o
     )
 else()
     add_executable(${PROJECT_NAME} 
-        src/main.cpp
+        src/AppEntry.cpp
     )
 endif()
 
@@ -63,8 +63,8 @@ install(TARGETS ${PROJECT_NAME} PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUD
 install(TARGETS dorsetDriver PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dorset-lang)
 
 # Testing
-add_executable(compileTests tests/compileTests.cpp)
-add_executable(benchmarkTests tests/benchmarkTests.cpp)
+add_executable(compileTests tests/CompileTests.cpp)
+add_executable(benchmarkTests tests/BenchmarkTests.cpp)
 
 target_link_libraries(compileTests dorsetDriver)
 target_link_libraries(benchmarkTests dorsetDriver)

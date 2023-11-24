@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "token.h"
+#include "../LexicalAnalysis/Token.h"
 
 void printUsage();
 void printVersion();

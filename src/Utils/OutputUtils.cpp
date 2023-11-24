@@ -1,9 +1,9 @@
-#include "outpututils.h"
+#include "OutputUtils.h"
 
 #include <iostream>
 #include <iomanip>
 
-#include "version.h"
+#include "Version.h"
 
 #ifndef GIT_COMMIT_HASH
 #define GIT_COMMIT_HASH "?"
