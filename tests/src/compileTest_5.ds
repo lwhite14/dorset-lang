@@ -1,13 +1,12 @@
-fn main() void 
+fn main() double 
 {
     var x = 5;
-    if x < 3 
+    if (x < 3)
     {
-        printf("X is smaller than 3!", 0)
+        return 0
     }
     else
     {
-        printf("X is bigger than 3!", 0)
+        return 1
     };
-
 }

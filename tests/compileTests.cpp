@@ -9,7 +9,7 @@ void resetGlobals()
 }
 
 
-TEST_CASE("Basic Hello World", "[Compile]") 
+TEST_CASE("Basic Hello World", "[Compile]") // compileTest_1.ds
 {
 	// Pre Work
 	resetGlobals();
@@ -24,7 +24,7 @@ TEST_CASE("Basic Hello World", "[Compile]")
 	REQUIRE(i == 0);
 }
 
-TEST_CASE("Externs", "[Compile]") 
+TEST_CASE("Externs", "[Compile]") // compileTest_2.ds
 {
 	// Pre Work
 	resetGlobals();
@@ -39,7 +39,7 @@ TEST_CASE("Externs", "[Compile]")
 	REQUIRE(i == 0);
 }
 
-TEST_CASE("Returns", "[Compile]") 
+TEST_CASE("Returns", "[Compile]") // compileTest_3.ds
 {
 	// Pre Work
 	resetGlobals();
@@ -54,7 +54,7 @@ TEST_CASE("Returns", "[Compile]")
 	REQUIRE(i == 0);
 }
 
-TEST_CASE("Variable and If Statement", "[Compile]") 
+TEST_CASE("Variable and If Statement", "[Compile]") // compileTest_4.ds
 {
 	// Pre Work
 	resetGlobals();
@@ -69,7 +69,7 @@ TEST_CASE("Variable and If Statement", "[Compile]")
 	REQUIRE(i == 0);
 }
 
-TEST_CASE("Return from Inside an If Block", "[Compile]") 
+TEST_CASE("Return from Inside an If Block", "[Compile]") // compileTest_5.ds
 {
 	// Pre Work
 	resetGlobals();
@@ -84,7 +84,7 @@ TEST_CASE("Return from Inside an If Block", "[Compile]")
 	REQUIRE(i == 0);
 }
 
-TEST_CASE("Inline Block", "[Compile]") 
+TEST_CASE("Inline Block", "[Compile]") // compileTest_6.ds
 {
 	// Pre Work
 	resetGlobals();

@@ -62,7 +62,7 @@ AST::ExprAST *ASTBuilder::parseExpression()
     {
         if (currentToken().getType() == _EOF)
         {
-            ErrorHandler::error("a block hasn't been terminated");
+            ErrorHandler::error("an expression has unexpectedly reached the end of the file", currentToken().getLine());
             return nullptr;
         }
 
@@ -202,6 +202,12 @@ AST::FunctionAST *ASTBuilder::parseDefinition()
 
     AST::BlockAST* block = parseBlock();
 
+    if (block == nullptr)
+    {
+        ErrorHandler::error("a block has not been parsed correctly", currentToken().getLine(), currentToken().getCharacter());
+        return nullptr;
+    }
+
     if (needsReturnToken && !hasReturnToken)
     {
         ErrorHandler::error("this function needs a return", currentToken().getLine(), currentToken().getCharacter());
@@ -224,6 +230,12 @@ AST::BlockAST *ASTBuilder::parseBlock()
 
     while (currentToken().getType() != RIGHT_BRACE)
     {
+        if (currentToken().getType() == _EOF)
+        {
+            ErrorHandler::error("a block has unexpectedly reached the end of the file", currentToken().getLine());
+            return nullptr;
+        }
+
         if (currentToken().getType() == LEFT_BRACE)
         {
             AST::BlockAST* block = parseBlock();
