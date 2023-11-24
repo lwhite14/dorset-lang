@@ -1,14 +1,12 @@
-fn newLine() void {
-    printf("\n", 0);
-}
-
-fn main() void {
-
+fn main() double 
+{
+    var x = 5;
+    if (x < 3)
     {
-        printf("Hello World", 0);
-        newLine();
-        printf("And hello again...", 0);
+        return 0;
     }
-
-    newLine();
+    else
+    {
+        return 1;
+    }
 }

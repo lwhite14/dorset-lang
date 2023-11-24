@@ -3,10 +3,10 @@ fn main() double
     var x = 5;
     if (x < 3)
     {
-        return 0
+        return 0;
     }
     else
     {
-        return 1
-    };
+        return 1;
+    }
 }

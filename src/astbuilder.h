@@ -37,6 +37,10 @@ private:
     AST::BlockAST *parseBlock();
     AST::PrototypeAST *parseExtern();
 
+    AST::ExprAST *parseIfExpression();
+    AST::ExprAST *parseForExpression();
+
+
     void handleDefinition(); 
     void handleExtern();
 

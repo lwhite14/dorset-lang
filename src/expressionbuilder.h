@@ -19,8 +19,6 @@ private:
     AST::ExprAST *parseStringExpr();
     AST::ExprAST *parseParenExpr();
     AST::ExprAST *parseIdentifierExpr();
-    AST::ExprAST *parseIfExpr();
-    AST::ExprAST *parseForExpr();
     AST::ExprAST* parseVarExpr();
     AST::ExprAST* parseReturnExpr();
     AST::ExprAST *parsePrimary();

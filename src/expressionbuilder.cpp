@@ -115,152 +115,6 @@ AST::ExprAST *ExpressionBuilder::parseIdentifierExpr()
     return new AST::CallExprAST(IdName, std::move(Args));
 }
 
-AST::ExprAST* ExpressionBuilder::parseIfExpr()
-{
-    advanceToken();  // eat the if.
-
-    // condition.
-    auto Cond = buildExpression();
-    if (!Cond)
-        return nullptr;
-
-    if (currentToken().getType() != LEFT_BRACE)
-    {
-        ErrorHandler::error("unknown token when expecting opening brace at the start of the block", currentToken().getLine(), currentToken().getCharacter());
-        return nullptr;
-    }
-    advanceToken();  // eat the '{'
-
-    bool thenReturns = false;
-    if (currentToken().getType() == RETURN)
-    {
-        thenReturns = true;
-    }
-    auto Then = buildExpression();
-    if (!Then)
-        return nullptr;
-
-    if (currentToken().getType() != RIGHT_BRACE)
-    {
-        ErrorHandler::error("unknown token when expecting opening brace at the start of the block", currentToken().getLine(), currentToken().getCharacter());
-        return nullptr;
-    }
-    advanceToken();  // eat the '}'
-
-    if (currentToken().getType() != ELSE)
-    {
-        ErrorHandler::error("expected else", currentToken().getLine(), currentToken().getCharacter());
-        return nullptr;
-    }
-
-    advanceToken();
-
-    if (currentToken().getType() != LEFT_BRACE)
-    {
-        ErrorHandler::error("unknown token when expecting opening brace at the start of the block", currentToken().getLine(), currentToken().getCharacter());
-        return nullptr;
-    }
-    advanceToken();  // eat the '{'
-
-    bool elseReturns = false;
-    if (currentToken().getType() == RETURN)
-    {
-        elseReturns = true;
-    }
-    auto Else = buildExpression();
-    if (!Else)
-        return nullptr;
-
-    if (currentToken().getType() != RIGHT_BRACE)
-    {
-        ErrorHandler::error("unknown token when expecting opening brace at the start of the block", currentToken().getLine(), currentToken().getCharacter());
-        return nullptr;
-    }
-    advanceToken();  // eat the '}'
-
-    return new AST::IfExprAST(std::move(Cond), std::move(Then), std::move(Else), thenReturns, elseReturns);
-}
-
-AST::ExprAST* ExpressionBuilder::parseForExpr()
-{
-    advanceToken();  // eat the for.
-
-    if (currentToken().getType() != LEFT_PAREN)
-    {
-        ErrorHandler::error("expected open parentheses", currentToken().getLine(), currentToken().getCharacter());
-        return nullptr;
-    }
-    advanceToken(); // eat '('
-
-    if (currentToken().getType() != IDENTIFIER) 
-    {
-        ErrorHandler::error("expected identifier after for", currentToken().getLine(), currentToken().getCharacter());
-        return nullptr;
-    }
-
-    std::string IdName = currentToken().getLexeme();
-    advanceToken();  // eat identifier.
-
-    if (currentToken().getLexeme() != "=") 
-    {
-        ErrorHandler::error("expected '=' after for", currentToken().getLine(), currentToken().getCharacter());
-        return nullptr;
-    }
-    advanceToken();  // eat '='.
-
-     
-    auto Start = buildExpression();
-    if (!Start) {
-        return nullptr;
-    }
-
-    if (currentToken().getLexeme() != ",") 
-    {
-        ErrorHandler::error("expected ',' after for start value", currentToken().getLine(), currentToken().getCharacter());
-        return nullptr;
-    }
-    advanceToken();
-
-    auto End = buildExpression();
-    if (!End)
-        return nullptr;
-
-    // The step value is optional.
-    AST::ExprAST* Step = nullptr;
-    if (currentToken().getLexeme() == ",") {
-        advanceToken();
-        Step = buildExpression();
-        if (!Step)
-            return nullptr;
-    }
-
-    if (currentToken().getType() != RIGHT_PAREN)
-    {
-        ErrorHandler::error("expected close parentheses", currentToken().getLine(), currentToken().getCharacter());
-        return nullptr;
-    }
-    advanceToken(); // eat ')'
-
-    if (currentToken().getType() != LEFT_BRACE)
-    {
-        ErrorHandler::error("unknown token when expecting opening brace at the start of the block", currentToken().getLine(), currentToken().getCharacter());
-        return nullptr;
-    }
-    advanceToken();  // eat the '{'
-
-    auto Body = buildExpression();
-    if (!Body)
-        return nullptr;
-
-    if (currentToken().getType() != RIGHT_BRACE)
-    {
-        ErrorHandler::error("unknown token when expecting opening brace at the start of the block", currentToken().getLine(), currentToken().getCharacter());
-        return nullptr;
-    }
-    advanceToken();  // eat the '}'
-
-    return new AST::ForExprAST(IdName, std::move(Start), std::move(End), std::move(Step), std::move(Body));
-}
 
 AST::ExprAST *ExpressionBuilder::parseVarExpr() 
 {
@@ -338,16 +192,6 @@ AST::ExprAST *ExpressionBuilder::parsePrimary()
         auto Expr = parseParenExpr();
         return Expr;
     }
-    else if (currentToken().getType() == IF)
-    {
-        auto Expr = parseIfExpr();
-        return Expr;
-    }
-    else if (currentToken().getType() == FOR)
-    {
-        auto Expr = parseForExpr();
-        return Expr;
-    }
     else if (currentToken().getType() == VAR) 
     {
         auto Expr = parseVarExpr();
@@ -412,7 +256,9 @@ AST::ExprAST* ExpressionBuilder::parseUnary()
     int Opc = currentToken().getLexeme()[0];
     advanceToken();
     if (auto Operand = parseUnary())
+    {
         return new AST::UnaryExprAST(Opc, std::move(Operand));
+    }
     return nullptr;
 }
 

@@ -1,13 +1,22 @@
+fn newLine() void {
+    printf("\n", 0);
+}
+
 fn main() void 
 {
     var x = 5;
-    if x < 3 
+    if (x < 3)
     {
-        printf("X is smaller than 3!", 0)
+        printf("X is smaller than 3!", 0);
+        newLine();
+        printf("..this code was executed in the then block.", 0);
+        newLine();
     }
     else
     {
-        printf("X is bigger than 3!", 0)
-    };
-
+        printf("X is bigger than 3!", 0);
+        newLine();
+        printf("..this code was executed in the else block.", 0);
+        newLine();
+    }
 }

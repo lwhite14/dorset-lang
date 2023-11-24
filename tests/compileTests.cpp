@@ -98,3 +98,18 @@ TEST_CASE("Inline Block", "[Compile]") // compileTest_6.ds
 
 	REQUIRE(i == 0);
 }
+
+TEST_CASE("For Loop", "[Compile]") // compileTest_7.ds
+{
+	// Pre Work
+	resetGlobals();
+
+	CompilerOptions options = CompilerOptions({"src/compileTest_7.ds"});
+
+	REQUIRE(options.getHadError() == false);
+
+	Compiler compiler = Compiler(options);
+	int i = compiler.compile();
+
+	REQUIRE(i == 0);
+}
