@@ -25,20 +25,19 @@ class ASTBuilder
 private:
     std::vector<Token> tokens;
     int currentTokenIndex;
-    bool hasReturnToken = false;
     bool needsReturnToken = false;
 
     Token currentToken();
     Token advanceToken();
 
-    AST::ExprAST *parseExpression();
+    AST::ExprAST *parseExpression(bool& hasReturn);
     AST::PrototypeAST *parsePrototype(); 
     AST::FunctionAST *parseDefinition(); 
-    AST::BlockAST *parseBlock();
+    AST::BlockAST *parseBlock(bool& hasReturn);
     AST::PrototypeAST *parseExtern();
 
-    AST::ExprAST *parseIfExpression();
-    AST::ExprAST *parseForExpression();
+    AST::ExprAST *parseIfExpression(bool& hasReturn);
+    AST::ExprAST *parseForExpression(bool& hasReturn);
 
 
     void handleDefinition(); 

@@ -54,7 +54,7 @@ void ASTBuilder::parseTokenList()
     }
 }
 
-AST::ExprAST *ASTBuilder::parseExpression()
+AST::ExprAST *ASTBuilder::parseExpression(bool& hasReturn)
 {
     std::vector<Token> exprTokens;
 
@@ -68,7 +68,7 @@ AST::ExprAST *ASTBuilder::parseExpression()
 
         if (currentToken().getType() == RETURN) 
         {
-            hasReturnToken = true;
+            hasReturn = true;
         }
 
         exprTokens.push_back(currentToken());
@@ -80,7 +80,7 @@ AST::ExprAST *ASTBuilder::parseExpression()
     return builder.buildExpression();
 }
 
-AST::ExprAST *ASTBuilder::parseIfExpression()
+AST::ExprAST *ASTBuilder::parseIfExpression(bool& hasReturn)
 {
     advanceToken();  // eat the if.
 
@@ -109,12 +109,7 @@ AST::ExprAST *ASTBuilder::parseIfExpression()
     }
 
     bool thenReturns = false;
-    if (currentToken().getType() == RETURN)
-    {
-        thenReturns = true;
-    } // TODO: this will always return false, need to refactor
-
-    AST::BlockAST* Then = parseBlock();
+    AST::BlockAST* Then = parseBlock(thenReturns);
     if (!Then)
     {
         return nullptr;
@@ -128,21 +123,21 @@ AST::ExprAST *ASTBuilder::parseIfExpression()
     advanceToken(); // eat 'else'
 
     bool elseReturns = false;
-    if (currentToken().getType() == RETURN)
-    {
-        elseReturns = true;
-    } // TODO: this will always return false, need to refactor
-
-    AST::BlockAST* Else = parseBlock();
+    AST::BlockAST* Else = parseBlock(elseReturns);
     if (!Else)
     {
         return nullptr;
     }
 
+    if (thenReturns && elseReturns)
+    {
+        hasReturn = true;
+    }
+
     return new AST::IfExprAST(std::move(Cond), std::move(Then), std::move(Else), thenReturns, elseReturns);
 }
 
-AST::ExprAST *ASTBuilder::parseForExpression()
+AST::ExprAST *ASTBuilder::parseForExpression(bool& hasReturn)
 {
     advanceToken();  // eat the for.
 
@@ -218,7 +213,7 @@ AST::ExprAST *ASTBuilder::parseForExpression()
         return nullptr;
     }
 
-    AST::BlockAST* Body = parseBlock();
+    AST::BlockAST* Body = parseBlock(hasReturn);
 
     if (!Body)
     {
@@ -335,41 +330,8 @@ AST::PrototypeAST *ASTBuilder::parsePrototype()
     return new AST::PrototypeAST(FnName, std::move(ArgNames), returnType, Kind != 0, BinaryPrecedence);
 }
 
-AST::FunctionAST *ASTBuilder::parseDefinition()
-{
-    advanceToken(); // eat def.
-    auto Proto = parsePrototype();
-    if (!Proto)
-    {
-        return nullptr;
-    }
 
-    needsReturnToken = true;
-    if (Proto->getReturnType() == "void")
-        needsReturnToken = false;
-
-    AST::BlockAST* block = parseBlock();
-
-    if (block == nullptr)
-    {
-        ErrorHandler::error("a block has not been parsed correctly", currentToken().getLine(), currentToken().getCharacter());
-        return nullptr;
-    }
-
-    if (needsReturnToken && !hasReturnToken)
-    {
-        ErrorHandler::error("this function needs a return", currentToken().getLine(), currentToken().getCharacter());
-        return nullptr;
-    }
-
-    AST::FunctionAST* Function = new AST::FunctionAST(std::move(Proto), block);
-    hasReturnToken = false;
-    needsReturnToken = true;
-    
-    return std::move(Function);
-}
-
-AST::BlockAST *ASTBuilder::parseBlock()
+AST::BlockAST *ASTBuilder::parseBlock(bool& hasReturn)
 {   
     if (currentToken().getType() != LEFT_BRACE)
     {
@@ -387,25 +349,24 @@ AST::BlockAST *ASTBuilder::parseBlock()
             ErrorHandler::error("a block has unexpectedly reached the end of the file", currentToken().getLine());
             return nullptr;
         }
-
-        if (currentToken().getType() == LEFT_BRACE)
+        else if (currentToken().getType() == LEFT_BRACE)
         {
-            AST::BlockAST* block = parseBlock();
+            AST::BlockAST* block = parseBlock(hasReturn);
             Exprs.push_back(block);
         }
         else if (currentToken().getType() == IF)
         {
-            AST::ExprAST* expr = parseIfExpression();
+            AST::ExprAST* expr = parseIfExpression(hasReturn);
             Exprs.push_back(expr);
         }
         else if (currentToken().getType() == FOR)
         {
-            AST::ExprAST* expr = parseForExpression();
+            AST::ExprAST* expr = parseForExpression(hasReturn);
             Exprs.push_back(expr);
         }
         else
         {
-            AST::ExprAST* expr = parseExpression();
+            AST::ExprAST* expr = parseExpression(hasReturn);
             Exprs.push_back(expr);
         }
     }
@@ -413,6 +374,42 @@ AST::BlockAST *ASTBuilder::parseBlock()
     advanceToken(); // Eat '}'
 
     return new AST::BlockAST(Exprs);
+}
+
+
+AST::FunctionAST *ASTBuilder::parseDefinition()
+{
+    advanceToken(); // eat def.
+    auto Proto = parsePrototype();
+    if (!Proto)
+    {
+        return nullptr;
+    }
+
+    needsReturnToken = true;
+    if (Proto->getReturnType() == "void")
+        needsReturnToken = false;
+
+    bool hasReturn = false;
+
+    AST::BlockAST* block = parseBlock(hasReturn);
+
+    if (block == nullptr)
+    {
+        ErrorHandler::error("a block has not been parsed correctly", currentToken().getLine(), currentToken().getCharacter());
+        return nullptr;
+    }
+
+    if (needsReturnToken && !hasReturn)
+    {
+        ErrorHandler::error("this function needs a return", currentToken().getLine(), currentToken().getCharacter());
+        return nullptr;
+    }
+
+    AST::FunctionAST* Function = new AST::FunctionAST(std::move(Proto), block);
+    needsReturnToken = true;
+    
+    return std::move(Function);
 }
 
 AST::PrototypeAST *ASTBuilder::parseExtern()

@@ -1,3 +1,8 @@
+fn newLine() void
+{
+    printf("\n", 0);
+}
+
 fn main() double 
 {
     var x = 5;
@@ -7,6 +12,9 @@ fn main() double
     }
     else
     {
-        return 1;
+        0;
     }
+
+    x = 6;
+    return x;
 }
