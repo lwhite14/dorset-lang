@@ -1,7 +1,5 @@
 #include "ExpressionBuilder.h"
 
-#include "error.h"
-
 ExpressionBuilder::ExpressionBuilder(std::vector<Token> tokens, bool needsReturnToken) 
 {
     this->tokens = tokens;

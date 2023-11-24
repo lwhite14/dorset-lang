@@ -4,6 +4,7 @@
 
 #include "../LexicalAnalysis/Token.h"
 #include "../AST/AST.h"
+#include "../Utils/Error.h"
 
 class ExpressionBuilder
 {
