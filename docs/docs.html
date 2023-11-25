@@ -78,7 +78,7 @@
 
                 <h2 id="versions">Versions</h2>
 
-                <p><b>Current stable version: 0.1.4-alpha.</b> Working towards version 1.0.0.</p>
+                <p><b>Current stable version: 0.1.5-alpha.</b> Working towards version 1.0.0.</p>
 
                 <h2 id="tech">Technology</h2>
 
@@ -101,7 +101,7 @@
                 <h3>Building</h3>
                 <p>
                     You will need an install of LLVM to use the dorset compiler. You can find more information on building and installing LLVM and Clang <a href="https://llvm.org/docs/GettingStarted.html">here</a><br>
-                    First, clone the dorset-lang repository. It is advised to clone from a stable version:<br> <i>git clone --branch 0.1.4-alpha https://github.com/lwhite14/dorset-lang.git</i><br>
+                    First, clone the dorset-lang repository. It is advised to clone from a stable version:<br> <i>git clone --branch 0.1.5-alpha https://github.com/lwhite14/dorset-lang.git</i><br>
                     Configure the CMake cache:<br> <i>cmake -B build -S . -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++</i><br>
                     Build dorset-lang:<br> <i>cmake --build build --config Release</i><br>
                     And install dorset-lang:<br> <i>sudo cmake --install build --prefix /usr/local</i><br>
@@ -121,7 +121,7 @@
 
                 <h2 id="feat-basics">Basic Rules and Features</h2>
                 <p>
-                    Dorset-lang is semi-functional, no object oriented language, so every expression and statement must live within a function. Any top level code must be a function declaration. <br>
+                    Dorset-lang is a semi-functional, non object oriented language, so every expression and statement must live within a function. Any top level code must be a function declaration. <br>
                     Code like this is not allowed:
                     <code><pre>
 fn test(x) double 
@@ -143,7 +143,7 @@ fn main() void
     printf("%f", test(3));
 }
                     </pre></code>
-                    The only types in dorset-lang 0.1.4 are doubles and voids. Any variables declared will automatically be a double to represent a number, however, you will have to specify whether a function returns a double or is void, returning nothing at all. <br>
+                    The only types in dorset-lang 0.1.5 are doubles and voids. Any variables declared will automatically be a double to represent a number, however, you will have to specify whether a function returns a double or is void, returning nothing at all. <br>
                     Another rule in dorset-lang is that every function needs a least one expression in its body.
                 </p>
 
@@ -195,20 +195,19 @@ test(num);
                 <p>
                     Conditionals consist of an if and then an else. Both are needed in a if block.
                     <code><pre>
-if 3 < x
+if (3 < x)
 {
-    printf("X is bigger than 3!", 0)
+    printf("X is bigger than 3!", 0);
 }
 else
 {
-    printf("X is not bigger than 3!", 0)
-};
+    printf("X is not bigger than 3!", 0);
+}
                     </pre></code>
-                    Firstly, declare your if and write your conditional that, when true, will execute the code inside the if block. <i>if 3 < x then </i>.<br> 
-                    After the condition, you will need the <i>{</i> and <i>}</i> tokens so the compiler knows when the following block begins and ends.<br>
-                    After the if block, <i>else</i> controls the code that will execute if the condition fails: <i>else</i>.<br>
-                    It's important to note that the terminating semicolon only comes <b>at the end</b> of the entire statement. <br>
-                    Note that you don't need semicolons for the expressions within the if else blocks. This is because in 0.1.4 you can only execute one expression within these blocks. You can define your own operators to get over this limitation, but there is no native semicolon solution.
+                    Firstly, declare your if and write your conditional that, when true, will execute the code inside the if block. <em>if (3 < x) { ...</em>. 
+                    This condition must be encapsulated by open and closed parentheses.
+                    After the condition, you will need the { and } tokens so the compiler knows when the following block begins and ends.
+                    After the if block, else controls the code that will execute if the condition fails: <em>else { ...</em>.
                 </p>
 
                 <h2 id="feat-loops">Loops</h2>
@@ -217,15 +216,15 @@ else
                     <code><pre>
 for (i = 1, i < x, 1.0)
 {
-    printf("*", 0)
-};     
+    printf("*", 0);
+}  
                     </pre></code>
                     Firstly, start the for loop with the <i>for</i> keyword. You will then need a start, an end, and a step for the loop. <br>
-                    In dorset-lang 0.1.4, you can only initialize new variables, but you can use any expression to initialize it, for example:
+                    In dorset-lang 0.1.5, you can only initialize new variables, but you can use any expression to initialize it, for example:
                     <code><pre>
 for (i = add(3, 4), i < 45, 3.0)
                     </pre></code>
-                    The first part represents the new variables used in the loop. The middle part is the condition which needs to be satisfied to continue looping. Once this condition is false, the loop ends. The last part is the step, and it is entirely optional. If you leave out the step, the loop will use a default step value of 1. The step is the number which is added to the newly declared variable every loop. So for the previous example, the variable <i>i</i> will have 3 added to it for each loop.
+                    The first part represents the new variables used in the loop. The middle part is the condition which needs to be satisfied to continue looping. Once this condition is false, the loop ends. The last part is the step. The step is the number which is added to the newly declared variable every loop. So for the previous example, the variable i will have 3 added to it for each loop.
                 </p>
 
                 <h2 id="feat-operators">Operator Overloading</h2>
@@ -235,15 +234,14 @@ for (i = add(3, 4), i < 45, 3.0)
                     <code><pre>
 fn unary!(v) double
 {
-    return
     if v 
     {
-        0
+        return 0;
     }
     else
     {
-        1
-    };
+        return 1;
+    }
 }
 
 fn binary> 10 (LHS, RHS) double

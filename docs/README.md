@@ -24,7 +24,7 @@
 Dorset lang is a language and compiler developed to be fast and strong.
 
 ### Versions
-Current stable version: 0.1.4-alpha. Working towards version 1.0.0.
+Current stable version: 0.1.5-alpha. Working towards version 1.0.0.
 
 ### Technology
 Written with C++ (Clang) and LLVM.
@@ -41,7 +41,7 @@ Written with C++ (Clang) and LLVM.
 You will need an install of LLVM to use the dorset compiler. You can find more information on building and installing LLVM and Clang here
 First, clone the dorset-lang repository. It is advised to clone from a stable version:
 ```
-git clone --branch 0.1.4-alpha https://github.com/lwhite14/dorset-lang.git
+git clone --branch 0.1.5-alpha https://github.com/lwhite14/dorset-lang.git
 ```
 Configure the CMake cache:
 ```
@@ -63,7 +63,7 @@ To compiler dorset-lang source code, run <em>dorset file.ds</em> to compile file
 ## Features
 
 ### Basic Rules and Features
-Dorset-lang is semi-functional, no object oriented language, so every expression and statement must live within a function. Any top level code must be a function declaration.
+Dorset-lang is a semi-functional, non object oriented language, so every expression and statement must live within a function. Any top level code must be a function declaration.
 Code like this is not allowed:
 ```
 fn test(x) double 
@@ -85,7 +85,7 @@ fn main() void
     printf("%f", test(3));
 }
  ```                  
-The only types in dorset-lang 0.1.4 are doubles and voids. Any variables declared will automatically be a double to represent a number, however, you will have to specify whether a function returns a double or is void, returning nothing at all.
+The only types in dorset-lang 0.1.5 are doubles and voids. Any variables declared will automatically be a double to represent a number, however, you will have to specify whether a function returns a double or is void, returning nothing at all.
 Another rule in dorset-lang is that every function needs a least one expression in its body.
 
 ### Functions
@@ -128,35 +128,34 @@ test(num);
 ### Conditionals
 Conditionals consist of an if and then an else. Both are needed in a if block.
 ```
-if 3 < x
+if (3 < x)
 {
-    printf("X is bigger than 3!", 0)
+    printf("X is bigger than 3!", 0);
 }
 else
 {
-    printf("X is not bigger than 3!", 0)
-};
+    printf("X is not bigger than 3!", 0);
+}
 ```               
-Firstly, declare your if and write your conditional that, when true, will execute the code inside the if block. if 3 < x then .
+Firstly, declare your if and write your conditional that, when true, will execute the code inside the if block. <em>if (3 < x) { ...</em>. 
+This condition must be encapsulated by open and closed parentheses.
 After the condition, you will need the { and } tokens so the compiler knows when the following block begins and ends.
-After the if block, else controls the code that will execute if the condition fails: else.
-It's important to note that the terminating semicolon only comes at the end of the entire statement.
-Note that you don't need semicolons for the expressions within the if else blocks. This is because in 0.1.4 you can only execute one expression within these blocks. You can define your own operators to get over this limitation, but there is no native semicolon solution.
+After the if block, else controls the code that will execute if the condition fails: <em>else { ...</em>.
 
 ### Loops
 Loops are implementing using the following syntax:
 ```
 for (i = 1, i < x, 1.0)
 {
-    printf("*", 0)
-};     
+    printf("*", 0);
+}
 ```                 
 Firstly, start the for loop with the for keyword. You will then need a start, an end, and a step for the loop.
-In dorset-lang 0.1.4, you can only initialize new variables, but you can use any expression to initialize it, for example:
+In dorset-lang 0.1.5, you can only initialize new variables, but you can use any expression to initialize it, for example:
 ```
 for (i = add(3, 4), i < 45, 3.0)
 ```                    
-The first part represents the new variables used in the loop. The middle part is the condition which needs to be satisfied to continue looping. Once this condition is false, the loop ends. The last part is the step, and it is entirely optional. If you leave out the step, the loop will use a default step value of 1. The step is the number which is added to the newly declared variable every loop. So for the previous example, the variable i will have 3 added to it for each loop.
+The first part represents the new variables used in the loop. The middle part is the condition which needs to be satisfied to continue looping. Once this condition is false, the loop ends. The last part is the step. The step is the number which is added to the newly declared variable every loop. So for the previous example, the variable i will have 3 added to it for each loop.
 
 ### Operator Overloading
 In dorset-lang, you can define your own operators. There are two types of operator overloading, unary operators and binary operator.
@@ -164,15 +163,14 @@ Unary operators take one argument and perform some operation on that parameter b
 ```
 fn unary!(v) double
 {
-    return
     if v 
     {
-        0
+        return 0;
     }
     else
     {
-        1
-    };
+        return 1;
+    }
 }
 
 fn binary> 10 (LHS, RHS) double

@@ -6,6 +6,22 @@ All notable changes to this project will be documented in this file. The format 
 
 Unreleased is the develop branch which includes every unmerged change from the last release version. These changes will be untested and may be potentially unstable, build this version at your own risk.
 
+## [0.1.5-alpha] - 2023-11-25
+
+### Added
+ - Can add raw code directly into the CLI.
+ - Some basic syntax tests.
+ - Some basic benchmark tests.
+ - Returning from inside an if block.
+ - Multi-line function blocks.
+
+### Changed
+ - Seperated compilation driver from final compiler binary.
+ - Block parsing. Will allow for better if and for token parsing.
+ - New source directory layout.
+ - More robust keyword and type lexer parsing.
+
+
 ## [0.1.4-alpha] - 2023-11-07
 
 ### Added
@@ -110,7 +126,8 @@ Unreleased is the develop branch which includes every unmerged change from the l
         - -v: printing the version.
 
 
-[unreleased]: https://github.com/lwhite14/dorset-lang/compare/0.1.4-alpha...develop
+[unreleased]: https://github.com/lwhite14/dorset-lang/compare/0.1.5-alpha...develop
+[0.1.5-alpha]: https://github.com/lwhite14/dorset-lang/releases/tag/0.1.5-alpha
 [0.1.4-alpha]: https://github.com/lwhite14/dorset-lang/releases/tag/0.1.4-alpha
 [0.1.3-alpha]: https://github.com/lwhite14/dorset-lang/releases/tag/0.1.3-alpha
 [0.1.2-alpha]: https://github.com/lwhite14/dorset-lang/releases/tag/0.1.2-alpha
