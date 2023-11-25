@@ -1,20 +1,30 @@
-fn newLine() void
-{
+fn binary>10(LHS, RHS) double {
+    return RHS < LHS;
+}
+
+fn newLine() void {
     printf("\n", 0);
 }
 
-fn main() double 
-{
-    var x = 5;
-    if (x < 3)
+fn test() double {
+    for (i = 1, i < 10, 1.0)
     {
-        return 0;
+        if (i > 5)
+        {
+            printf("Larger than 5: %f", i);
+            newLine();
+            return i;
+        }
+        else
+        {
+            0;
+        }
     }
-    else
-    {
-        0;
-    }
+    return 0;
+}
 
-    x = 6;
-    return x;
+fn main() void {
+    var x = test();
+    printf("Final number is: %f", x);
+    newLine();
 }
