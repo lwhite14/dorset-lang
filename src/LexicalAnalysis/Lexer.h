@@ -26,7 +26,8 @@ private:
     void string();
     void number();
     char peekNext();
-    void identifier();
+    void nonKeywordAlpha();
+    bool identifier(std::string text);
     bool type(std::string text);
     void nextLine();
 

@@ -136,7 +136,7 @@ void Lexer::scanToken()
         }
         else if (isalpha(c))
         {
-            identifier();
+            nonKeywordAlpha();
         }
         else
         {
@@ -244,31 +244,35 @@ char Lexer::peekNext()
     return source[current + 1];
 }
 
-void Lexer::identifier()
+void Lexer::nonKeywordAlpha()
 {
     while (isalnum(peek()))
     {
         advance();
     }
-
     std::string text = source.substr(start, current - start);
+
+    if (identifier(text)) { return; }
+    if (type(text)) { return; }
+
+    TokenType tokenType = IDENTIFIER;
+    addToken(tokenType);
+    return;
+}
+
+bool Lexer::identifier(std::string text)
+{
     TokenType tokenType;
     std::map<std::string, TokenType>::const_iterator pos = keywords.find(text);
     if (pos == keywords.end())
     {
-        if (!type(text)) 
-        {
-            tokenType = IDENTIFIER;
-            addToken(tokenType);
-            return;
-        }
-        else { return; }
+        return false;
     }
     else
     {
         tokenType = pos->second;
         addToken(tokenType);
-        return;
+        return true;
     }
 }
 
