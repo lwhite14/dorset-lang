@@ -6,26 +6,36 @@ Very fragile, handle with care :worried:
 
 ### Syntax
 ```
-fn test(x) double
-{
-    return x + 12;
-}
-
-fn main() void
-{ 
-    var num = 1 + 2;
-
-    printf("num = %f", num); // expecting 3
-    printf("\n", 0);
-
-    printf("num = %f", test(num)); // expecting 15
-    printf("\n", 0);
-
-    num = num + 4;
-
-    printf("num = %f", num); // expecting 7
+fn newLine() void {
     printf("\n", 0);
 }
+
+fn binary>10(L, R) double {
+    return R < L;
+}
+
+fn calculation(x) double {
+    return (x + 12) * 0.25;
+}
+
+fn main() void { 
+    var num = 4;
+    var numAfterCalc = calculation(num);
+
+    if (numAfterCalc > 3)
+    {
+        printf("Our calculation results in a number bigger than 3!", 0);
+    }
+    else
+    {
+        printf("Our calculation results in a number smaller than 3...", 0);
+    }
+
+    newLine();
+    printf("Our final number was %f", numAfterCalc);
+    newLine();
+}
+
 ```
 ### Building
 Dorset requires cmake, LLVM, and of course a C++ compiler (gcc, msvc, clang).
