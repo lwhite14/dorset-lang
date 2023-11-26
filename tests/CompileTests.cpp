@@ -29,7 +29,7 @@ TEST_CASE("Externs", "[Compile]") // compileTest_2.ds
 	// Pre Work
 	resetGlobals();
 
-	CompilerOptions options = CompilerOptions({"src/compileTest_2.ds", "-l"});
+	CompilerOptions options = CompilerOptions({"src/compileTest_2.ds"});
 
 	REQUIRE(options.getHadError() == false);
 

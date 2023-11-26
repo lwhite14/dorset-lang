@@ -1,3 +1,7 @@
 extern someFunction() double;
 
 extern someOtherFunction(x, y) double;
+
+fn main() double {
+    return 0;
+}

@@ -81,14 +81,14 @@ void CompilerOptions::processFlag()
     // {
     //     isLibrary = true;
     // }
-    // else if (currentArgument() == "-r" || currentArgument() == "--llvmir")
-    // {
-    //     generateLLVMIR = true;
-    // }
-    // else if (currentArgument() == "-b" || currentArgument() == "--keepbin")
-    // {
-    //     deleteBinaries = false;
-    // }
+    else if (currentArgument() == "-r" || currentArgument() == "--llvmir")
+    {
+        generateLLVMIR = true;
+    }
+    else if (currentArgument() == "-b" || currentArgument() == "--keepbin")
+    {
+        deleteBinaries = false;
+    }
     else if (currentArgument() == "-rs")
     {
         hasRawCode = true;
@@ -282,10 +282,10 @@ int Compiler::compile()
         if (!ErrorHandler::HadError)
         {
             outputBinaries();
-            // if (options.deleteBinaries) 
-            // {
-            //     removeBinaries();
-            // }
+            if (options.deleteBinaries) 
+            {
+                removeBinaries();
+            }
         }
     }
     else
@@ -301,38 +301,59 @@ int Compiler::compile()
 
 void Compiler::outputBinaries()
 {
-    std::string ir;
-    raw_string_ostream ostream(ir);
-    ostream << *AST::MasterAST::TheModule;
-    ostream.flush();
+    InitializeAllTargetInfos();
+    InitializeAllTargets();
+    InitializeAllTargetMCs();
+    InitializeAllAsmPrinters();
+    InitializeAllAsmParsers();
 
-    std::ofstream irFile;
-    irFile.open(options.outputLL);
-    irFile << ir;
-    irFile.close();
+    // Create a target machine (adjust the triple for your target architecture).
+    std::string triple = sys::getDefaultTargetTriple();
+    AST::MasterAST::TheModule->setTargetTriple(triple);
+    std::string error;
+    const Target *target = TargetRegistry::lookupTarget(triple, error);
+    TargetOptions opt = TargetOptions();
+    TargetMachine *machine = target->createTargetMachine(triple, "generic", "", opt, std::optional<Reloc::Model>());
 
-//     if (system(("llc " + options.outputLL + " -o " + options.outputS).c_str()) != 0)
-//     {
-//         ErrorHandler::error("error compiling LLVM IR");
-//         return;
-//     }
-//     if (system(("clang -c " + options.outputS + " -o " + options.outputO).c_str()) != 0)
-//     {
-//         ErrorHandler::error("error compiling assembly");
-//         return;
-//     }
-//     if (!options.isLibrary)
-//     {
-// #if defined(_WIN64) || defined(_WIN32)
-//         if (system(("clang " + options.outputS + " -o " + options.outputFinal).c_str()) != 0)
-// #else
-//         if (system(("clang " + options.outputS + " -o " + options.outputFinal + " -no-pie").c_str()) != 0)
-// #endif
-//         {
-//             ErrorHandler::error("error compiling object file");
-//             return;
-//         }
-//     }
+    // Generate the LLVM IR file
+    if (options.generateLLVMIR || !options.deleteBinaries)
+    {
+        std::string ir;
+        raw_string_ostream ostream(ir);
+        ostream << *AST::MasterAST::TheModule;
+        ostream.flush();
+
+        std::ofstream irFile;
+        irFile.open(options.outputLL);
+        irFile << ir;
+        irFile.close();
+    }
+
+    // Generate the object file.
+    std::error_code EC;
+    raw_fd_ostream dest(options.outputO, EC, sys::fs::OF_None);
+
+    legacy::PassManager pass;
+    if (machine->addPassesToEmitFile(pass, dest, nullptr, CodeGenFileType::CGFT_ObjectFile)) 
+    {
+        ErrorHandler::error("can't emit object file");
+        return;
+    }
+
+    pass.run(*AST::MasterAST::TheModule);
+    dest.flush();
+
+#if defined(_WIN64) || defined(_WIN32)
+    std::string cmd = "gcc " + options.outputO + " -o " + options.outputFinal;
+#else
+    std::string cmd = "gcc " + options.outputO + " -o " + options.outputFinal + " -no-pie";
+#endif
+
+    if (system(cmd.c_str()) != 0)
+    {
+        ErrorHandler::error("error during executable generation");
+        return;
+    }
 }
 
 void Compiler::removeBinaries()
