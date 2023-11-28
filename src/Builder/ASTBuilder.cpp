@@ -121,7 +121,7 @@ AST::ExprAST *ASTBuilder::parseIfExpression(bool& hasReturn)
     if (currentToken().getType() == ELSE)
     {
         advanceToken(); // eat 'else'
-        AST::BlockAST* Else = parseBlock(elseReturns);
+        Else = parseBlock(elseReturns);
         if (!Else)
         {
             return nullptr;
