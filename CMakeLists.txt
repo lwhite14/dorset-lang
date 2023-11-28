@@ -11,6 +11,9 @@ set(CMAKE_CXX_STANDARD 20)
 include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
+set(DORSET_OBJECT_COMPILER "gcc" CACHE STRING "The binary responsible for compiling the final object file.")
+message(STATUS "Object Compiler: ${DORSET_OBJECT_COMPILER}")
+
 # Get the current working branch
 execute_process(
     COMMAND git rev-parse --abbrev-ref HEAD
@@ -82,6 +85,9 @@ llvm_map_components_to_libnames(llvm_libs
 target_link_libraries(dorsetDriver ${llvm_libs})
 
 target_link_libraries(${PROJECT_NAME} dorsetDriver)
+
+target_compile_definitions(dorsetDriver PRIVATE
+    "-DDORSET_OBJECT_COMPILER=\"${DORSET_OBJECT_COMPILER}\"")
 
 target_compile_definitions(dorsetDriver PRIVATE
     "-DGIT_COMMIT_HASH=\"${GIT_COMMIT_HASH}\"")

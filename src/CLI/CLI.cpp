@@ -1,5 +1,9 @@
 #include "CLI.h"
 
+#ifndef DORSET_OBJECT_COMPILER
+#define DORSET_OBJECT_COMPILER "gcc"
+#endif
+
 bool fileExists(std::string fileName)
 {
     if (FILE *file = fopen(fileName.c_str(), "r"))
@@ -358,10 +362,12 @@ void Compiler::outputBinaries()
     pass.run(*AST::MasterAST::TheModule);
     dest.flush();
 
+    std::string objComp = DORSET_OBJECT_COMPILER;
+
 #if defined(_WIN64) || defined(_WIN32)
-    std::string cmd = "clang " + options.outputO + " -o " + options.outputFinal;
+    std::string cmd = objComp + " " + options.outputO + " -o " + options.outputFinal;
 #else
-    std::string cmd = "clang " + options.outputO + " -o " + options.outputFinal + " -no-pie";
+    std::string cmd = objComp + " " + options.outputO + " -o " + options.outputFinal + " -no-pie";
 #endif
 
     if (system(cmd.c_str()) != 0)
