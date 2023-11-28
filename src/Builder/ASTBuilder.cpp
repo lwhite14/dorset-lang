@@ -115,18 +115,17 @@ AST::ExprAST *ASTBuilder::parseIfExpression(bool& hasReturn)
         return nullptr;
     }
 
-    if (currentToken().getType() != ELSE)
-    {
-        ErrorHandler::error("expected else", currentToken().getLine(), currentToken().getCharacter());
-        return nullptr;
-    }
-    advanceToken(); // eat 'else'
-
+    AST::BlockAST* Else = nullptr;
     bool elseReturns = false;
-    AST::BlockAST* Else = parseBlock(elseReturns);
-    if (!Else)
+
+    if (currentToken().getType() == ELSE)
     {
-        return nullptr;
+        advanceToken(); // eat 'else'
+        AST::BlockAST* Else = parseBlock(elseReturns);
+        if (!Else)
+        {
+            return nullptr;
+        }
     }
 
     if (thenReturns && elseReturns)

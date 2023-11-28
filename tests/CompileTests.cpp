@@ -143,3 +143,18 @@ TEST_CASE("Returning from For Loop", "[Compile]") // compileTest_9.ds
 
 	REQUIRE(i == 0);
 }
+
+TEST_CASE("Optional Else in If Statement", "[Compile]") // compileTest_10.ds
+{
+	// Pre Work
+	resetGlobals();
+
+	CompilerOptions options = CompilerOptions({"src/compileTest_10.ds"});
+
+	REQUIRE(options.getHadError() == false);
+
+	Compiler compiler = Compiler(options);
+	int i = compiler.compile();
+
+	REQUIRE(i == 0);
+}

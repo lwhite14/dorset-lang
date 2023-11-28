@@ -392,9 +392,12 @@ namespace AST
         TheFunction->insert(TheFunction->end(), ElseBB);
         MasterAST::Builder->SetInsertPoint(ElseBB);
 
-        Value *ElseV = Else->codegen();
-        if (!ElseV)
-            return nullptr;
+        if (Else)
+        {
+            Value *ElseV = Else->codegen();
+            if (!ElseV)
+                return nullptr;
+        }
 
         if (!ElseReturns)
         {
