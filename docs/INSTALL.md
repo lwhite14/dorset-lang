@@ -42,13 +42,13 @@ Now that you have all the needed packages for building dorsetc, you can [build f
 
 ## Building LLVM from Source
 
-You can always take the plunge and build LLVM from source. If so, make sure to build LLVM 17 (17.0.5), and include the subprojects LLVM, Clang, lld, and clang-tools-extra. Make sure to include all targets.
+You can always take the plunge and build LLVM from source. If so, make sure to build LLVM 17 (17.0.5), and include the subprojects LLVM, Clang, lld, and clang-tools-extra. Make sure to include all targets and include M68k and Xtensa experimental targets.
 ```
 git clone --branch llvmorg-17.0.5 https://github.com/llvm/llvm-project.git
 cd llvm-project
 mkdir build
 cd build
-cmake -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;lld;" -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=all -DLLVM_TARGETS_TO_BUILD=all -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" ../llvm
+cmake -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;lld;" -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD="M68k;Xtensa;" -DLLVM_TARGETS_TO_BUILD=all -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" ../llvm
 ```
 
 After configuring, build and install:

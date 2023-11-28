@@ -48,8 +48,20 @@ void CompilerOptions::error(std::string message)
 
 std::string CompilerOptions::removeFileExtension(std::string fileName)
 {
-    size_t lastindex = fileName.find_last_of(".");
-    return fileName.substr(0, lastindex);
+    size_t lastIndex = fileName.find_last_of(".");
+    return fileName.substr(0, lastIndex);
+}
+
+std::string CompilerOptions::removeForwardSlashes(std::string filePath)
+{
+    size_t firstIndex = filePath.find_last_of("/");
+    return filePath.substr(firstIndex + 1, filePath.size());
+}
+
+std::string CompilerOptions::removeBackSlashes(std::string filePath)
+{
+    size_t firstIndex = filePath.find_last_of("\\");
+    return filePath.substr(firstIndex + 1, filePath.size());
 }
 
 void CompilerOptions::processFlag()
@@ -111,7 +123,7 @@ void CompilerOptions::processFile()
             return;
         }
 
-        sourceFile = removeFileExtension(currentArgument());
+        sourceFile = removeForwardSlashes(removeFileExtension(currentArgument()));
         sourceFileLocation = std::filesystem::absolute(currentArgument()).generic_string();
         hasSourceFile = true;
     }
@@ -119,19 +131,22 @@ void CompilerOptions::processFile()
 
 void CompilerOptions::constructOutputBinaryNames()
 {
+    std::string currentPath = std::filesystem::current_path().string();
+
     if (hasOutputName)
     {
         std::string name = removeFileExtension(outputFinal);
-        outputLL = name + ".ll";
-        outputO = name + ".o";
-        outputS = name + ".s";
+        outputFinal = currentPath + "/" + outputFinal;
+        outputLL = currentPath + "/" + name + ".ll";
+        outputO = currentPath + "/"  + name + ".o";
+        outputS = currentPath + "/"  + name + ".s";
     }
     else
     {
-        outputFinal = sourceFile + ".out";
-        outputLL = sourceFile + ".ll";
-        outputO = sourceFile + ".o";
-        outputS = sourceFile + ".s";
+        outputFinal = currentPath + "/"  + sourceFile + ".out";
+        outputLL = currentPath + "/"  + sourceFile + ".ll";
+        outputO = currentPath + "/"  + sourceFile + ".o";
+        outputS = currentPath + "/"  + sourceFile + ".s";
     }
 }
 

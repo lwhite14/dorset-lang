@@ -51,6 +51,8 @@ private:
     void error(std::string message);
 
     std::string removeFileExtension(std::string fileName);
+    std::string removeForwardSlashes(std::string filePath);
+    std::string removeBackSlashes(std::string filePath);
 
     void processFlag();
     void processFile();
