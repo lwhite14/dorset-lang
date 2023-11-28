@@ -344,9 +344,9 @@ void Compiler::outputBinaries()
     dest.flush();
 
 #if defined(_WIN64) || defined(_WIN32)
-    std::string cmd = "gcc " + options.outputO + " -o " + options.outputFinal;
+    std::string cmd = "clang " + options.outputO + " -o " + options.outputFinal;
 #else
-    std::string cmd = "gcc " + options.outputO + " -o " + options.outputFinal + " -no-pie";
+    std::string cmd = "clang " + options.outputO + " -o " + options.outputFinal + " -no-pie";
 #endif
 
     if (system(cmd.c_str()) != 0)

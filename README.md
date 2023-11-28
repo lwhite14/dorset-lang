@@ -38,9 +38,9 @@ fn main() void {
 
 ```
 ### Building
-Dorset requires cmake, LLVM, and of course a C++ compiler (gcc, msvc, clang).
+Dorset requires cmake, LLVM, and of course a C++ compiler (gcc, msvc, clang) to build. The dorsetc compiler uses clang, so you will need to install the clang package on Linux or install the pre-built LLVM binaries on Windows.
 > **Note**
-> It is recommended to use Clang. If building LLVM from source, make sure to include the Clang subproject.
+> It is recommended to use Clang for building dorset-lang. If building LLVM from source, make sure to include the Clang subproject.
 ```
 git clone https://github.com/lwhite14/dorset-lang.git
 cd dorset-lang
@@ -50,6 +50,7 @@ build/dorsetc --help
 ```
 
 ### Installing
+Consult the [install](./docs/INSTALL.md) pages for more detailed installation instructions.
 ```
 cmake --build build --config Release
 sudo cmake --install build --prefix /usr/local
