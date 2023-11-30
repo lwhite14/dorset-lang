@@ -353,7 +353,7 @@ void Compiler::outputBinaries()
     raw_fd_ostream dest(options.outputO, EC, sys::fs::OF_None);
 
     legacy::PassManager pass;
-    if (machine->addPassesToEmitFile(pass, dest, nullptr, CodeGenFileType::CGFT_ObjectFile)) 
+    if (machine->addPassesToEmitFile(pass, dest, nullptr, CodeGenFileType::ObjectFile)) 
     {
         ErrorHandler::error("can't emit object file");
         return;
