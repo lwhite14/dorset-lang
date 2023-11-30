@@ -343,6 +343,7 @@ AST::BlockAST *ASTBuilder::parseBlock(bool& hasReturn)
 
     while (currentToken().getType() != RIGHT_BRACE)
     {
+        AST::ExprAST* expr = nullptr;
         if (currentToken().getType() == _EOF)
         {
             ErrorHandler::error("a block has unexpectedly reached the end of the file", currentToken().getLine());
@@ -350,24 +351,27 @@ AST::BlockAST *ASTBuilder::parseBlock(bool& hasReturn)
         }
         else if (currentToken().getType() == LEFT_BRACE)
         {
-            AST::BlockAST* block = parseBlock(hasReturn);
-            Exprs.push_back(block);
+            expr = parseBlock(hasReturn);
         }
         else if (currentToken().getType() == IF)
         {
-            AST::ExprAST* expr = parseIfExpression(hasReturn);
-            Exprs.push_back(expr);
+            expr = parseIfExpression(hasReturn);
         }
         else if (currentToken().getType() == FOR)
         {
-            AST::ExprAST* expr = parseForExpression(hasReturn);
-            Exprs.push_back(expr);
+            expr = parseForExpression(hasReturn);
         }
         else
         {
-            AST::ExprAST* expr = parseExpression(hasReturn);
-            Exprs.push_back(expr);
+            expr = parseExpression(hasReturn);
         }
+
+        if (!expr)
+        {
+            ErrorHandler::error("parsing expression has failed", currentToken().getLine(), currentToken().getCharacter());
+            return nullptr;
+        }
+        Exprs.push_back(expr);
     }
 
     advanceToken(); // Eat '}'

@@ -127,7 +127,7 @@ void CompilerOptions::processFile()
             return;
         }
 
-        sourceFile = removeForwardSlashes(removeFileExtension(currentArgument()));
+        sourceFile = removeForwardSlashes(currentArgument());
         sourceFileLocation = std::filesystem::absolute(currentArgument()).generic_string();
         hasSourceFile = true;
     }
@@ -136,22 +136,22 @@ void CompilerOptions::processFile()
 void CompilerOptions::constructOutputBinaryNames()
 {
     std::string currentPath = std::filesystem::current_path().string();
+    std::string name; 
 
     if (hasOutputName)
     {
-        std::string name = removeFileExtension(outputFinal);
+        name = removeFileExtension(outputFinal);
         outputFinal = currentPath + "/" + outputFinal;
-        outputLL = currentPath + "/" + name + ".ll";
-        outputO = currentPath + "/"  + name + ".o";
-        outputS = currentPath + "/"  + name + ".s";
     }
     else
     {
-        outputFinal = currentPath + "/"  + sourceFile + ".out";
-        outputLL = currentPath + "/"  + sourceFile + ".ll";
-        outputO = currentPath + "/"  + sourceFile + ".o";
-        outputS = currentPath + "/"  + sourceFile + ".s";
+        name = removeFileExtension(sourceFile);
+        outputFinal = currentPath + "/" + name + ".out";
     }
+
+    outputLL = currentPath + "/" + name + ".ll";
+    outputO = currentPath + "/"  + name + ".o";
+    outputS = currentPath + "/"  + name + ".s"; 
 }
 
 CompilerOptions::CompilerOptions(std::vector<std::string> args) // For testing purproses
@@ -294,7 +294,7 @@ int Compiler::compile()
         {
             printTokens(tokens);
         }
-        AST::MasterAST::initializeModule(options.sourceFileLocation.c_str());
+        AST::MasterAST::initializeModule(options.sourceFile.c_str());
         AST::createExternalFunctions();
         buildAST(tokens);
 
