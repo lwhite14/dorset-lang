@@ -1,0 +1,15 @@
+fn newLine() void {
+    printf("\n", 0);
+}
+
+
+fn main() void {
+    array 3 numbers = (1, 3, 12);
+
+
+    var soloNumber = numbers[3];
+
+    printf("The third number in the array is: %f", soloNumber);
+    newLine();
+
+}

@@ -22,6 +22,7 @@ private:
     AST::ExprAST *parseIdentifierExpr();
     AST::ExprAST* parseVarExpr();
     AST::ExprAST* parseReturnExpr();
+    AST::ExprAST* parseArrayExpr();
     AST::ExprAST *parsePrimary();
     AST::ExprAST *parseBinOpRHS(int ExprPrec, AST::ExprAST *LHS);
     AST::ExprAST* parseUnary();

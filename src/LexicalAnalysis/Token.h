@@ -7,7 +7,7 @@ enum TokenType
 {
     // Single-character tokens.
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
-    COMMA, DOT, SEMICOLON,
+    COMMA, DOT, SEMICOLON, LEFT_SQUARE, RIGHT_SQUARE,
 
     // One or two character tokens.
                 EXCLAMATION_EQUAL,
@@ -28,7 +28,7 @@ enum TokenType
     // Keywords.
     AND, CLASS, ELSE, _FALSE, FUNCTION, FOR, IF, NIL, OR,
     PRINT, RETURN, SUPER, THIS, _TRUE, VAR, WHILE, EXTERN,
-    THEN, _IN,
+    THEN, _IN, ARRAY,
 
     // Types
     TYPE_VOID, TYPE_DOUBLE,
@@ -59,7 +59,8 @@ static std::map<std::string, enum TokenType> keywords = {
     {"then",   THEN},
     {"in",     _IN},
     {"binary", BINARY},
-    {"unary",  UNARY}
+    {"unary",  UNARY},
+    {"array",  ARRAY}
 };
 
 static std::map<std::string, enum TokenType> types = {

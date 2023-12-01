@@ -74,8 +74,32 @@ AST::ExprAST *ExpressionBuilder::parseIdentifierExpr()
 
     advanceToken(); // eat identifier.
 
+    if (currentToken().getType() == LEFT_SQUARE)
+    {
+        advanceToken(); // eat '['
+
+        if (currentToken().getType() != NUMBER)
+        {
+            ErrorHandler::error("expected number to identify index", currentToken().getLine(), currentToken().getCharacter());
+            return nullptr;
+        }
+        std::string arrayIndex = currentToken().getLiteral();
+        advanceToken(); // eat number
+
+        if (currentToken().getType() != RIGHT_SQUARE)
+        {
+            ErrorHandler::error("expected ']'", currentToken().getLine(), currentToken().getCharacter());
+            return nullptr;
+        }
+        advanceToken(); // eat ']'
+
+        return new AST::VariableExprAST(IdName + arrayIndex);
+    }
+
     if (currentToken().getType() != LEFT_PAREN) // Simple variable ref.
+    {
         return new AST::VariableExprAST(IdName);
+    }
 
     // Call.
     advanceToken(); // eat (
@@ -168,6 +192,53 @@ AST::ExprAST* ExpressionBuilder::parseReturnExpr()
     return new AST::ReturnExprAST(RetVal);
 }
 
+AST::ExprAST *ExpressionBuilder::parseArrayExpr()
+{
+    advanceToken(); // eat the array token
+
+    if (currentToken().getType() != NUMBER)
+    {
+        ErrorHandler::error("expected array size", currentToken().getLine(), currentToken().getCharacter());
+        return nullptr;
+    }
+    int size = std::stod(currentToken().getLexeme());
+    advanceToken(); // eat the array length / number
+
+    if (currentToken().getType() != IDENTIFIER)
+    {
+        ErrorHandler::error("expected array identifier", currentToken().getLine(), currentToken().getCharacter());
+        return nullptr;
+    }
+    std::string name = currentToken().getLexeme();
+    advanceToken(); // eat the identifier
+
+    if (currentToken().getType() != EQUAL)
+    {
+        ErrorHandler::error("expected '='", currentToken().getLine(), currentToken().getCharacter());
+        return nullptr;
+    }
+    advanceToken(); // eat the '='
+
+    if (currentToken().getType() != LEFT_PAREN)
+    {
+        ErrorHandler::error("expected '('", currentToken().getLine(), currentToken().getCharacter());
+        return nullptr;
+    }
+
+    std::vector<AST::ExprAST*> Exprs;
+    while (currentToken().getType() != RIGHT_PAREN)
+    {
+        advanceToken(); // eat comma or left paren
+
+        AST::ExprAST* Expr = parsePrimary();
+        Exprs.push_back(Expr);
+    }
+
+    advanceToken(); // eat the ')'
+
+    return new AST::ArrayExprAST(name, size, std::move(Exprs));
+}
+
 AST::ExprAST *ExpressionBuilder::parsePrimary()
 {
     if (currentToken().getType() == IDENTIFIER)
@@ -198,6 +269,11 @@ AST::ExprAST *ExpressionBuilder::parsePrimary()
     else if (currentToken().getType() == RETURN) 
     {
         auto Expr = parseReturnExpr();
+        return Expr;
+    }
+    else if (currentToken().getType() == ARRAY)
+    {
+        auto Expr = parseArrayExpr();
         return Expr;
     }
     else

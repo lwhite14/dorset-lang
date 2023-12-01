@@ -82,6 +82,14 @@ void Lexer::scanToken()
     {
         addToken(BACK_SLASH);
     }
+    else if (c == '[') 
+    {
+        addToken(LEFT_SQUARE);
+    }
+    else if (c == ']') 
+    {
+        addToken(RIGHT_SQUARE);
+    }
     else if (c == '!')
     {
         addToken(match('=') ? EXCLAMATION_EQUAL : EXCLAMATION);

@@ -40,8 +40,8 @@ using namespace llvm;
 namespace AST
 {
     Value *logError(std::string message);
-    Function* getFunction(std::string Name);
-    AllocaInst* CreateEntryBlockAlloca(Function* TheFunction, const std::string& VarName);
+    Function *getFunction(std::string Name);
+    AllocaInst *CreateEntryBlockAlloca(Function *TheFunction, const std::string &VarName, Type* type);
    
 
     /// ExprAST - Base class for all expression nodes.
@@ -73,7 +73,7 @@ namespace AST
         Value *codegen() override;
     };
 
-    /// VariableExprAST - Expression class for referencing a variable, like "a".
+    /// VariableExprAST - Expression class variable references 'x = 4'
     class VariableExprAST : public ExprAST
     {
     private:
@@ -85,7 +85,7 @@ namespace AST
         const std::string& getName();
     };
 
-    /// VarExprAST - Expression class for var/in
+    /// VarExprAST - Expression class for variables 'var x = 3'
     class VarExprAST : public ExprAST 
     {
         std::string Name;
@@ -95,6 +95,23 @@ namespace AST
         VarExprAST(std::string Name, ExprAST* Init);
 
         Value* codegen() override;
+    };
+
+
+    // ArrayExprAST - Expression class for double arrays
+    class ArrayExprAST : public ExprAST 
+    {
+        std::string Name;
+        int Size;
+        std::vector<ExprAST*> Values;
+        std::vector<VarExprAST*> ArrayElements;
+
+    public:
+        ArrayExprAST(std::string Name, int Size, std::vector<ExprAST*> Values);
+
+        Value* codegen() override;
+        ExprAST* getElement(int i);
+
     };
 
     /// BinaryExprAST - Expression class for a binary operator.

@@ -27,11 +27,13 @@ namespace AST
         return nullptr;
     }
 
-    AllocaInst *CreateEntryBlockAlloca(Function *TheFunction, const std::string &VarName)
+    AllocaInst *CreateEntryBlockAlloca(Function *TheFunction, const std::string &VarName, Type* type)
     {
         IRBuilder<> TmpB(&TheFunction->getEntryBlock(), TheFunction->getEntryBlock().begin());
-        return TmpB.CreateAlloca(Type::getDoubleTy(*MasterAST::TheContext), nullptr, VarName);
+        return TmpB.CreateAlloca(type, nullptr, VarName);
+        // return TmpB.CreateAlloca(Type::getDoubleTy(*MasterAST::TheContext), nullptr, VarName);
     }
+
 
     void MasterAST::initializeModule(const char *moduleName)
     {
@@ -115,7 +117,7 @@ namespace AST
             InitVal = Init->codegen();
             if (InitVal == nullptr)
             { 
-                logError("variable initialization has failed");
+                return logError("variable initialization has failed");
             }
 
         }
@@ -125,7 +127,7 @@ namespace AST
         }
 
 
-        AllocaInst *Alloca = CreateEntryBlockAlloca(TheFunction, Name);
+        AllocaInst *Alloca = CreateEntryBlockAlloca(TheFunction, Name, Type::getDoubleTy(*MasterAST::TheContext));
         MasterAST::Builder->CreateStore(InitVal, Alloca);
 
         // Remember this binding.
@@ -133,6 +135,30 @@ namespace AST
 
         // Return the body computation.
         return InitVal;
+    }
+
+    ArrayExprAST::ArrayExprAST(std::string Name, int Size, std::vector<ExprAST*> Values)
+        : Name(Name), Size(Size), Values(Values)
+    {       
+        for (unsigned int i = 0; i < Values.size(); i++)
+        {
+            ArrayElements.push_back(new VarExprAST(Name + std::to_string(i), Values[i]));
+        }
+    }
+
+    Value* ArrayExprAST::codegen()
+    {
+        for (unsigned int i = 0; i < ArrayElements.size(); i++)
+        {
+            ArrayElements[i]->codegen();
+        }
+
+        return Constant::getNullValue(Type::getDoubleTy(*MasterAST::TheContext));
+    }
+
+    ExprAST* ArrayExprAST::getElement(int i)
+    {
+        return Values[i];
     }
 
     BinaryExprAST::BinaryExprAST(char Op, ExprAST *LHS, ExprAST *RHS)
@@ -321,7 +347,7 @@ namespace AST
         for (auto &Arg : TheFunction->args())
         {
             // Create an alloca for this variable.
-            AllocaInst *Alloca = CreateEntryBlockAlloca(TheFunction, Arg.getName().str());
+            AllocaInst *Alloca = CreateEntryBlockAlloca(TheFunction, Arg.getName().str(), Type::getDoubleTy(*MasterAST::TheContext));
 
             // Store the initial value into the alloca.
             MasterAST::Builder->CreateStore(&Arg, Alloca);
@@ -428,7 +454,7 @@ namespace AST
         Function *TheFunction = MasterAST::Builder->GetInsertBlock()->getParent();
 
         // Create an alloca for the variable in the entry block.
-        AllocaInst *Alloca = CreateEntryBlockAlloca(TheFunction, VarName);
+        AllocaInst *Alloca = CreateEntryBlockAlloca(TheFunction, VarName, Type::getDoubleTy(*MasterAST::TheContext));
 
         // Emit the start code first, without 'variable' in scope.
         Value *StartVal = Start->codegen();
@@ -561,7 +587,7 @@ namespace AST
         {
             if (!Exprs[i]->codegen())
             {
-                logError("expression in block failed");
+                return logError("expression in block failed");
             }
         }
 
