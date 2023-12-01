@@ -4,12 +4,23 @@ fn newLine() void {
 
 
 fn main() void {
-    array 3 numbers = (1, 3, 12);
+    var numbers[3] = (1, 3, 12);
 
+    var soloNumber = numbers[2];
 
-    var soloNumber = numbers[3];
-
-    printf("The third number in the array is: %f", soloNumber);
+    printf("The third number in the first array is: %f", soloNumber);
     newLine();
 
+
+    var numbersTwo[2];
+    soloNumber = numbersTwo[1];
+
+    printf("The first number in the second array is: %f", soloNumber);
+    newLine();
+
+    numbersTwo[1] = 3;
+    soloNumber = numbersTwo[1];
+
+    printf("This new number should be 3: %f", soloNumber);
+    newLine();
 }
