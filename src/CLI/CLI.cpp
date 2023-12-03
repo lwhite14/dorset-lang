@@ -334,6 +334,8 @@ void Compiler::outputBinaries()
     TargetOptions opt = TargetOptions();
     TargetMachine *machine = target->createTargetMachine(triple, "generic", "", opt, std::optional<Reloc::Model>());
 
+    AST::MasterAST::TheModule->setDataLayout(machine->createDataLayout());
+
     // Generate the LLVM IR file
     if (options.generateLLVMIR || !options.deleteBinaries)
     {
