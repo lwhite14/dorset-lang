@@ -250,6 +250,7 @@ namespace AST
             return MasterAST::Builder->CreateCall(CalleeF, ArgsV, "calltmp");
     }
 
+
     PrototypeAST::PrototypeAST(const std::string& Name, std::vector<std::string> Args, std::string ReturnType, bool IsOperator, unsigned Prec)
         : Name(Name), Args(std::move(Args)), IsOperator(IsOperator), Precedence(Prec), ReturnType(ReturnType)
     {
@@ -604,5 +605,22 @@ namespace AST
                                                       /* return type */ MasterAST::Builder->getDoubleTy(),
                                                       /* format arg */ {bytePtrTy, doubleTy},
                                                       /* vararg */ true));
+
+
+        createNewLineFunction();
+    }
+
+    void createNewLineFunction()
+    {
+        PrototypeAST* proto = new PrototypeAST("newLine", std::vector<std::string>(), "void");
+        std::vector<ExprAST*> args;
+        args.push_back(new StringExprAST("\n"));
+        args.push_back(new NumberExprAST(0));
+        std::vector<ExprAST*> exprs;
+        exprs.push_back(new AST::CallExprAST("printf", std::move(args)));
+        BlockAST* block = new BlockAST(exprs);
+        FunctionAST* function = new FunctionAST(proto, block);
+
+        function->codegen();
     }
 }

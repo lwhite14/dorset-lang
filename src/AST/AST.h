@@ -256,4 +256,5 @@ namespace AST
     };
 
     void createExternalFunctions();
+    void createNewLineFunction();
 }
