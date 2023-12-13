@@ -2,6 +2,14 @@
 
 # Install
 
+- [Install](#install)
+  - [Requirements](#requirements)
+  - [LLVM](#llvm)
+    - [LLVM Packages](#llvm-packages)
+    - [LLVM from Source](#llvm-from-source)
+  - [Building from Source](#building-from-source)
+  - [Installing Pre-Built Binaries](#installing-pre-built-binaries)
+
 ## Requirements
 For using dorsetc:
  - Clang/GCC (you can use a package or pre-built binary).
@@ -15,18 +23,9 @@ For building dorset-lang from source:
 > You can use Clang or GCC for the final compilation stage. <br>
 > Use the CMake variable -DDORSET_OBJECT_COMPILER to switch between the two before compiling dorsetc. The default is GCC.
 
-## Installing Pre-Built Binaries
+## LLVM
 
-Pre-built binaries have been provided for Linux platforms, however, these are experimental and are subject to bugs. You may need to update libstdc++ to use dorsetc:
-```
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-sudo apt-get update
-sudo apt-get install --only-upgrade libstdc++6
-```
-
-Install dorsetc in <em>/usr/local/bin</em> and libdorsetDriver.a into <em>/usr/local/lib</em>.
-
-## Using LLVM Packages
+### LLVM Packages
 
 To use dorsetc, you will need to build it from source which requires LLVM libraries. <br>
 
@@ -44,7 +43,7 @@ This process is similar for other versions of Ubuntu or Debian, but will change 
 
 Now that you have all the needed packages for building dorsetc, you can [build from source](#building-from-source).
 
-## Building LLVM from Source
+### LLVM from Source
 
 You can always take the plunge and build LLVM from source. If so, make sure to build LLVM 18 (18.0.0), and include the subprojects LLVM, Clang, lld, and clang-tools-extra. Make sure to include all targets and include M68k and Xtensa experimental targets.
 ```
@@ -67,7 +66,7 @@ After installing LLVM, you can start the process of [building dorset-lang from s
 ```
 git clone https://github.com/lwhite14/dorset-lang.git
 cd dorset-lang
-cmake -B build -S . -DCMAKE_C_COMPILER="/usr/bin/clang-18" -DCMAKE_CXX_COMPILER="/usr/bin/clang++-18" -DLLVM_DIR="/usr/lib/llvm-18/cmake"
+cmake -B build -DCMAKE_C_COMPILER="/usr/bin/clang-18" -DCMAKE_CXX_COMPILER="/usr/bin/clang++-18" -DLLVM_DIR="/usr/lib/llvm-18/cmake" dorsetc
 cmake --build build --config Release
 ```
 > **Note**
@@ -76,6 +75,17 @@ cmake --build build --config Release
 
 Now you can install:
 ```
-sudo cmake --install build
+sudo cmake --install build --config Release
 dorsetc --version
 ```
+
+## Installing Pre-Built Binaries
+
+Pre-built binaries have been provided for Linux platforms, however, these are experimental and are subject to bugs. You may need to update libstdc++ to use dorsetc:
+```
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt-get update
+sudo apt-get install --only-upgrade libstdc++6
+```
+
+Install dorsetc in <em>/usr/local/bin</em> and libdorsetDriver.a into <em>/usr/local/lib</em>.

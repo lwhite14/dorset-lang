@@ -6,6 +6,26 @@ All notable changes to this project will be documented in this file. The format 
 
 Unreleased is the develop branch which includes every unmerged change from the last release version. These changes will be untested and may be potentially unstable, build this version at your own risk.
 
+## [0.2.0-alpha] - 2023-12-13
+
+### Added
+ - Install docs pages.
+ - Optional else block for if statements.
+ - Users can choose which binary to compile the final object file.
+ - Very simple arrays.
+ - In-built newLine function.
+ - In-built print function.
+
+### Fixed
+ - Final outputs binaries are outputted in the same directory that dorsetc is called in.
+
+### Changed 
+ - Renamed compiler to 'dorsetc'
+ - Compile to object file directly without system calls.
+ - Module ID for LLVM IR file is now just the file name.
+ - dorsetc outputs .exe and .obj files for Windows.
+
+
 ## [0.1.5-alpha] - 2023-11-25
 
 ### Added
@@ -126,7 +146,8 @@ Unreleased is the develop branch which includes every unmerged change from the l
         - -v: printing the version.
 
 
-[unreleased]: https://github.com/lwhite14/dorset-lang/compare/0.1.5-alpha...develop
+[unreleased]: https://github.com/lwhite14/dorset-lang/compare/0.2.0-alpha...develop
+[0.2.0-alpha]: https://github.com/lwhite14/dorset-lang/releases/tag/0.2.0-alpha
 [0.1.5-alpha]: https://github.com/lwhite14/dorset-lang/releases/tag/0.1.5-alpha
 [0.1.4-alpha]: https://github.com/lwhite14/dorset-lang/releases/tag/0.1.4-alpha
 [0.1.3-alpha]: https://github.com/lwhite14/dorset-lang/releases/tag/0.1.3-alpha

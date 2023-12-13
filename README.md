@@ -6,10 +6,6 @@ Very fragile, handle with care :worried:
 
 ### Syntax
 ```
-fn newLine() void {
-    printf("\n", 0);
-}
-
 fn binary>10(L, R) double {
     return R < L;
 }
@@ -24,11 +20,11 @@ fn main() void {
 
     if (numAfterCalc > 3)
     {
-        printf("Our calculation results in a number bigger than 3!", 0);
+        print("Our calculation results in a number bigger than 3!");
     }
     else
     {
-        printf("Our calculation results in a number smaller than 3...", 0);
+        print("Our calculation results in a number smaller than 3...");
     }
 
     newLine();
