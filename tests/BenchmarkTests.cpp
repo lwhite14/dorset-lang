@@ -25,9 +25,9 @@ void compileTest1()
 void runTest1()
 {
 #if defined(_WIN64) || defined(_WIN32)
-    system("\"src\\benchmarkTest_1.out\"");
+    system("\"benchmarkTest_1.out\"");
 #else
-    system("src/benchmarkTest_1.out");
+    system("benchmarkTest_1.out");
 #endif
 }
 
@@ -44,9 +44,9 @@ void compileTest2()
 void runTest2()
 {
 #if defined(_WIN64) || defined(_WIN32)
-    system("\"src\\benchmarkTest_2.out\"");
+    system("\"benchmarkTest_2.out\"");
 #else
-    system("src/benchmarkTest_2.out");
+    system("benchmarkTest_2.out");
 #endif
 }
 
@@ -63,9 +63,9 @@ void compileTest3()
 void runTest3()
 {
 #if defined(_WIN64) || defined(_WIN32)
-    system("\"src\\benchmarkTest_3.out\"");
+    system("\"benchmarkTest_3.out\"");
 #else
-    system("src/benchmarkTest_3.out");
+    system("benchmarkTest_3.out");
 #endif
 }
 
@@ -82,9 +82,9 @@ void compileTest4()
 void runTest4()
 {
 #if defined(_WIN64) || defined(_WIN32)
-    system("\"src\\benchmarkTest_4.out\"");
+    system("\"benchmarkTest_4.out\"");
 #else
-    system("src/benchmarkTest_4.out");
+    system("benchmarkTest_4.out");
 #endif
 }
 
