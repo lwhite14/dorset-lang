@@ -23,10 +23,10 @@ jobs:
       - name: Emit Version
         run: build/dorsetc --version
 
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: dorset-lang-build
-          path: |
-            build/dorsetc
-            build/libdorsetDriver.a
+      # - name: Upload Artifacts
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: dorset-lang-build
+      #     path: |
+      #       build/dorsetc
+      #       build/libdorsetDriver.a

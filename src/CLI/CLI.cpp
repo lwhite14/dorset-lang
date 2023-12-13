@@ -146,11 +146,21 @@ void CompilerOptions::constructOutputBinaryNames()
     else
     {
         name = removeFileExtension(sourceFile);
+
+#if defined(_WIN64) || defined(_WIN32)
+        outputFinal = currentPath + "/" + name + ".exe";
+#else
         outputFinal = currentPath + "/" + name + ".out";
+#endif
+
     }
 
     outputLL = currentPath + "/" + name + ".ll";
+#if defined(_WIN64) || defined(_WIN32)
+    outputO = currentPath + "/"  + name + ".obj";
+#else
     outputO = currentPath + "/"  + name + ".o";
+#endif
     outputS = currentPath + "/"  + name + ".s"; 
 }
 
