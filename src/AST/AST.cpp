@@ -250,8 +250,35 @@ namespace AST
             return MasterAST::Builder->CreateCall(CalleeF, ArgsV, "calltmp");
     }
 
+    PrototypeArgumentAST::PrototypeArgumentAST(std::string Name, std::string ArgType)
+        : Name(Name)
+    {
+        if (ArgType == "double")
+        {
+            this->ArgType = MasterAST::Builder->getDoubleTy();
+        }
+        else if (ArgType == "string")
+        {
+            this->ArgType = MasterAST::Builder->getInt8Ty()->getPointerTo();
+        }
+        else
+        {
+            ErrorHandler::warning("could not parse argument type: " + Name + ", double assumed");
+            this->ArgType = MasterAST::Builder->getDoubleTy(); 
+        }
+    }
 
-    PrototypeAST::PrototypeAST(const std::string& Name, std::vector<std::string> Args, std::string ReturnType, bool IsOperator, unsigned Prec)
+    std::string PrototypeArgumentAST::getName()
+    {
+        return Name;
+    }
+
+    Type* PrototypeArgumentAST::getType()
+    {
+        return ArgType;
+    }
+
+    PrototypeAST::PrototypeAST(const std::string& Name, std::vector<PrototypeArgumentAST*> Args, std::string ReturnType, bool IsOperator, unsigned Prec)
         : Name(Name), Args(std::move(Args)), IsOperator(IsOperator), Precedence(Prec), ReturnType(ReturnType)
     {
     }
@@ -269,7 +296,13 @@ namespace AST
     Function *PrototypeAST::codegen()
     {
         // Make the function type:  double(double,double) etc.
-        std::vector<Type *> Doubles(Args.size(), Type::getDoubleTy(*MasterAST::TheContext));
+        // std::vector<Type *> Doubles(Args.size(), Type::getDoubleTy(*MasterAST::TheContext));
+
+        std::vector<Type*> ArgsTypes;
+        for (unsigned int i = 0; i < Args.size(); i++)
+        {
+            ArgsTypes.push_back(Args[i]->getType());
+        }
 
         llvm::Type* type;
 
@@ -286,14 +319,14 @@ namespace AST
             type = Type::getVoidTy(*MasterAST::TheContext);
         }
 
-        FunctionType* FT = FunctionType::get(type, Doubles, false);
+        FunctionType* FT = FunctionType::get(type, ArgsTypes, false);
         Function* F = Function::Create(FT, Function::ExternalLinkage, Name, MasterAST::TheModule);
 
         // Set names for all arguments.
         unsigned Idx = 0;
         for (auto &Arg : F->args())
         {
-            Arg.setName(Args[Idx++]);
+            Arg.setName(Args[Idx++]->getName());
         }
 
         return F;
@@ -607,12 +640,13 @@ namespace AST
                                                       /* vararg */ true));
 
 
+        createPrintFunction();
         createNewLineFunction();
     }
 
     void createNewLineFunction()
     {
-        PrototypeAST* proto = new PrototypeAST("newLine", std::vector<std::string>(), "void");
+        PrototypeAST* proto = new PrototypeAST("newLine", std::vector<PrototypeArgumentAST*>(), "void");
         std::vector<ExprAST*> args;
         args.push_back(new StringExprAST("\n"));
         args.push_back(new NumberExprAST(0));
@@ -622,5 +656,37 @@ namespace AST
         FunctionAST* function = new FunctionAST(proto, block);
 
         function->codegen();
+    }
+
+    void createPrintFunction()
+    {
+        std::vector<PrototypeArgumentAST*> protoArgs;
+        protoArgs.push_back(new PrototypeArgumentAST("STR", "string"));
+
+        PrototypeAST* proto = new PrototypeAST("print", protoArgs, "void");
+
+        auto& P = *proto;
+        MasterAST::FunctionProtos[proto->getName()] = std::move(proto);
+        Function* TheFunction = getFunction(P.getName());
+
+        BasicBlock* BB = BasicBlock::Create(*MasterAST::TheContext, "entry", TheFunction);
+        MasterAST::Builder->SetInsertPoint(BB);
+
+        MasterAST::NamedValues.clear();
+
+        Value* stringVal = TheFunction->args().begin();
+
+        Function* CalleeF = getFunction("printf");
+
+        std::vector<Value*> ArgsV;
+        ArgsV.push_back(stringVal);
+        double val = 0;
+        ArgsV.push_back(ConstantFP::get(*MasterAST::TheContext, APFloat(val)));
+
+        MasterAST::Builder->CreateCall(CalleeF, ArgsV, "calltmp");      
+
+        MasterAST::Builder->CreateRet(nullptr);
+
+        verifyFunction(*TheFunction);
     }
 }

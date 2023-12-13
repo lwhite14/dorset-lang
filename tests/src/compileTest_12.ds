@@ -1,0 +1,8 @@
+fn main() void {
+    print("Hello World!");
+    newLine();
+
+    print("This should be on a new line!");
+    newLine();
+
+}

@@ -27,7 +27,7 @@ enum TokenType
 
     // Keywords.
     AND, CLASS, ELSE, _FALSE, FUNCTION, FOR, IF, NIL, OR,
-    PRINT, RETURN, SUPER, THIS, _TRUE, VAR, WHILE, EXTERN,
+    RETURN, SUPER, THIS, _TRUE, VAR, WHILE, EXTERN,
     THEN, _IN, 
 
     // Types
@@ -48,7 +48,6 @@ static std::map<std::string, enum TokenType> keywords = {
     {"if",     IF},
     {"nil",    NIL},
     {"or",     OR},
-    {"print",  PRINT},
     {"return", RETURN},
     {"super",  SUPER},
     {"this",   THIS},

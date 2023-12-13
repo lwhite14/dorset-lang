@@ -286,10 +286,10 @@ AST::PrototypeAST *ASTBuilder::parsePrototype()
     }
 
     advanceToken(); // Move to first argument in argument list.
-    std::vector<std::string> ArgNames;
+    std::vector<AST::PrototypeArgumentAST*> Args;
     while (currentToken().getType() == IDENTIFIER)
     {
-        ArgNames.push_back(currentToken().getLexeme());
+        Args.push_back(new AST::PrototypeArgumentAST(currentToken().getLexeme(), "double"));
         advanceToken(); // Move to comma or right parethesis
         if (currentToken().getType() != COMMA)
         {
@@ -320,13 +320,13 @@ AST::PrototypeAST *ASTBuilder::parsePrototype()
     advanceToken(); // eat type declaration.
 
     // Verify right number of names for operator.
-    if (Kind && ArgNames.size() != Kind)
+    if (Kind && Args.size() != Kind)
     {
         ErrorHandler::error("invalid number of operands for operator", currentToken().getLine(), currentToken().getCharacter());
         return nullptr;
     }
 
-    return new AST::PrototypeAST(FnName, std::move(ArgNames), returnType, Kind != 0, BinaryPrecedence);
+    return new AST::PrototypeAST(FnName, std::move(Args), returnType, Kind != 0, BinaryPrecedence);
 }
 
 

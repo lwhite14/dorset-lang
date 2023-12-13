@@ -149,17 +149,28 @@ namespace AST
         Value *codegen() override;
     };
 
+    class PrototypeArgumentAST {
+        std::string Name;
+        Type* ArgType;
+
+    public:
+        PrototypeArgumentAST(std::string Name, std::string ArgType);
+
+        std::string getName();
+        Type* getType();
+    };
+
     /// PrototypeAST - This class represents the "prototype" for a function,
     /// which captures its argument names as well as if it is an operator.
     class PrototypeAST {
         std::string Name;
-        std::vector<std::string> Args;
+        std::vector<PrototypeArgumentAST*> Args;
         bool IsOperator;
         unsigned Precedence;
         std::string ReturnType;
 
     public:
-        PrototypeAST(const std::string& Name, std::vector<std::string> Args, std::string ReturnType, bool IsOperator = false, unsigned Prec = 0);
+        PrototypeAST(const std::string& Name, std::vector<PrototypeArgumentAST*> Args, std::string ReturnType, bool IsOperator = false, unsigned Prec = 0);
 
         Function* codegen();
         const std::string& getName() const;
@@ -257,4 +268,5 @@ namespace AST
 
     void createExternalFunctions();
     void createNewLineFunction();
+    void createPrintFunction();
 }

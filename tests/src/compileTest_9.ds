@@ -2,10 +2,6 @@ fn binary>10(LHS, RHS) double {
     return RHS < LHS;
 }
 
-fn newLine() void {
-    printf("\n", 0);
-}
-
 fn test() double {
     for (i = 1, i < 10, 1.0)
     {
