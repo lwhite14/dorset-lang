@@ -17,11 +17,11 @@ jobs:
         run: cmake --build build --config Release
 
       - name: Test
-        working-directory: build
+        working-directory: build/test
         run: ctest --build-config Release --verbose
 
       - name: Emit Version
-        run: build/dorsetc --version
+        run: build/bin/dorsetc/dorsetc --version
 
       # - name: Upload Artifacts
       #   uses: actions/upload-artifact@v3

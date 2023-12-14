@@ -40,9 +40,9 @@ Dorset requires cmake, LLVM, and of course a C++ compiler (gcc, msvc, clang) to 
 ```
 git clone https://github.com/lwhite14/dorset-lang.git
 cd dorset-lang
-cmake -B build -S . -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+cmake -B build -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ dorsetc
 cmake --build build
-build/dorsetc --help
+build/bin/dorsetc/dorsetc --help
 ```
 
 ### Installing

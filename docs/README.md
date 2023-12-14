@@ -48,7 +48,7 @@ git clone --branch 0.2.0-alpha https://github.com/lwhite14/dorset-lang.git
 ```
 Configure the CMake cache:
 ```
-cmake -B build -S . -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+cmake -B build -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ dorsetc
 ```
 Build dorset-lang:
 ```

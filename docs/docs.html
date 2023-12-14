@@ -99,11 +99,12 @@
                     <li>LLVM.</li>
                     <li>C++ Compiler (Clang comes with LLVM).</li>
                 </ol>
+
                 <h3>Building</h3>
                 <p>
                     You will need an install of LLVM to use the dorset compiler. You can find more information on building and installing LLVM and Clang <a href="https://llvm.org/docs/GettingStarted.html">here</a><br>
                     First, clone the dorset-lang repository. It is advised to clone from a stable version:<br> <i>git clone --branch 0.2.0-alpha https://github.com/lwhite14/dorset-lang.git</i><br>
-                    Configure the CMake cache:<br> <i>cmake -B build -S . -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++</i><br>
+                    Configure the CMake cache:<br> <i>cmake -B build -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ dorsetc</i><br>
                     Build dorset-lang:<br> <i>cmake --build build --config Release</i><br>
                     And install dorset-lang:<br> <i>sudo cmake --install build --prefix /usr/local</i><br>
                 </p>

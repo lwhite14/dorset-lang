@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file. The format 
 
 Unreleased is the develop branch which includes every unmerged change from the last release version. These changes will be untested and may be potentially unstable, build this version at your own risk.
 
-## [0.2.0-alpha] - 2023-12-13
+## [0.2.0-alpha] - 2023-12-14
 
 ### Added
  - Install docs pages.
