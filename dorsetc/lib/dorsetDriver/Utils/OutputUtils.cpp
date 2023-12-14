@@ -31,7 +31,7 @@ void printUsage()
 
 void printVersion()
 {
-    std::cout << "dorset-lang " << Version.to_string() << std::endl;
+    std::cout << "dorset-lang " << getVersion().to_string() << std::endl;
 
     std::string commit = GIT_COMMIT_HASH;
 

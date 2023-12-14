@@ -1,6 +1,7 @@
 add_library(dorsetDriver STATIC
     Utils/Error.cpp
     Utils/OutputUtils.cpp
+    Utils/Version.cpp
     LexicalAnalysis/Lexer.cpp
     LexicalAnalysis/Token.cpp
     Builder/ASTBuilder.cpp
