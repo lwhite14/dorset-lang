@@ -2,6 +2,8 @@
 
 #include <dorset-lang/Driver/CLI.h>
 
+using namespace Dorset;
+
 using std::chrono::high_resolution_clock;
 using std::chrono::duration_cast;
 using std::chrono::duration;

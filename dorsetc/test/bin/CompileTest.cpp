@@ -3,6 +3,8 @@
 
 #include <dorset-lang/Driver/CLI.h>
 
+using namespace Dorset;
+
 void resetGlobals()
 {
 	ErrorHandler::HadError = false;

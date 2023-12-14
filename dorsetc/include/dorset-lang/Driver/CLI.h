@@ -13,75 +13,78 @@
 #include <dorset-lang/AST/AST.h>
 #include <dorset-lang/Builder/ASTBuilder.h>
 
-static bool fileExists(std::string fileName);
-
-class CompilerOptions
+namespace Dorset
 {
-private:
-    std::vector<std::string> arguments;
+    static bool fileExists(std::string fileName);
 
-    int currentArgumentIndex = 0;
+    class CompilerOptions
+    {
+    private:
+        std::vector<std::string> arguments;
 
-    bool hasSourceFile = false;
-    bool hasRawCode = false;
+        int currentArgumentIndex = 0;
 
-    bool isHelp = false;
-    bool isVersion = false;
-    bool isTokens = false;
-    bool hasOutputName = false;
-    bool isLibrary = false;
-    bool generateLLVMIR = false;
-    bool deleteBinaries = true;
+        bool hasSourceFile = false;
+        bool hasRawCode = false;
 
-    bool hadError = false;
+        bool isHelp = false;
+        bool isVersion = false;
+        bool isTokens = false;
+        bool hasOutputName = false;
+        bool isLibrary = false;
+        bool generateLLVMIR = false;
+        bool deleteBinaries = true;
 
-    std::string sourceFile = "output";
-    std::string sourceFileLocation = "output";
+        bool hadError = false;
 
-    std::string outputLL;
-    std::string outputS;
-    std::string outputO;
-    std::string outputFinal;
+        std::string sourceFile = "output";
+        std::string sourceFileLocation = "output";
 
-    std::string rawCode = "";
+        std::string outputLL;
+        std::string outputS;
+        std::string outputO;
+        std::string outputFinal;
 
-    void advanceArgument();
-    std::string currentArgument();
-    bool isAtEnd();
-    void error(std::string message);
+        std::string rawCode = "";
 
-    std::string removeFileExtension(std::string fileName);
-    std::string removeForwardSlashes(std::string filePath);
-    std::string removeBackSlashes(std::string filePath);
+        void advanceArgument();
+        std::string currentArgument();
+        bool isAtEnd();
+        void error(std::string message);
 
-    void processFlag();
-    void processFile();
+        std::string removeFileExtension(std::string fileName);
+        std::string removeForwardSlashes(std::string filePath);
+        std::string removeBackSlashes(std::string filePath);
 
-    void constructOutputBinaryNames();
+        void processFlag();
+        void processFile();
 
-public:
-    CompilerOptions(int argc, char *argv[]);
-    CompilerOptions(std::vector<std::string> args); // For testing purproses
+        void constructOutputBinaryNames();
 
-    bool getHadError();
+    public:
+        CompilerOptions(int argc, char *argv[]);
+        CompilerOptions(std::vector<std::string> args); // For testing purproses
 
-    friend class Compiler;
-};
+        bool getHadError();
 
-class Compiler
-{
-private:
-    CompilerOptions options;
+        friend class Compiler;
+    };
 
-    std::string getSourceContents(std::string fileName);
-    std::vector<Token> lex(std::string contents);
-    void buildAST(std::vector<Token> tokens);
+    class Compiler
+    {
+    private:
+        CompilerOptions options;
 
-    void outputBinaries();
-    void removeBinaries();
+        std::string getSourceContents(std::string fileName);
+        std::vector<Token> lex(std::string contents);
+        void buildAST(std::vector<Token> tokens);
 
-public:
-    Compiler(CompilerOptions options);
+        void outputBinaries();
+        void removeBinaries();
 
-    int compile();
-};
+    public:
+        Compiler(CompilerOptions options);
+
+        int compile();
+    };
+}

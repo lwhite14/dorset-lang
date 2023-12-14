@@ -4,4 +4,7 @@
 
 using namespace semver;
 
-version getVersion();
+namespace Dorset
+{
+    version getVersion();
+}

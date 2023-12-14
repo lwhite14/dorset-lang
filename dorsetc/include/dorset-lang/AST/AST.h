@@ -36,236 +36,239 @@
 
 using namespace llvm;
 
-namespace AST
+namespace Dorset
 {
-    Value *logError(std::string message);
-    Function *getFunction(std::string Name);
-    AllocaInst *CreateEntryBlockAlloca(Function *TheFunction, const std::string &VarName, Type* type);
-   
-
-    /// ExprAST - Base class for all expression nodes.
-    class ExprAST
+    namespace AST
     {
-    public:
-        virtual ~ExprAST() = default;
-        virtual Value *codegen() = 0;
-    };
+        Value *logError(std::string message);
+        Function *getFunction(std::string Name);
+        AllocaInst *CreateEntryBlockAlloca(Function *TheFunction, const std::string &VarName, Type* type);
+    
 
-    /// NumberExprAST - Expression class for numeric literals like "1.0".
-    class NumberExprAST : public ExprAST
-    {
-    private:
-        double Val;
-
-    public:
-        NumberExprAST(double Val);
-        Value *codegen() override;
-    };
-
-    class StringExprAST : public ExprAST
-    {
-    private:
-        std::string Val;
-
-    public:
-        StringExprAST(std::string Val);
-        Value *codegen() override;
-    };
-
-    /// VariableExprAST - Expression class variable references 'x = 4'
-    class VariableExprAST : public ExprAST
-    {
-    private:
-        std::string Name;
-
-    public:
-        VariableExprAST(const std::string &Name);
-        Value *codegen() override;
-        const std::string& getName();
-    };
-
-    /// VarExprAST - Expression class for variables 'var x = 3'
-    class VarExprAST : public ExprAST 
-    {
-        std::string Name;
-        ExprAST* Init;
-
-    public:
-        VarExprAST(std::string Name, ExprAST* Init);
-
-        Value* codegen() override;
-    };
-
-
-    // ArrayExprAST - Expression class for double arrays
-    class ArrayExprAST : public ExprAST 
-    {
-        std::string Name;
-        int Size;
-        std::vector<ExprAST*> Values;
-        std::vector<VarExprAST*> ArrayElements;
-
-    public:
-        ArrayExprAST(std::string Name, int Size, std::vector<ExprAST*> Values);
-
-        Value* codegen() override;
-        ExprAST* getElement(int i);
-
-    };
-
-    /// BinaryExprAST - Expression class for a binary operator.
-    class BinaryExprAST : public ExprAST
-    {
-    private:
-        char Op;
-        ExprAST *LHS;
-        ExprAST *RHS;
-
-    public:
-        BinaryExprAST(char Op, ExprAST *LHS, ExprAST *RHS);
-        Value *codegen() override;
-    };
-
-    /// CallExprAST - Expression class for function calls.
-    class CallExprAST : public ExprAST
-    {
-    private:
-        std::string Callee;
-        std::vector<ExprAST *> Args;
-
-    public:
-        CallExprAST(const std::string &Callee, std::vector<ExprAST *> Args);
-        Value *codegen() override;
-    };
-
-    /// BlockAST - Represents a block, '{ }'.
-    class BlockAST : public ExprAST { 
-        std::vector<ExprAST*> Exprs;
-
-    public:
-        BlockAST(std::vector<ExprAST*> Exprs);
-
-        Value *codegen() override;
-    };
-
-    class PrototypeArgumentAST {
-        std::string Name;
-        Type* ArgType;
-
-    public:
-        PrototypeArgumentAST(std::string Name, std::string ArgType);
-
-        std::string getName();
-        Type* getType();
-    };
-
-    /// PrototypeAST - This class represents the "prototype" for a function,
-    /// which captures its argument names as well as if it is an operator.
-    class PrototypeAST {
-        std::string Name;
-        std::vector<PrototypeArgumentAST*> Args;
-        bool IsOperator;
-        unsigned Precedence;
-        std::string ReturnType;
-
-    public:
-        PrototypeAST(const std::string& Name, std::vector<PrototypeArgumentAST*> Args, std::string ReturnType, bool IsOperator = false, unsigned Prec = 0);
-
-        Function* codegen();
-        const std::string& getName() const;
-        const std::string& getReturnType() const;
-
-        bool isUnaryOp() const;
-        bool isBinaryOp() const;
-
-        char getOperatorName() const;
-
-        unsigned getBinaryPrecedence() const;
-    };
-
-    /// FunctionAST - This class represents a function definition itself.
-    class FunctionAST
-    {
-        PrototypeAST *Proto;
-        BlockAST* Body;
-
-    public:
-        FunctionAST(PrototypeAST *Proto, BlockAST *Body);
-        Function *codegen();
-    };
-
-    /// IfExprAST - Expression class for if/then/else.
-    class IfExprAST : public ExprAST {
-        ExprAST* Cond;
-        ExprAST* Then;
-        ExprAST* Else;
-
-        bool ThenReturns = false;
-        bool ElseReturns = false;
-
-    public:
-        IfExprAST(ExprAST* Cond, ExprAST* Then, ExprAST* Else, bool ThenReturns, bool ElseReturns);
-
-        Value* codegen() override;
-    };
-
-    /// ForExprAST - Expression class for for/in.
-    class ForExprAST : public ExprAST {
-        std::string VarName;
-        ExprAST* Start; 
-        ExprAST* End; 
-        ExprAST* Step; 
-        ExprAST* Body;
-
-    public:
-        ForExprAST(const std::string& VarName, ExprAST* Start, ExprAST* End, ExprAST* Step, ExprAST* Body);
-
-        Value* codegen() override;
-    };
-
-    /// UnaryExprAST - Expression class for a unary operator.
-    class UnaryExprAST : public ExprAST {
-        char Opcode;
-        ExprAST* Operand;
-
-    public:
-        UnaryExprAST(char Opcode, ExprAST* Operand);
-
-        Value* codegen() override;
-    };
-
-    /// ReturnExprAST - Expression that represents the return value of a function.
-    class ReturnExprAST : public ExprAST {
-        ExprAST* Expr;
-
-    public:
-        ReturnExprAST(ExprAST* Expr);
-        
-        Value* codegen() override;
-    };
-
-    class MasterAST
-    {
-    public:
-        static inline LLVMContext* TheContext;
-        static inline Module* TheModule;
-        static inline IRBuilder<>* Builder;
-        static inline std::map<std::string, AllocaInst*> NamedValues;
-        static inline legacy::FunctionPassManager* TheFPM;
-        static inline std::map<std::string, PrototypeAST*> FunctionProtos;
-        static inline std::map<char, int> BinopPrecedence =
+        /// ExprAST - Base class for all expression nodes.
+        class ExprAST
         {
-            {'=' , 2},
-            {'<', 10},
-            {'+', 20},
-            {'-', 30},
-            {'*', 40}
+        public:
+            virtual ~ExprAST() = default;
+            virtual Value *codegen() = 0;
         };
 
-        static void initializeModule(const char* moduleName);
-    };
+        /// NumberExprAST - Expression class for numeric literals like "1.0".
+        class NumberExprAST : public ExprAST
+        {
+        private:
+            double Val;
 
-    void createExternalFunctions();
-    void createNewLineFunction();
-    void createPrintFunction();
+        public:
+            NumberExprAST(double Val);
+            Value *codegen() override;
+        };
+
+        class StringExprAST : public ExprAST
+        {
+        private:
+            std::string Val;
+
+        public:
+            StringExprAST(std::string Val);
+            Value *codegen() override;
+        };
+
+        /// VariableExprAST - Expression class variable references 'x = 4'
+        class VariableExprAST : public ExprAST
+        {
+        private:
+            std::string Name;
+
+        public:
+            VariableExprAST(const std::string &Name);
+            Value *codegen() override;
+            const std::string& getName();
+        };
+
+        /// VarExprAST - Expression class for variables 'var x = 3'
+        class VarExprAST : public ExprAST 
+        {
+            std::string Name;
+            ExprAST* Init;
+
+        public:
+            VarExprAST(std::string Name, ExprAST* Init);
+
+            Value* codegen() override;
+        };
+
+
+        // ArrayExprAST - Expression class for double arrays
+        class ArrayExprAST : public ExprAST 
+        {
+            std::string Name;
+            int Size;
+            std::vector<ExprAST*> Values;
+            std::vector<VarExprAST*> ArrayElements;
+
+        public:
+            ArrayExprAST(std::string Name, int Size, std::vector<ExprAST*> Values);
+
+            Value* codegen() override;
+            ExprAST* getElement(int i);
+
+        };
+
+        /// BinaryExprAST - Expression class for a binary operator.
+        class BinaryExprAST : public ExprAST
+        {
+        private:
+            char Op;
+            ExprAST *LHS;
+            ExprAST *RHS;
+
+        public:
+            BinaryExprAST(char Op, ExprAST *LHS, ExprAST *RHS);
+            Value *codegen() override;
+        };
+
+        /// CallExprAST - Expression class for function calls.
+        class CallExprAST : public ExprAST
+        {
+        private:
+            std::string Callee;
+            std::vector<ExprAST *> Args;
+
+        public:
+            CallExprAST(const std::string &Callee, std::vector<ExprAST *> Args);
+            Value *codegen() override;
+        };
+
+        /// BlockAST - Represents a block, '{ }'.
+        class BlockAST : public ExprAST { 
+            std::vector<ExprAST*> Exprs;
+
+        public:
+            BlockAST(std::vector<ExprAST*> Exprs);
+
+            Value *codegen() override;
+        };
+
+        class PrototypeArgumentAST {
+            std::string Name;
+            Type* ArgType;
+
+        public:
+            PrototypeArgumentAST(std::string Name, std::string ArgType);
+
+            std::string getName();
+            Type* getType();
+        };
+
+        /// PrototypeAST - This class represents the "prototype" for a function,
+        /// which captures its argument names as well as if it is an operator.
+        class PrototypeAST {
+            std::string Name;
+            std::vector<PrototypeArgumentAST*> Args;
+            bool IsOperator;
+            unsigned Precedence;
+            std::string ReturnType;
+
+        public:
+            PrototypeAST(const std::string& Name, std::vector<PrototypeArgumentAST*> Args, std::string ReturnType, bool IsOperator = false, unsigned Prec = 0);
+
+            Function* codegen();
+            const std::string& getName() const;
+            const std::string& getReturnType() const;
+
+            bool isUnaryOp() const;
+            bool isBinaryOp() const;
+
+            char getOperatorName() const;
+
+            unsigned getBinaryPrecedence() const;
+        };
+
+        /// FunctionAST - This class represents a function definition itself.
+        class FunctionAST
+        {
+            PrototypeAST *Proto;
+            BlockAST* Body;
+
+        public:
+            FunctionAST(PrototypeAST *Proto, BlockAST *Body);
+            Function *codegen();
+        };
+
+        /// IfExprAST - Expression class for if/then/else.
+        class IfExprAST : public ExprAST {
+            ExprAST* Cond;
+            ExprAST* Then;
+            ExprAST* Else;
+
+            bool ThenReturns = false;
+            bool ElseReturns = false;
+
+        public:
+            IfExprAST(ExprAST* Cond, ExprAST* Then, ExprAST* Else, bool ThenReturns, bool ElseReturns);
+
+            Value* codegen() override;
+        };
+
+        /// ForExprAST - Expression class for for/in.
+        class ForExprAST : public ExprAST {
+            std::string VarName;
+            ExprAST* Start; 
+            ExprAST* End; 
+            ExprAST* Step; 
+            ExprAST* Body;
+
+        public:
+            ForExprAST(const std::string& VarName, ExprAST* Start, ExprAST* End, ExprAST* Step, ExprAST* Body);
+
+            Value* codegen() override;
+        };
+
+        /// UnaryExprAST - Expression class for a unary operator.
+        class UnaryExprAST : public ExprAST {
+            char Opcode;
+            ExprAST* Operand;
+
+        public:
+            UnaryExprAST(char Opcode, ExprAST* Operand);
+
+            Value* codegen() override;
+        };
+
+        /// ReturnExprAST - Expression that represents the return value of a function.
+        class ReturnExprAST : public ExprAST {
+            ExprAST* Expr;
+
+        public:
+            ReturnExprAST(ExprAST* Expr);
+            
+            Value* codegen() override;
+        };
+
+        class MasterAST
+        {
+        public:
+            static inline LLVMContext* TheContext;
+            static inline Module* TheModule;
+            static inline IRBuilder<>* Builder;
+            static inline std::map<std::string, AllocaInst*> NamedValues;
+            static inline legacy::FunctionPassManager* TheFPM;
+            static inline std::map<std::string, PrototypeAST*> FunctionProtos;
+            static inline std::map<char, int> BinopPrecedence =
+            {
+                {'=' , 2},
+                {'<', 10},
+                {'+', 20},
+                {'-', 30},
+                {'*', 40}
+            };
+
+            static void initializeModule(const char* moduleName);
+        };
+
+        void createExternalFunctions();
+        void createNewLineFunction();
+        void createPrintFunction();
+    }
 }

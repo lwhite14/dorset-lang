@@ -1,6 +1,9 @@
 #include <dorset-lang/Utils/Version.h>
 
-version getVersion()
+namespace Dorset
 {
-    return version{0, 2, 0, semver::prerelease::alpha, 1};
+    version getVersion()
+    {
+        return version{0, 2, 0, semver::prerelease::alpha, 2};
+    }
 }

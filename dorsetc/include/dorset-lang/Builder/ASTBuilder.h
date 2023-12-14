@@ -8,31 +8,34 @@
 #include <dorset-lang/Utils/Error.h>
 #include <dorset-lang/Builder/ExpressionBuilder.h>
 
-class ASTBuilder
+namespace Dorset
 {
-private:
-    std::vector<Token> tokens;
-    int currentTokenIndex;
-    bool needsReturnToken = false;
+    class ASTBuilder
+    {
+    private:
+        std::vector<Token> tokens;
+        int currentTokenIndex;
+        bool needsReturnToken = false;
 
-    Token currentToken();
-    Token advanceToken();
+        Token currentToken();
+        Token advanceToken();
 
-    AST::ExprAST *parseExpression(bool& hasReturn);
-    AST::PrototypeAST *parsePrototype(); 
-    AST::FunctionAST *parseDefinition(); 
-    AST::BlockAST *parseBlock(bool& hasReturn);
-    AST::PrototypeAST *parseExtern();
+        AST::ExprAST *parseExpression(bool& hasReturn);
+        AST::PrototypeAST *parsePrototype(); 
+        AST::FunctionAST *parseDefinition(); 
+        AST::BlockAST *parseBlock(bool& hasReturn);
+        AST::PrototypeAST *parseExtern();
 
-    AST::ExprAST *parseIfExpression(bool& hasReturn);
-    AST::ExprAST *parseForExpression(bool& hasReturn);
+        AST::ExprAST *parseIfExpression(bool& hasReturn);
+        AST::ExprAST *parseForExpression(bool& hasReturn);
 
 
-    void handleDefinition(); 
-    void handleExtern();
+        void handleDefinition(); 
+        void handleExtern();
 
-public:
-    ASTBuilder(std::vector<Token> tokens);
+    public:
+        ASTBuilder(std::vector<Token> tokens);
 
-    void parseTokenList();
-};
+        void parseTokenList();
+    };
+}
