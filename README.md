@@ -42,7 +42,7 @@ git clone https://github.com/lwhite14/dorset-lang.git
 cd dorset-lang
 cmake -B build -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ dorsetc
 cmake --build build
-build/bin/dorsetc/dorsetc --help
+build/bin/dorsetc --help
 ```
 
 ### Installing
