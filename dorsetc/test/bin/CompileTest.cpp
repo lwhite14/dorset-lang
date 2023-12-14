@@ -11,7 +11,7 @@ void resetGlobals()
 }
 
 
-TEST_CASE("Basic Hello World", "[Compile]") // compileTest_1.ds
+TEST_CASE("Basic Hello World [1]", "[Compile]") // compileTest_1.ds
 {
 	// Pre Work
 	resetGlobals();
@@ -26,7 +26,7 @@ TEST_CASE("Basic Hello World", "[Compile]") // compileTest_1.ds
 	REQUIRE(i == 0);
 }
 
-TEST_CASE("Externs", "[Compile]") // compileTest_2.ds
+TEST_CASE("Externs [2]", "[Compile]") // compileTest_2.ds
 {
 	// Pre Work
 	resetGlobals();
@@ -41,7 +41,7 @@ TEST_CASE("Externs", "[Compile]") // compileTest_2.ds
 	REQUIRE(i == 0);
 }
 
-TEST_CASE("Returns", "[Compile]") // compileTest_3.ds
+TEST_CASE("Returns [3]", "[Compile]") // compileTest_3.ds
 {
 	// Pre Work
 	resetGlobals();
@@ -56,7 +56,7 @@ TEST_CASE("Returns", "[Compile]") // compileTest_3.ds
 	REQUIRE(i == 0);
 }
 
-TEST_CASE("Variable and If Statement", "[Compile]") // compileTest_4.ds
+TEST_CASE("Variable and If Statement [4]", "[Compile]") // compileTest_4.ds
 {
 	// Pre Work
 	resetGlobals();
@@ -71,7 +71,7 @@ TEST_CASE("Variable and If Statement", "[Compile]") // compileTest_4.ds
 	REQUIRE(i == 0);
 }
 
-TEST_CASE("Return from Inside an If Block", "[Compile]") // compileTest_5.ds
+TEST_CASE("Return from Inside an If Block [5]", "[Compile]") // compileTest_5.ds
 {
 	// Pre Work
 	resetGlobals();
@@ -86,7 +86,7 @@ TEST_CASE("Return from Inside an If Block", "[Compile]") // compileTest_5.ds
 	REQUIRE(i == 0);
 }
 
-TEST_CASE("Inline Block", "[Compile]") // compileTest_6.ds
+TEST_CASE("Inline Block [6]", "[Compile]") // compileTest_6.ds
 {
 	// Pre Work
 	resetGlobals();
@@ -101,7 +101,7 @@ TEST_CASE("Inline Block", "[Compile]") // compileTest_6.ds
 	REQUIRE(i == 0);
 }
 
-TEST_CASE("For Loop", "[Compile]") // compileTest_7.ds
+TEST_CASE("For Loop [7]", "[Compile]") // compileTest_7.ds
 {
 	// Pre Work
 	resetGlobals();
@@ -116,7 +116,7 @@ TEST_CASE("For Loop", "[Compile]") // compileTest_7.ds
 	REQUIRE(i == 0);
 }
 
-TEST_CASE("Empty Function Body", "[Compile]") // compileTest_8.ds
+TEST_CASE("Empty Function Body [8]", "[Compile]") // compileTest_8.ds
 {
 	// Pre Work
 	resetGlobals();
@@ -131,7 +131,7 @@ TEST_CASE("Empty Function Body", "[Compile]") // compileTest_8.ds
 	REQUIRE(i == 0);
 }
 
-TEST_CASE("Returning from For Loop", "[Compile]") // compileTest_9.ds
+TEST_CASE("Returning from For Loop [9]", "[Compile]") // compileTest_9.ds
 {
 	// Pre Work
 	resetGlobals();
@@ -146,7 +146,7 @@ TEST_CASE("Returning from For Loop", "[Compile]") // compileTest_9.ds
 	REQUIRE(i == 0);
 }
 
-TEST_CASE("Optional Else in If Statement", "[Compile]") // compileTest_10.ds
+TEST_CASE("Optional Else in If Statement [10]", "[Compile]") // compileTest_10.ds
 {
 	// Pre Work
 	resetGlobals();
@@ -161,7 +161,7 @@ TEST_CASE("Optional Else in If Statement", "[Compile]") // compileTest_10.ds
 	REQUIRE(i == 0);
 }
 
-TEST_CASE("Basic Arrays", "[Compile]") // compileTest_11.ds
+TEST_CASE("Basic Arrays [11]", "[Compile]") // compileTest_11.ds
 {
 	// Pre Work
 	resetGlobals();
@@ -176,7 +176,7 @@ TEST_CASE("Basic Arrays", "[Compile]") // compileTest_11.ds
 	REQUIRE(i == 0);
 }
 
-TEST_CASE("In-Built 'newLine' and 'print' Functions", "[Compile]") // compileTest_12.ds
+TEST_CASE("In-Built 'newLine' and 'print' Functions [12]", "[Compile]") // compileTest_12.ds
 {
 	// Pre Work
 	resetGlobals();

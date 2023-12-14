@@ -1,9 +1,9 @@
 fn main() void {
-    for (i = 1, i < 10, 1.0)
+    for (var i = 1, i < 10, 1.0)
     {
         print("*");
         newLine();
-        print("...the end of the for loop...");
-        newLine();
     }
+    print("...the end of the for loop...");
+    newLine();
 }

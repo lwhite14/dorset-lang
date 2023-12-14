@@ -1,19 +1,19 @@
 fn main() double
 {
     var x = 0;
-    for (i = 1, i < 50, 1.0)
+    for (var i = 1, i < 50, 1.0)
     {
         x = x + i;
     }
 
     var y = 0;
-    for (i = 1, i < 150, 1.0)
+    for (var i = 1, i < 150, 1.0)
     {
         y = y + (i * 3);
     }
 
     var z = 0;
-    for (i = 1, i < 300, 1.0)
+    for (var i = 1, i < 300, 1.0)
     {
         z = z + (i * 3);
     }

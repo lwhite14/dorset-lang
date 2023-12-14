@@ -149,9 +149,16 @@ namespace Dorset
         }
         advanceToken(); // eat '('
 
+        if (currentToken().getType() != VAR)
+        {
+            ErrorHandler::error("expected variable declaration", currentToken().getLine(), currentToken().getCharacter());
+            return nullptr;
+        }
+        advanceToken(); // eat 'var'
+
         if (currentToken().getType() != IDENTIFIER) 
         {
-            ErrorHandler::error("expected identifier after for", currentToken().getLine(), currentToken().getCharacter());
+            ErrorHandler::error("expected identifier after variable declaration", currentToken().getLine(), currentToken().getCharacter());
             return nullptr;
         }
 
