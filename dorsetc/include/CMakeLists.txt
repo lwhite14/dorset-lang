@@ -1,1 +1,1 @@
-add_subdirectory(dorsetDriver)
+add_subdirectory(dorset-lang)

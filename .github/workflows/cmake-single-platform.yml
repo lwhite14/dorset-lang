@@ -21,7 +21,7 @@ jobs:
         run: ctest --build-config Release --verbose
 
       - name: Emit Version
-        run: build/bin/dorsetc/dorsetc --version
+        run: build/bin/dorsetc --version
 
       # - name: Upload Artifacts
       #   uses: actions/upload-artifact@v3
