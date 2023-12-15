@@ -117,13 +117,13 @@ namespace Dorset
         class ArrayElementRefExprAST : public ExprAST
         {
             std::string ArrayName;
-            int Index;
+            ExprAST *Index;
 
         public:
-            ArrayElementRefExprAST(const std::string &ArrayName, int Index);
+            ArrayElementRefExprAST(const std::string &ArrayName, ExprAST *Index);
             Value *codegen() override;
             const std::string& getName();
-            const int getIndex();
+            Value *getIndex();
         };
 
         /// BinaryExprAST - Expression class for a binary operator.

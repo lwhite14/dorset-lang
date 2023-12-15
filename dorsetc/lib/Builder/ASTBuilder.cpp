@@ -94,14 +94,29 @@ namespace Dorset
         }
         advanceToken(); // eat '('
 
+        bool WhileCond = true;
+        int parenCount = 1;
         std::vector<Token> exprTokens;
-        while (currentToken().getType() != RIGHT_PAREN)
-        {
+        while (WhileCond)
+        {            
+            if (currentToken().getType() == RIGHT_PAREN)
+            {
+                parenCount--;
+            }
+            else if (currentToken().getType() == LEFT_PAREN)
+            {
+                parenCount++;
+            }
+
             exprTokens.push_back(currentToken());
             advanceToken();
+
+            if (parenCount == 0)
+            {
+                WhileCond = false;
+            }
         }
         exprTokens.push_back(Token(_EOE, " ", "", currentToken().getLine(), currentToken().getCharacter()));
-        advanceToken(); // eat ')'
         ExpressionBuilder builder = ExpressionBuilder(exprTokens, false);
         AST::ExprAST* Cond = builder.buildExpression();
 
@@ -206,14 +221,29 @@ namespace Dorset
         }
 
         // The step
+        bool WhileCond = true;
+        int parenCount = 1;
         std::vector<Token> stepExprTokens;
-        while (currentToken().getType() != RIGHT_PAREN)
-        {
+        while (WhileCond)
+        {            
+            if (currentToken().getType() == RIGHT_PAREN)
+            {
+                parenCount--;
+            }
+            else if (currentToken().getType() == LEFT_PAREN)
+            {
+                parenCount++;
+            }
+
             stepExprTokens.push_back(currentToken());
             advanceToken();
+
+            if (parenCount == 0)
+            {
+                WhileCond = false;
+            }
         }
         stepExprTokens.push_back(Token(_EOE, " ", "", currentToken().getLine(), currentToken().getCharacter()));
-        advanceToken(); // eat ')'
         builder = ExpressionBuilder(stepExprTokens, false);
         AST::ExprAST* Step = builder.buildExpression();
         if (!Step)

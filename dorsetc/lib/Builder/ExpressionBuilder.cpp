@@ -80,13 +80,7 @@ namespace Dorset
         {
             advanceToken(); // eat '['
 
-            if (currentToken().getType() != NUMBER)
-            {
-                ErrorHandler::error("expected number to identify index", currentToken().getLine(), currentToken().getCharacter());
-                return nullptr;
-            }
-            std::string arrayIndex = currentToken().getLiteral();
-            advanceToken(); // eat number
+            AST::ExprAST* arrayIndex = buildExpression();
 
             if (currentToken().getType() != RIGHT_SQUARE)
             {
@@ -95,8 +89,7 @@ namespace Dorset
             }
             advanceToken(); // eat ']'
 
-            // return new AST::VariableExprAST(IdName + arrayIndex);
-            return new AST::ArrayElementRefExprAST(IdName, std::stod(arrayIndex));
+            return new AST::ArrayElementRefExprAST(IdName, arrayIndex);
         }
 
         if (currentToken().getType() != LEFT_PAREN) // Simple variable ref.
@@ -287,7 +280,7 @@ namespace Dorset
         }
         else
         {
-            ErrorHandler::error("unknown token when expecting an expression: " + currentToken().getLexeme(), currentToken().getLine(), currentToken().getCharacter());
+            ErrorHandler::error("unknown token when expecting an expression: '" + currentToken().getLexeme() + "'/" + currentToken().getTypeStr(), currentToken().getLine(), currentToken().getCharacter());
             return nullptr;
         }
     }

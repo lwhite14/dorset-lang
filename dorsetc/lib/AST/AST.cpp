@@ -187,7 +187,7 @@ namespace Dorset
             return Array;
         }
 
-        ArrayElementRefExprAST::ArrayElementRefExprAST(const std::string &ArrayName, int Index)
+        ArrayElementRefExprAST::ArrayElementRefExprAST(const std::string &ArrayName, ExprAST *Index)
             : ArrayName(ArrayName), Index(Index)
         {
         }
@@ -198,9 +198,11 @@ namespace Dorset
 
             ArrayType *ArrayType = ArrayType::get(Type::getDoubleTy(*MasterAST::TheContext), WorkingArray->getSize());
 
+            Value *uintResult = MasterAST::Builder->CreateFPToUI(getIndex(), Type::getInt32Ty(*MasterAST::TheContext));
+
             Value *indices[] = {
                 ConstantInt::get(*MasterAST::TheContext, APInt(32, 0)),
-                ConstantInt::get(*MasterAST::TheContext, APInt(32, Index))
+                uintResult
             };
 
             Value *elementPtr = MasterAST::Builder->CreateGEP(ArrayType, WorkingArray->getArray(), indices);
@@ -214,9 +216,9 @@ namespace Dorset
             return ArrayName;
         }
 
-        const int ArrayElementRefExprAST::getIndex()
+        Value *ArrayElementRefExprAST::getIndex()
         {
-            return Index;
+            return Index->codegen();
         }
 
         BinaryExprAST::BinaryExprAST(char Op, ExprAST *LHS, ExprAST *RHS)
@@ -261,12 +263,14 @@ namespace Dorset
 
                     ArrayType *ArrayType = ArrayType::get(Type::getDoubleTy(*MasterAST::TheContext), WorkingArray->getSize());
 
+                    Value *uintResult = MasterAST::Builder->CreateFPToUI(LHS_ArrayRef->getIndex(), Type::getInt32Ty(*MasterAST::TheContext));
+
                     Value *indices[] = {
                         ConstantInt::get(*MasterAST::TheContext, APInt(32, 0)),
-                        ConstantInt::get(*MasterAST::TheContext, APInt(32, LHS_ArrayRef->getIndex()))
+                        uintResult
                     };
 
-                    Value *ElementPtr = MasterAST::Builder->CreateGEP(ArrayType, WorkingArray->getArray(), indices, LHS_ArrayRef->getName() + std::to_string(LHS_ArrayRef->getIndex()));
+                    Value *ElementPtr = MasterAST::Builder->CreateGEP(ArrayType, WorkingArray->getArray(), indices);
                     MasterAST::Builder->CreateStore(Val, ElementPtr);
 
                     return Val;
