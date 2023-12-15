@@ -56,7 +56,6 @@ namespace Dorset
         /// NumberExprAST - Expression class for numeric literals like "1.0".
         class NumberExprAST : public ExprAST
         {
-        private:
             double Val;
 
         public:
@@ -66,7 +65,6 @@ namespace Dorset
 
         class StringExprAST : public ExprAST
         {
-        private:
             std::string Val;
 
         public:
@@ -77,7 +75,6 @@ namespace Dorset
         /// VariableExprAST - Expression class variable references 'x = 4'
         class VariableExprAST : public ExprAST
         {
-        private:
             std::string Name;
 
         public:
@@ -105,20 +102,33 @@ namespace Dorset
             std::string Name;
             int Size;
             std::vector<ExprAST*> Values;
-            std::vector<VarExprAST*> ArrayElements;
+            GlobalVariable *Array;
 
         public:
             ArrayExprAST(std::string Name, int Size, std::vector<ExprAST*> Values);
 
             Value* codegen() override;
-            ExprAST* getElement(int i);
 
+            const int getSize();
+            GlobalVariable *getArray();
+
+        };
+
+        class ArrayElementRefExprAST : public ExprAST
+        {
+            std::string ArrayName;
+            int Index;
+
+        public:
+            ArrayElementRefExprAST(const std::string &ArrayName, int Index);
+            Value *codegen() override;
+            const std::string& getName();
+            const int getIndex();
         };
 
         /// BinaryExprAST - Expression class for a binary operator.
         class BinaryExprAST : public ExprAST
         {
-        private:
             char Op;
             ExprAST *LHS;
             ExprAST *RHS;
@@ -131,7 +141,6 @@ namespace Dorset
         /// CallExprAST - Expression class for function calls.
         class CallExprAST : public ExprAST
         {
-        private:
             std::string Callee;
             std::vector<ExprAST *> Args;
 
@@ -141,7 +150,8 @@ namespace Dorset
         };
 
         /// BlockAST - Represents a block, '{ }'.
-        class BlockAST : public ExprAST { 
+        class BlockAST : public ExprAST 
+        { 
             std::vector<ExprAST*> Exprs;
 
         public:
@@ -150,7 +160,8 @@ namespace Dorset
             Value *codegen() override;
         };
 
-        class PrototypeArgumentAST {
+        class PrototypeArgumentAST 
+        {
             std::string Name;
             Type* ArgType;
 
@@ -163,7 +174,8 @@ namespace Dorset
 
         /// PrototypeAST - This class represents the "prototype" for a function,
         /// which captures its argument names as well as if it is an operator.
-        class PrototypeAST {
+        class PrototypeAST 
+        {
             std::string Name;
             std::vector<PrototypeArgumentAST*> Args;
             bool IsOperator;
@@ -197,7 +209,8 @@ namespace Dorset
         };
 
         /// IfExprAST - Expression class for if/then/else.
-        class IfExprAST : public ExprAST {
+        class IfExprAST : public ExprAST 
+        {
             ExprAST* Cond;
             ExprAST* Then;
             ExprAST* Else;
@@ -212,7 +225,8 @@ namespace Dorset
         };
 
         /// ForExprAST - Expression class for for/in.
-        class ForExprAST : public ExprAST {
+        class ForExprAST : public ExprAST
+        {
             std::string VarName;
             ExprAST* Start; 
             ExprAST* End; 
@@ -226,7 +240,8 @@ namespace Dorset
         };
 
         /// UnaryExprAST - Expression class for a unary operator.
-        class UnaryExprAST : public ExprAST {
+        class UnaryExprAST : public ExprAST 
+        {
             char Opcode;
             ExprAST* Operand;
 
@@ -237,7 +252,8 @@ namespace Dorset
         };
 
         /// ReturnExprAST - Expression that represents the return value of a function.
-        class ReturnExprAST : public ExprAST {
+        class ReturnExprAST : public ExprAST 
+        {
             ExprAST* Expr;
 
         public:
@@ -253,6 +269,7 @@ namespace Dorset
             static inline Module* TheModule;
             static inline IRBuilder<>* Builder;
             static inline std::map<std::string, AllocaInst*> NamedValues;
+            static inline std::map<std::string, ArrayExprAST*> Arrays;
             static inline legacy::FunctionPassManager* TheFPM;
             static inline std::map<std::string, PrototypeAST*> FunctionProtos;
             static inline std::map<char, int> BinopPrecedence =

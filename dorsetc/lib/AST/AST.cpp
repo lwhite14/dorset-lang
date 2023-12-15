@@ -142,25 +142,81 @@ namespace Dorset
         ArrayExprAST::ArrayExprAST(std::string Name, int Size, std::vector<ExprAST*> Values)
             : Name(Name), Size(Size), Values(Values)
         {       
-            for (unsigned int i = 0; i < Values.size(); i++)
-            {
-                ArrayElements.push_back(new VarExprAST(Name + std::to_string(i), Values[i]));
-            }
         }
 
         Value* ArrayExprAST::codegen()
         {
-            for (unsigned int i = 0; i < ArrayElements.size(); i++)
+            // Create the global array variable
+            ArrayType *ArrayType = ArrayType::get(Type::getDoubleTy(*MasterAST::TheContext), Size);
+            Array = new GlobalVariable(*MasterAST::TheModule, ArrayType, false, GlobalValue::CommonLinkage, nullptr, Name);
+
+            Constant *ArrayValues[Size];
+
+            for (unsigned int i = 0; i < Size; i++)
             {
-                ArrayElements[i]->codegen();
+                ArrayValues[i] = ConstantFP::get(*MasterAST::TheContext, APFloat(0.0));
             }
 
-            return Constant::getNullValue(Type::getDoubleTy(*MasterAST::TheContext));
+            Array->setInitializer(ConstantArray::get(ArrayType, *ArrayValues));
+
+
+            for (unsigned int i = 0; i < Size; i++)
+            {
+                // Specify the indices for the element you want to assign
+                Value *indices[] = {
+                    ConstantInt::get(*MasterAST::TheContext, APInt(32, 0)),
+                    ConstantInt::get(*MasterAST::TheContext, APInt(32, i))
+                };
+
+                Value *ElementPtr = MasterAST::Builder->CreateGEP(ArrayType, Array, indices, Name + std::to_string(i));
+                MasterAST::Builder->CreateStore(Values[i]->codegen(), ElementPtr);
+            }
+
+            MasterAST::Arrays[Name] = this;
+
+            return Array;
         }
 
-        ExprAST* ArrayExprAST::getElement(int i)
+        const int ArrayExprAST::getSize()
         {
-            return Values[i];
+            return Size;
+        }
+
+        GlobalVariable *ArrayExprAST::getArray()
+        {
+            return Array;
+        }
+
+        ArrayElementRefExprAST::ArrayElementRefExprAST(const std::string &ArrayName, int Index)
+            : ArrayName(ArrayName), Index(Index)
+        {
+        }
+
+        Value *ArrayElementRefExprAST::codegen()
+        {
+            ArrayExprAST *WorkingArray = MasterAST::Arrays[ArrayName];
+
+            ArrayType *ArrayType = ArrayType::get(Type::getDoubleTy(*MasterAST::TheContext), WorkingArray->getSize());
+
+            Value *indices[] = {
+                ConstantInt::get(*MasterAST::TheContext, APInt(32, 0)),
+                ConstantInt::get(*MasterAST::TheContext, APInt(32, Index))
+            };
+
+            Value *elementPtr = MasterAST::Builder->CreateGEP(ArrayType, WorkingArray->getArray(), indices);
+            Value *loadedValue = MasterAST::Builder->CreateLoad(Type::getDoubleTy(*MasterAST::TheContext), elementPtr);
+
+            return loadedValue;
+        }
+
+        const std::string& ArrayElementRefExprAST::getName()
+        {
+            return ArrayName;
+        }
+
+        const int ArrayElementRefExprAST::getIndex()
+        {
+            return Index;
         }
 
         BinaryExprAST::BinaryExprAST(char Op, ExprAST *LHS, ExprAST *RHS)
@@ -172,21 +228,74 @@ namespace Dorset
         {
             if (Op == '=')
             {
-                VariableExprAST *LHSE = static_cast<VariableExprAST *>(LHS);
-                if (!LHSE)
-                    return logError("destination of '=' must be a variable");
-                // Codegen the RHS.
-                Value *Val = RHS->codegen();
-                if (!Val)
-                    return nullptr;
+                bool isArray = false;
 
-                // Look up the name.
-                Value *Variable = MasterAST::NamedValues[LHSE->getName()];
-                if (!Variable)
-                    return logError("unknown variable name: " + LHSE->getName());
+                VariableExprAST         *LHS_Variable = dynamic_cast<VariableExprAST *>         (LHS);
+                ArrayElementRefExprAST  *LHS_ArrayRef = dynamic_cast<ArrayElementRefExprAST *>  (LHS);
 
-                MasterAST::Builder->CreateStore(Val, Variable);
-                return Val;
+                if (LHS_Variable == nullptr)
+                {
+                    isArray = true;
+                }
+
+                if (isArray)
+                {
+                    if (!LHS_ArrayRef)
+                    {
+                        return logError("destination of '=' must be a variable");
+                    }
+
+                    // Codegen the RHS.
+                    Value *Val = RHS->codegen();
+                    if (!Val)
+                    {
+                        return logError("'right hand side' generation failed for variable: " + LHS_ArrayRef->getName());
+                    }
+
+                    // Look up the name.
+                    ArrayExprAST *WorkingArray = MasterAST::Arrays[LHS_ArrayRef->getName()];
+                    if (!WorkingArray)
+                    {
+                        return logError("unknown array name: " + LHS_ArrayRef->getName());
+                    }
+
+                    ArrayType *ArrayType = ArrayType::get(Type::getDoubleTy(*MasterAST::TheContext), WorkingArray->getSize());
+
+                    Value *indices[] = {
+                        ConstantInt::get(*MasterAST::TheContext, APInt(32, 0)),
+                        ConstantInt::get(*MasterAST::TheContext, APInt(32, LHS_ArrayRef->getIndex()))
+                    };
+
+                    Value *ElementPtr = MasterAST::Builder->CreateGEP(ArrayType, WorkingArray->getArray(), indices, LHS_ArrayRef->getName() + std::to_string(LHS_ArrayRef->getIndex()));
+                    MasterAST::Builder->CreateStore(Val, ElementPtr);
+
+                    return Val;
+                }
+                else
+                {
+                    if (!LHS_Variable)
+                    {
+                        return logError("destination of '=' must be a variable");
+                    }
+
+                    // Codegen the RHS.
+                    Value *Val = RHS->codegen();
+                    if (!Val)
+                    {
+                        return logError("'right hand side' generation failed for variable: " + LHS_Variable->getName());
+                    }
+
+                    // Look up the name.
+                    Value *Variable = MasterAST::NamedValues[LHS_Variable->getName()];
+
+                    if (!Variable)
+                    {
+                        return logError("unknown variable name: " + LHS_ArrayRef->getName());
+                    }
+
+                    MasterAST::Builder->CreateStore(Val, Variable);
+                    return Val;
+                }
             }
 
             Value *L = LHS->codegen();
@@ -380,6 +489,7 @@ namespace Dorset
 
             // Record the function arguments in the NamedValues map.
             MasterAST::NamedValues.clear();
+            MasterAST::Arrays.clear();
             for (auto &Arg : TheFunction->args())
             {
                 // Create an alloca for this variable.

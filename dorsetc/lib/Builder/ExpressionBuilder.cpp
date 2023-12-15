@@ -95,7 +95,8 @@ namespace Dorset
             }
             advanceToken(); // eat ']'
 
-            return new AST::VariableExprAST(IdName + arrayIndex);
+            // return new AST::VariableExprAST(IdName + arrayIndex);
+            return new AST::ArrayElementRefExprAST(IdName, std::stod(arrayIndex));
         }
 
         if (currentToken().getType() != LEFT_PAREN) // Simple variable ref.
@@ -160,7 +161,7 @@ namespace Dorset
 
             if (currentToken().getType() != NUMBER)
             {
-
+                ErrorHandler::error("expected a number to idicate array size", currentToken().getLine(), currentToken().getCharacter());
                 return nullptr;
             }
             int arraySize = std::stod(currentToken().getLiteral());
@@ -168,13 +169,14 @@ namespace Dorset
 
             if (currentToken().getType() != RIGHT_SQUARE)
             {
-
+                ErrorHandler::error("expected ']' here", currentToken().getLine(), currentToken().getCharacter());
                 return nullptr;
             }
             advanceToken(); // eat ']'
 
             std::vector<AST::ExprAST*> Exprs;
 
+            int counter = 0;
             if (currentToken().getType() == EQUAL)
             {
                 advanceToken(); // eat the '='
@@ -185,6 +187,8 @@ namespace Dorset
 
                     AST::ExprAST* Expr = parsePrimary();
                     Exprs.push_back(Expr);
+
+                    counter++;
                 }
 
                 advanceToken(); // eat the ')'
@@ -195,8 +199,15 @@ namespace Dorset
                 {
                     Exprs.push_back(new AST::NumberExprAST(0));
                 }
+                counter = arraySize;
             }
-            
+
+            if (counter != arraySize)
+            {
+                ErrorHandler::error("mismatch between declared array size and initialized elements", currentToken().getLine(), currentToken().getCharacter());
+                return nullptr;
+            }
+
             return new AST::ArrayExprAST(Name, arraySize, std::move(Exprs)); 
         }
 
