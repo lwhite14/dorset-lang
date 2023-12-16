@@ -2,6 +2,8 @@
 
 # Dorset-Lang
 
+A programming language and compiler.
+
 Very fragile, handle with care :worried:
 
 ### Syntax
@@ -60,3 +62,6 @@ ctest --build-config Debug --verbose
 > Replace <i>--build-config Debug</i> with <i>--build-config Release</i> if Release is the configuration that you used.
 
 
+### Third-Party Contributions
+ - Powered by the [LLVM Project](https://github.com/llvm/llvm-project).
+ - Help from the [Kaleidoscope Tutorials](https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/index.html)
