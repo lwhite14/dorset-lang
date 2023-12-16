@@ -284,10 +284,11 @@ namespace Dorset
 
                     if (!Variable)
                     {
-                        return logError("unknown variable name: " + LHS_ArrayRef->getName());
+                        return logError("unknown variable name: " + LHS_Variable->getName());
                     }
 
                     MasterAST::Builder->CreateStore(Val, Variable);
+
                     return Val;
                 }
             }
@@ -295,7 +296,9 @@ namespace Dorset
             Value *L = LHS->codegen();
             Value *R = RHS->codegen();
             if (!L || !R)
-                return nullptr;
+            {
+                return logError("left or right hand side generations has failed for some expression");
+            }
 
             if (Op == "+")
             {
@@ -479,7 +482,10 @@ namespace Dorset
             MasterAST::FunctionProtos[Proto->getName()] = std::move(Proto);
             Function *TheFunction = getFunction(P.getName());
             if (!TheFunction)
+            {
+                ErrorHandler::error("function does not exist for this prototype: " + P.getName());
                 return nullptr;
+            }
 
             // If this is an operator, install it.
             if (P.isBinaryOp())
@@ -504,7 +510,11 @@ namespace Dorset
                 MasterAST::NamedValues[std::string(Arg.getName())] = Alloca;
             }
 
-            Body->codegen();
+            if (Body->codegen() == nullptr)
+            {
+                ErrorHandler::error("block generation has failed for function: " + P.getName());
+                return nullptr;
+            }
 
             if (P.getReturnType() == "void") 
             {
@@ -733,7 +743,7 @@ namespace Dorset
         {
             for (unsigned int i = 0; i < Exprs.size(); i++)
             {
-                if (!Exprs[i]->codegen())
+                if (Exprs[i]->codegen() == nullptr)
                 {
                     return logError("expression in block failed");
                 }
