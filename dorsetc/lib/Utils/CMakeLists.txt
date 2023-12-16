@@ -18,8 +18,16 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+execute_process(
+    COMMAND git show --no-patch --format=%ci HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_COMMIT_DATE
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
 target_compile_definitions(dorsetUtils PRIVATE "-DGIT_COMMIT_HASH=\"${GIT_COMMIT_HASH}\"")
 target_compile_definitions(dorsetUtils PRIVATE "-DGIT_BRANCH=\"${GIT_BRANCH}\"")
+target_compile_definitions(dorsetUtils PRIVATE "-DGIT_COMMIT_DATE=\"${GIT_COMMIT_DATE}\"")
 
 target_link_libraries(dorsetDriver dorsetLexicalAnalysis)
 

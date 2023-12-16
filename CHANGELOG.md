@@ -21,6 +21,7 @@ Unreleased is the develop branch which includes every unmerged change from the l
  - Public code uses a namespace ('using namespace Dorset;').
  - Using 'var' keyword for loop start variable.
  - Using LLVMs built in array construct instead of keeping track of variables.
+ - Update CLI --version message.
 
 ### Removed
  - HTML docs page.

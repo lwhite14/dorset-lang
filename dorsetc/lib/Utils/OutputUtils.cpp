@@ -9,6 +9,10 @@
 #define GIT_COMMIT_HASH "?"
 #endif
 
+#ifndef GIT_COMMIT_DATE
+#define GIT_COMMIT_DATE "?"
+#endif
+
 #ifndef GIT_BRANCH
 #define GIT_BRANCH "?"
 #endif
@@ -33,17 +37,30 @@ namespace Dorset
 
     void printVersion()
     {
-        std::cout << "dorset-lang " << getVersion().to_string() << std::endl;
+        std::cout << "dorsetc " << getVersion().to_string() << " ";
 
-        std::string commit = GIT_COMMIT_HASH;
+        std::string hash = GIT_COMMIT_HASH;
+        hash = hash.substr(0, 9);
 
-        if (commit == "")
+        std::string date = GIT_COMMIT_DATE;
+        date = date.substr(0, 10);
+
+        if (hash == "")
+        {
+            std::cout << "(?) ";
+        }
+        else
+        {
+            std::cout << "(" << hash << ") ";
+        }
+
+        if (date == "")
         {
             std::cout << "(?)" << std::endl;
         }
         else
         {
-            std::cout << "(" << commit << ")" << std::endl;
+            std::cout << "(" << date << ")" << std::endl;
         }
 
         std::string branch = GIT_BRANCH;
