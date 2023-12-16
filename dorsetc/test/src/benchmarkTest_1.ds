@@ -3,15 +3,16 @@
 
 fn main() double {
     var op = 3;
+    var n = 24;
 
-    var Arr[24];
-    for (var i = 0, i < 24, 1.0) {
+    var Arr[n];
+    for (var i = 0, i < n, 1.0) {
         Arr[i] = op;
     }
 
     var result = 1;
 
-    for (var i = 0, i < 24, 1.0) {
+    for (var i = 0, i < n, 1.0) {
 
         if (Arr[i] == 0) {
             result = result + 1;
@@ -41,6 +42,9 @@ fn main() double {
         }
 
     }
+
+    printf("Result is: %f", result);
+    newLine();
 
     return result;
 }

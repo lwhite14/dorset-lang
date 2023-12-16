@@ -100,17 +100,18 @@ namespace Dorset
         class ArrayExprAST : public ExprAST 
         {
             std::string Name;
-            int Size;
+            ExprAST* SizeExpr;
+            Value* Size;
             std::vector<ExprAST*> Values;
-            GlobalVariable *Array;
+            AllocaInst *Array;
 
         public:
-            ArrayExprAST(std::string Name, int Size, std::vector<ExprAST*> Values);
+            ArrayExprAST(std::string Name, ExprAST* SizeExpr, std::vector<ExprAST*> Values);
 
             Value* codegen() override;
 
-            const int getSize();
-            GlobalVariable *getArray();
+            Value *getSize();
+            AllocaInst *getArray();
 
         };
 

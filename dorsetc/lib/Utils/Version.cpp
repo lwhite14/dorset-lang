@@ -4,6 +4,6 @@ namespace Dorset
 {
     version getVersion()
     {
-        return version{0, 2, 0, semver::prerelease::alpha, 6};
+        return version{0, 2, 0, semver::prerelease::alpha, 7};
     }
 }

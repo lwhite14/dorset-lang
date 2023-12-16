@@ -139,37 +139,32 @@ namespace Dorset
             return InitVal;
         }
 
-        ArrayExprAST::ArrayExprAST(std::string Name, int Size, std::vector<ExprAST*> Values)
-            : Name(Name), Size(Size), Values(Values)
+        ArrayExprAST::ArrayExprAST(std::string Name, ExprAST* SizeExpr, std::vector<ExprAST*> Values)
+            : Name(Name), SizeExpr(SizeExpr), Values(Values)
         {       
         }
 
         Value* ArrayExprAST::codegen()
         {
-            // Create the global array variable
-            ArrayType *ArrayType = ArrayType::get(Type::getDoubleTy(*MasterAST::TheContext), Size);
-            Array = new GlobalVariable(*MasterAST::TheModule, ArrayType, false, GlobalValue::CommonLinkage, nullptr, Name);
+            Size = SizeExpr->codegen();
 
-            Constant *ArrayValues[Size];
+            Value *uintResult = MasterAST::Builder->CreateFPToUI(Size, Type::getInt32Ty(*MasterAST::TheContext));
 
-            for (unsigned int i = 0; i < Size; i++)
+            Array = MasterAST::Builder->CreateAlloca(Type::getDoubleTy(*MasterAST::TheContext), uintResult, Name);
+
+            for (unsigned int i = 0; i < Values.size(); i++)
             {
-                ArrayValues[i] = ConstantFP::get(*MasterAST::TheContext, APFloat(0.0));
-            }
+                Value* dynamicIndex = MasterAST::Builder->getInt32(i);
 
-            Array->setInitializer(ConstantArray::get(ArrayType, *ArrayValues));
+                Value *uintResult = MasterAST::Builder->CreateFPToUI(dynamicIndex, Type::getInt32Ty(*MasterAST::TheContext));
 
+                // Access the dynamically calculated element of the array
+                Value* elementPtr = MasterAST::Builder->CreateGEP(Type::getDoubleTy(*MasterAST::TheContext), getArray(), uintResult);
 
-            for (unsigned int i = 0; i < Size; i++)
-            {
-                // Specify the indices for the element you want to assign
-                Value *indices[] = {
-                    ConstantInt::get(*MasterAST::TheContext, APInt(32, 0)),
-                    ConstantInt::get(*MasterAST::TheContext, APInt(32, i))
-                };
+                Value* Val = Values[i]->codegen();
 
-                Value *ElementPtr = MasterAST::Builder->CreateGEP(ArrayType, Array, indices, Name + std::to_string(i));
-                MasterAST::Builder->CreateStore(Values[i]->codegen(), ElementPtr);
+                // Store the modified value back to the array
+                MasterAST::Builder->CreateStore(Val, elementPtr);
             }
 
             MasterAST::Arrays[Name] = this;
@@ -177,12 +172,12 @@ namespace Dorset
             return Array;
         }
 
-        const int ArrayExprAST::getSize()
+        Value *ArrayExprAST::getSize()
         {
             return Size;
         }
 
-        GlobalVariable *ArrayExprAST::getArray()
+        AllocaInst *ArrayExprAST::getArray()
         {
             return Array;
         }
@@ -196,17 +191,13 @@ namespace Dorset
         {
             ArrayExprAST *WorkingArray = MasterAST::Arrays[ArrayName];
 
-            ArrayType *ArrayType = ArrayType::get(Type::getDoubleTy(*MasterAST::TheContext), WorkingArray->getSize());
-
             Value *uintResult = MasterAST::Builder->CreateFPToUI(getIndex(), Type::getInt32Ty(*MasterAST::TheContext));
 
-            Value *indices[] = {
-                ConstantInt::get(*MasterAST::TheContext, APInt(32, 0)),
-                uintResult
-            };
+            // Access the dynamically calculated element of the array
+            Value* elementPtr = MasterAST::Builder->CreateGEP(Type::getDoubleTy(*MasterAST::TheContext), WorkingArray->getArray(), uintResult);
 
-            Value *elementPtr = MasterAST::Builder->CreateGEP(ArrayType, WorkingArray->getArray(), indices);
-            Value *loadedValue = MasterAST::Builder->CreateLoad(Type::getDoubleTy(*MasterAST::TheContext), elementPtr);
+            // Load the current value from the array
+            Value* loadedValue = MasterAST::Builder->CreateLoad(Type::getDoubleTy(*MasterAST::TheContext), elementPtr);
 
             return loadedValue;
         }
@@ -261,17 +252,16 @@ namespace Dorset
                         return logError("unknown array name: " + LHS_ArrayRef->getName());
                     }
 
-                    ArrayType *ArrayType = ArrayType::get(Type::getDoubleTy(*MasterAST::TheContext), WorkingArray->getSize());
-
                     Value *uintResult = MasterAST::Builder->CreateFPToUI(LHS_ArrayRef->getIndex(), Type::getInt32Ty(*MasterAST::TheContext));
 
-                    Value *indices[] = {
-                        ConstantInt::get(*MasterAST::TheContext, APInt(32, 0)),
-                        uintResult
-                    };
+                    // Access the dynamically calculated element of the array
+                    Value* elementPtr = MasterAST::Builder->CreateGEP(Type::getDoubleTy(*MasterAST::TheContext), WorkingArray->getArray(), uintResult);
 
-                    Value *ElementPtr = MasterAST::Builder->CreateGEP(ArrayType, WorkingArray->getArray(), indices);
-                    MasterAST::Builder->CreateStore(Val, ElementPtr);
+                    // // Load the current value from the array
+                    // Value* loadedValue = MasterAST::Builder->CreateLoad(Type::getDoubleTy(*MasterAST::TheContext), elementPtr);
+
+                    // Store the modified value back to the array
+                    MasterAST::Builder->CreateStore(Val, elementPtr);
 
                     return Val;
                 }
