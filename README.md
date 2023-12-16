@@ -18,12 +18,10 @@ fn main() void {
     var num = 4;
     var numAfterCalc = calculation(num);
 
-    if (numAfterCalc > 3)
-    {
+    if (numAfterCalc > 3) {
         print("Our calculation results in a number bigger than 3!");
     }
-    else
-    {
+    else {
         print("Our calculation results in a number smaller than 3...");
     }
 
@@ -55,7 +53,7 @@ sudo cmake --install build --prefix /usr/local
 ### Testing
 Firstly, configure and build the project, the above sections detail this process. Then, run the following commands.
 ```
-cd build
+cd build/test
 ctest --build-config Debug --verbose
 ```
 > **Note**

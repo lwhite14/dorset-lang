@@ -25,7 +25,7 @@
 Dorset lang is a language and compiler developed to be fast and strong.
 
 ### Versions
-Current stable version: 0.2.0-alpha. Working towards version 1.0.0.
+Current stable version: 0.2.1-alpha. Working towards version 1.0.0.
 
 ### Technology
 Written with C++ (Clang) and LLVM.
@@ -44,7 +44,7 @@ For more detailed installation instructions, see the [install pages](INSTALL.md)
 You will need an install of LLVM to use dorsetc. You can find more information on building and installing LLVM and Clang [here](https://llvm.org/docs/GettingStarted.html).
 First, clone the dorset-lang repository. It is advised to clone from a stable version:
 ```
-git clone --branch 0.2.0-alpha https://github.com/lwhite14/dorset-lang.git
+git clone --branch 0.2.1-alpha https://github.com/lwhite14/dorset-lang.git
 ```
 Configure the CMake cache:
 ```
@@ -69,8 +69,7 @@ To compiler dorset-lang source code, run <em>dorsetc file.ds</em> to compile fil
 Dorset-lang is a semi-functional, non object oriented language, so every expression and statement must live within a function. Any top level code must be a function declaration.
 Code like this is not allowed:
 ```
-fn test(x) double 
-{ 
+fn test(x) double { 
     return x + 2; 
 }
 
@@ -78,18 +77,16 @@ printf("%f", test(3));
 ```                
 The main entry point of your dorset-lang executable is the main function. So for the previous example, to make it work within the semi-functional framework you would write:
 ```
-fn test(x) double 
-{ 
+fn test(x) double { 
     return x + 2; 
 }
 
-fn main() void
-{
+fn main() void {
     printf("%f", test(3));
 }
  ```         
 There are three in-built functions which will help you output data to the screen. 'newLine', 'print', and 'printf'. newLine outputs the new line character, priming the next output on the next line. print outputs the inputted string to the terminal. Finally, printf outputs the string to the terminal, using the %f characters, you can feed a double to the output string as well. <em>printf("The number is: %f", 3)</em>. <br>        
-The only types in dorset-lang 0.2.0 are doubles and voids. Any variables declared will automatically be a double to represent a number, however, you will have to specify whether a function returns a double or is void, returning nothing at all.
+The only types in dorset-lang 0.2.1 are doubles and voids. Any variables declared will automatically be a double to represent a number, however, you will have to specify whether a function returns a double or is void, returning nothing at all.
 Another rule in dorset-lang is that every function needs a least one expression in its body.
 
 ### Functions
@@ -102,8 +99,7 @@ Functions have five key components which are all necessary to compile.
 
 A basic function may look like this:
 ```
-fn test(x) double 
-{ 
+fn test(x) double { 
     return x + 2; 
 }
 ```              
@@ -132,12 +128,10 @@ test(num);
 ### Conditionals
 Conditionals consist of an if and then an else. Both are needed in a if block.
 ```
-if (3 < x)
-{
+if (3 < x) {
     printf("X is bigger than 3!", 0);
 }
-else
-{
+else {
     printf("X is not bigger than 3!", 0);
 }
 ```               
@@ -149,15 +143,14 @@ After the if block, else controls the code that will execute if the condition fa
 ### Loops
 Loops are implementing using the following syntax:
 ```
-for (i = 1, i < x, 1.0)
-{
+for (var i = 1, i < x, 1.0) {
     printf("*", 0);
 }
 ```                 
 Firstly, start the for loop with the for keyword. You will then need a start, an end, and a step for the loop.
-In dorset-lang 0.2.0, you can only initialize new variables, but you can use any expression to initialize it, for example:
+In dorset-lang 0.2.1, you can only initialize new variables, but you can use any expression to initialize it, for example:
 ```
-for (i = add(3, 4), i < 45, 3.0)
+for (var i = add(3, 4), i < 45, 3.0)
 ```                    
 The first part represents the new variables used in the loop. The middle part is the condition which needs to be satisfied to continue looping. Once this condition is false, the loop ends. The last part is the step. The step is the number which is added to the newly declared variable every loop. So for the previous example, the variable i will have 3 added to it for each loop.
 
@@ -172,7 +165,7 @@ To declare initial values, use the syntax:
 var numbers[3] = (1, 3, 12);
 ```
 This syntax will initialize numbers[0] as 1, numbers[1] as 3, and numbers[2] as 12. <br>
-In dorset-lang 0.2.0, you can't pass in arrays as function parameters. Any arrays you use must be used in the function they're first declared.
+In dorset-lang 0.2.1, you can't pass in arrays as function parameters. Any arrays you use must be used in the function they're first declared.
 ```
 var numbers[3] = (1, 3, 12);
 
@@ -186,20 +179,16 @@ newLine();
 In dorset-lang, you can define your own operators. There are two types of operator overloading, unary operators and binary operator.
 Unary operators take one argument and perform some operation on that parameter before returning the result. Binary operators take two parameters and do the same, perform some operation and return. Here's an example of both:
 ```
-fn unary!(v) double
-{
-    if v 
-    {
+fn unary!(v) double {
+    if (v) {
         return 0;
     }
-    else
-    {
+    else {
         return 1;
     }
 }
 
-fn binary> 10 (LHS, RHS) double
-{
+fn binary>10(LHS, RHS) double {
     return RHS < LHS;
 }
 ```

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.23)
-project(dorsetc VERSION 0.2.0 DESCRIPTION "Dorset compiler for the Dorset programming language.")
+project(dorsetc VERSION 0.2.1 DESCRIPTION "Dorset compiler for the Dorset programming language.")
 
 find_package(LLVM REQUIRED CONFIG)
 

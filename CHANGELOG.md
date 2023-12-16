@@ -6,6 +6,25 @@ All notable changes to this project will be documented in this file. The format 
 
 Unreleased is the develop branch which includes every unmerged change from the last release version. These changes will be untested and may be potentially unstable, build this version at your own risk.
 
+## [0.2.1-alpha] - 2023-12-16
+
+### Added
+ - Implement the '==' operator.
+ - Can now use expressions for array element index.
+ - Can now use expressions to set array size at initialization.
+
+### Fixed
+ - Bug where unknown variable name would crash dorsetc (potentially introduced in this version).
+
+### Changed 
+ - Libs for each individual component.
+ - Public code uses a namespace ('using namespace Dorset;').
+ - Using 'var' keyword for loop start variable.
+ - Using LLVMs built in array construct instead of keeping track of variables.
+
+### Removed
+ - HTML docs page.
+
 ## [0.2.0-alpha] - 2023-12-14
 
 ### Added
@@ -146,7 +165,8 @@ Unreleased is the develop branch which includes every unmerged change from the l
         - -v: printing the version.
 
 
-[unreleased]: https://github.com/lwhite14/dorset-lang/compare/0.2.0-alpha...develop
+[unreleased]: https://github.com/lwhite14/dorset-lang/compare/0.2.1-alpha...develop
+[0.2.1-alpha]: https://github.com/lwhite14/dorset-lang/releases/tag/0.2.1-alpha
 [0.2.0-alpha]: https://github.com/lwhite14/dorset-lang/releases/tag/0.2.0-alpha
 [0.1.5-alpha]: https://github.com/lwhite14/dorset-lang/releases/tag/0.1.5-alpha
 [0.1.4-alpha]: https://github.com/lwhite14/dorset-lang/releases/tag/0.1.4-alpha
