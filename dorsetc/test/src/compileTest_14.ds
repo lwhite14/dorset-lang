@@ -1,0 +1,24 @@
+fn main() void {
+
+    var numOne = 3;
+    var numTwo = 3;
+
+    if (numOne == numTwo)
+    {
+        print("these two are equal!");
+        newLine();
+    }
+
+    var numThree = 2;
+    var numFour = 4;
+
+    if (numThree == numFour)
+    {
+        // null
+    }
+    else 
+    {
+        print("these two are NOT equal!");
+        newLine();
+    }
+}

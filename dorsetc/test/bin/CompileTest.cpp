@@ -205,3 +205,18 @@ TEST_CASE("Expression in Array Element Index [13]", "[Compile]") // compileTest_
 
 	REQUIRE(i == 0);
 }
+
+TEST_CASE("'==' Operator [14]", "[Compile]") // compileTest_14.ds
+{
+	// Pre Work
+	resetGlobals();
+
+	CompilerOptions options = CompilerOptions({"src/compileTest_14.ds"});
+
+	REQUIRE(options.getHadError() == false);
+
+	Compiler compiler = Compiler(options);
+	int i = compiler.compile();
+
+	REQUIRE(i == 0);
+}

@@ -298,7 +298,7 @@ namespace Dorset
                 return LHS;
 
             // Okay, we know this is a binop.
-            int BinOp = currentToken().getLexeme()[0];
+            std::string BinOp = currentToken().getLexeme();
             advanceToken(); // eat binop
 
             // Parse the unary expression after the binary operator.
@@ -345,18 +345,13 @@ namespace Dorset
             return -1;
         }
 
-        if (currentToken().getLexeme().length() != 1)
-        {
-            return -1;
-        }
-
         if (!isascii(currentToken().getLexeme()[0]))
         {
             return -1;
         }
 
         // Make sure it's a declared binop.
-        int TokPrec = AST::MasterAST::BinopPrecedence[currentToken().getLexeme()[0]];
+        int TokPrec = AST::MasterAST::BinopPrecedence[currentToken().getLexeme()];
         if (TokPrec <= 0)
         {
             return -1;

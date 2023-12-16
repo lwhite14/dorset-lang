@@ -221,14 +221,14 @@ namespace Dorset
             return Index->codegen();
         }
 
-        BinaryExprAST::BinaryExprAST(char Op, ExprAST *LHS, ExprAST *RHS)
+        BinaryExprAST::BinaryExprAST(std::string Op, ExprAST *LHS, ExprAST *RHS)
             : Op(Op), LHS(std::move(LHS)), RHS(std::move(RHS))
         {
         }
 
         Value *BinaryExprAST::codegen()
         {
-            if (Op == '=')
+            if (Op == "=")
             {
                 bool isArray = false;
 
@@ -307,21 +307,27 @@ namespace Dorset
             if (!L || !R)
                 return nullptr;
 
-            if (Op == '+')
+            if (Op == "+")
             {
                 return MasterAST::Builder->CreateFAdd(L, R, "addtmp");
             }
-            else if (Op == '-')
+            else if (Op == "-")
             {
                 return MasterAST::Builder->CreateFSub(L, R, "subtmp");
             }
-            else if (Op == '*')
+            else if (Op == "*")
             {
                 return MasterAST::Builder->CreateFMul(L, R, "multmp");
             }
-            else if (Op == '<')
+            else if (Op == "<")
             {
-                L = MasterAST::Builder->CreateFCmpULT(L, R, "cmptmp");
+                L = MasterAST::Builder->CreateFCmpULT(L, R, "fcmptmp");
+                // Convert bool 0/1 to double 0.0 or 1.0
+                return MasterAST::Builder->CreateUIToFP(L, Type::getDoubleTy(*MasterAST::TheContext), "booltmp");
+            }
+            else if (Op == "==")
+            {
+                L = MasterAST::Builder->CreateFCmpOEQ(L, R, "fcmptmp");
                 // Convert bool 0/1 to double 0.0 or 1.0
                 return MasterAST::Builder->CreateUIToFP(L, Type::getDoubleTy(*MasterAST::TheContext), "booltmp");
             }
@@ -457,10 +463,12 @@ namespace Dorset
             return IsOperator && Args.size() == 2;
         }
 
-        char PrototypeAST::getOperatorName() const
+        std::string PrototypeAST::getOperatorName() const
         {
             assert(isUnaryOp() || isBinaryOp());
-            return Name[Name.size() - 1];
+            std::string returnOp;
+            returnOp.push_back(Name[Name.size() - 1]);
+            return returnOp;
         }
 
         unsigned PrototypeAST::getBinaryPrecedence() const

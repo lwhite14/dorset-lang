@@ -1,11 +1,46 @@
-fn calc(number) double
-{
-    return number * 3 + 4;
-}
+// Calc --- Benchmark Test
+// dorset-lang 0.2.0-alpha.6
 
-fn main() double
-{
-    var x = 3;
-    var y = calc(x);
-    return y;
+fn main() double {
+    var op = 3;
+
+    var Arr[24];
+    for (var i = 0, i < 24, 1.0) {
+        Arr[i] = op;
+    }
+
+    var result = 1;
+
+    for (var i = 0, i < 24, 1.0) {
+
+        if (Arr[i] == 0) {
+            result = result + 1;
+        } 
+        else {
+            if (Arr[i] == 1) {
+                result = result - 1;
+            } 
+            else {
+                if (Arr[i] == 2) {
+                    result = result * i;
+                } 
+                else {   
+                    if (Arr[i] == 3) {
+                        result = result + i;
+                    } 
+                    else {
+                        if (Arr[i] == 4) {
+                            result = result - i;
+                        } 
+                        else {
+                            result = 0;
+                        }
+                    }   
+                }
+            }
+        }
+
+    }
+
+    return result;
 }

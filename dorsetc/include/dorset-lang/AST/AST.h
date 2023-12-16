@@ -129,12 +129,12 @@ namespace Dorset
         /// BinaryExprAST - Expression class for a binary operator.
         class BinaryExprAST : public ExprAST
         {
-            char Op;
+            std::string Op;
             ExprAST *LHS;
             ExprAST *RHS;
 
         public:
-            BinaryExprAST(char Op, ExprAST *LHS, ExprAST *RHS);
+            BinaryExprAST(std::string  Op, ExprAST *LHS, ExprAST *RHS);
             Value *codegen() override;
         };
 
@@ -192,7 +192,7 @@ namespace Dorset
             bool isUnaryOp() const;
             bool isBinaryOp() const;
 
-            char getOperatorName() const;
+            std::string getOperatorName() const;
 
             unsigned getBinaryPrecedence() const;
         };
@@ -272,13 +272,14 @@ namespace Dorset
             static inline std::map<std::string, ArrayExprAST*> Arrays;
             static inline legacy::FunctionPassManager* TheFPM;
             static inline std::map<std::string, PrototypeAST*> FunctionProtos;
-            static inline std::map<char, int> BinopPrecedence =
+            static inline std::map<std::string, int> BinopPrecedence =
             {
-                {'=' , 2},
-                {'<', 10},
-                {'+', 20},
-                {'-', 30},
-                {'*', 40}
+                {"=",  2 },
+                {"==", 4 },
+                {"<",  10},
+                {"+",  20},
+                {"-",  30},
+                {"*",  40}
             };
 
             static void initializeModule(const char* moduleName);
